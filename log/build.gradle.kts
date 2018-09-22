@@ -11,10 +11,10 @@ subprojects {
   }
 }
 tasks {
-  register("buildAll", GradleBuild::class) {
-    setTasks(listOf("build"))
+  register("buildAll") {
+    dependsOn(subprojects.map { it.tasks["build"] })
   }
-  register("cleanAll", GradleBuild::class) {
-    setTasks(listOf("clean"))
+  register("cleanAll") {
+    dependsOn(subprojects.map { it.tasks["clean"] })
   }
 }
