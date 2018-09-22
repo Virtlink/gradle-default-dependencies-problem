@@ -1,10 +1,10 @@
 subprojects {
   group = "org.metaborg"
-  version = "0.1.0-SNAPSHOT"
+  version = "0.2.0-SNAPSHOT"
   repositories {
     mavenCentral()
   }
-  apply(plugin = "java-library")
+  apply(plugin = "java")
   configure<JavaPluginExtension> {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
