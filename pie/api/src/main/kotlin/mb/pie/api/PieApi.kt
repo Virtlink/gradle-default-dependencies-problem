@@ -2,6 +2,6 @@ package mb.pie.api
 
 import mb.log.api.Logger
 
-interface PieAPI {
+interface PieApi {
   fun doPieStuff(logger: Logger)
 }
