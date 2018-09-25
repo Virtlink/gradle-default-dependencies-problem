@@ -1,0 +1,25 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+  kotlin("jvm") version "1.2.70" apply false
+}
+subprojects {
+  group = "org.metaborg"
+  version = "develop-SNAPSHOT"
+  repositories {
+    mavenCentral()
+    jcenter()
+  }
+  apply(plugin = "kotlin")
+  tasks.withType<KotlinCompile>().all {
+    kotlinOptions.jvmTarget = "1.8"
+  }
+}
+tasks {
+  register("buildAll") {
+    dependsOn(subprojects.map { it.tasks["build"] })
+  }
+  register("cleanAll") {
+    dependsOn(subprojects.map { it.tasks["clean"] })
+  }
+}
