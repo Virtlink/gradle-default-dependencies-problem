@@ -1,8 +1,0 @@
-[submodule "external/wuff"]
-  path = external/wuff
-  url = git@github.com:Gohla/wuff.git
-  branch = wip
-[submodule "external/unpuzzle"]
-  path = external/unpuzzle
-  url = git@github.com:Gohla/unpuzzle.git
-  branch = wip
