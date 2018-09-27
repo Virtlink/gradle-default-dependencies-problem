@@ -1,5 +1,6 @@
 package mb.releng.eclipse.mavenize
 
+import mb.releng.eclipse.util.createJarFromDirectory
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils
 import org.eclipse.aether.RepositorySystem
 import org.eclipse.aether.RepositorySystemSession
@@ -19,15 +20,21 @@ import java.nio.file.Path
 
 
 /**
- * Installs bundles as Maven artifacts into a local repository.
+ * Installs Eclipse bundles as Maven artifacts into a local repository.
  */
-class BundleInstaller(repositoryDir: Path, groupId: String) : AutoCloseable {
-  private val converter = BundleConverter(groupId)
+class EclipseBundleInstaller(repositoryDir: Path, groupId: String) : AutoCloseable {
+  private val converter = EclipseBundleConverter(groupId)
   private val tempDir = Files.createTempDirectory("bundle_installer")
   private val system: RepositorySystem
   private val session: RepositorySystemSession
 
   init {
+    if(!Files.exists(repositoryDir)) {
+      Files.createDirectories(repositoryDir)
+    } else if(!Files.isDirectory(repositoryDir)) {
+      throw IOException("Repository at path $repositoryDir is not a directory")
+    }
+
     val locator = MavenRepositorySystemUtils.newServiceLocator()
     locator.addService(RepositoryConnectorFactory::class.java, BasicRepositoryConnectorFactory::class.java)
     locator.addService(TransporterFactory::class.java, FileTransporterFactory::class.java)
@@ -61,13 +68,41 @@ class BundleInstaller(repositoryDir: Path, groupId: String) : AutoCloseable {
   }
 
 
-  fun install(bundleFileOrDirectory: Path) {
+  fun installOneFromJarOrDirectory(bundleJarOrDirectory: Path) {
+    val installRequest = InstallRequest()
+    addToInstallRequest(bundleJarOrDirectory, installRequest)
+    system.install(session, installRequest)
+  }
+
+  fun installAllFromDirectory(directory: Path) {
+    when {
+      !Files.exists(directory) -> {
+        throw IOException("Directory $directory does not exist")
+      }
+      !Files.isDirectory(directory) -> {
+        throw IOException("Directory $directory is not a directory")
+      }
+    }
+    val installRequest = InstallRequest()
+    Files.list(directory).forEach {
+      addToInstallRequest(it, installRequest)
+    }
+    system.install(session, installRequest)
+  }
+
+
+  private fun addToInstallRequest(bundleFileOrDirectory: Path, installRequest: InstallRequest) {
     val bundleJar = when {
       !Files.exists(bundleFileOrDirectory) -> {
         throw IOException("Bundle file or directory $bundleFileOrDirectory does not exist")
       }
       Files.isDirectory(bundleFileOrDirectory) -> {
-        TODO("Convert bundle from directory into a JAR file which can be installed into a Maven repository")
+        val jarFile = Files.createTempFile(tempDir, bundleFileOrDirectory.fileName.toString(), ".jar")
+        Files.newOutputStream(jarFile).buffered().use { outputStream ->
+          createJarFromDirectory(bundleFileOrDirectory, outputStream)
+          outputStream.flush()
+        }
+        jarFile
       }
       else -> {
         bundleFileOrDirectory
@@ -77,6 +112,7 @@ class BundleInstaller(repositoryDir: Path, groupId: String) : AutoCloseable {
 
     var jarArtifact: Artifact = DefaultArtifact(metadata.groupId, metadata.artifactId, "", "jar", metadata.version)
     jarArtifact = jarArtifact.setFile(bundleJar.toFile())
+    installRequest.addArtifact(jarArtifact)
 
     val pomFile = Files.createTempFile(tempDir, "${metadata.artifactId}-${metadata.version}", ".pom")
     Files.newOutputStream(pomFile).buffered().use { outputStream ->
@@ -87,9 +123,6 @@ class BundleInstaller(repositoryDir: Path, groupId: String) : AutoCloseable {
     }
     var pomArtifact: Artifact = SubArtifact(jarArtifact, "", "pom")
     pomArtifact = pomArtifact.setFile(pomFile.toFile())
-
-    val installRequest = InstallRequest()
-    installRequest.addArtifact(jarArtifact).addArtifact(pomArtifact)
-    system.install(session, installRequest)
+    installRequest.addArtifact(pomArtifact)
   }
 }

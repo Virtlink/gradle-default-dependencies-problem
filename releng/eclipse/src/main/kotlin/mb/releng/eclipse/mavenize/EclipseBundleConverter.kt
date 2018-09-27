@@ -7,9 +7,9 @@ import java.util.jar.JarInputStream
 import java.util.jar.Manifest
 
 /**
- * Converts bundle metadata from manifest files into Maven metadata.
+ * Converts Eclipse bundle metadata from manifest files into Maven metadata.
  */
-class BundleConverter(private val groupId: String) {
+class EclipseBundleConverter(private val groupId: String) {
   fun convert(bundleJar: Path): MavenMetadata {
     val manifest: Manifest
     when {
