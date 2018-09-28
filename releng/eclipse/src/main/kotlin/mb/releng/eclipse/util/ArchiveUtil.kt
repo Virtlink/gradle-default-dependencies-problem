@@ -1,6 +1,7 @@
 package mb.releng.eclipse.util
 
 import org.apache.commons.compress.archivers.ArchiveStreamFactory
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -13,9 +14,25 @@ import java.util.jar.JarOutputStream
 import java.util.jar.Manifest
 
 /**
- * Unpacks archive from [inputStream] into [unpackDirectory].
+ * Unpacks archive from [inputStream] into [unpackDirectory], using [fileName] for a file format hint.
  */
-fun unpack(inputStream: InputStream, unpackDirectory: Path) {
+fun unpack(inputStream: InputStream, fileName: String, unpackDirectory: Path) {
+  when {
+    fileName.endsWith(".tar.gz") -> {
+      GzipCompressorInputStream(inputStream).buffered().use { compressorInputStream ->
+        unarchive(compressorInputStream, unpackDirectory)
+      }
+    }
+    fileName.endsWith(".dmg") -> {
+      throw TODO("Cannot unpack $fileName, unpacking DMG files is not yet supported")
+    }
+    else -> {
+      unarchive(inputStream, unpackDirectory)
+    }
+  }
+}
+
+private fun unarchive(inputStream: InputStream, unpackDirectory: Path) {
   ArchiveStreamFactory().createArchiveInputStream(inputStream).use { archiveInputStream ->
     while(true) {
       val entry = archiveInputStream.nextEntry ?: break
