@@ -1,6 +1,7 @@
 package mb.releng.eclipse.mavenize
 
-import mb.releng.eclipse.util.createJarFromDirectory
+import mb.releng.eclipse.util.TempDir
+import mb.releng.eclipse.util.packJar
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils
 import org.eclipse.aether.RepositorySystem
 import org.eclipse.aether.RepositorySystemSession
@@ -13,18 +14,19 @@ import org.eclipse.aether.spi.connector.RepositoryConnectorFactory
 import org.eclipse.aether.spi.connector.transport.TransporterFactory
 import org.eclipse.aether.transport.file.FileTransporterFactory
 import org.eclipse.aether.util.artifact.SubArtifact
+import java.io.Closeable
 import java.io.IOException
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path
 
-
 /**
- * Installs Eclipse bundles as Maven artifacts into a local repository.
+ * Installs Eclipse bundles as Maven artifacts into the local repository at [repositoryDir]. Since Eclipse bundles have
+ * no consistent notion of group IDs, the given [groupId] is used.
  */
-class EclipseBundleInstaller(repositoryDir: Path, groupId: String) : AutoCloseable {
+class EclipseBundleInstaller(repositoryDir: Path, groupId: String) : Closeable {
   private val converter = EclipseBundleConverter(groupId)
-  private val tempDir = Files.createTempDirectory("bundle_installer")
+  private val tempDir = TempDir("bundle_installer")
   private val system: RepositorySystem
   private val session: RepositorySystemSession
 
@@ -61,19 +63,22 @@ class EclipseBundleInstaller(repositoryDir: Path, groupId: String) : AutoCloseab
   }
 
   override fun close() {
-    // Delete contents of temporary directory and the directory itself.
-    Files.walk(tempDir)
-      .sorted(Comparator.reverseOrder())
-      .forEach { Files.deleteIfExists(it) }
+    tempDir.close()
   }
 
 
+  /**
+   * Installs bundle from JAR or directory [bundleJarOrDirectory] into the local repository.
+   */
   fun installOneFromJarOrDirectory(bundleJarOrDirectory: Path) {
     val installRequest = InstallRequest()
     addToInstallRequest(bundleJarOrDirectory, installRequest)
     system.install(session, installRequest)
   }
 
+  /**
+   * Installs all bundles found in [directory] into the local repository.
+   */
   fun installAllFromDirectory(directory: Path) {
     when {
       !Files.exists(directory) -> {
@@ -97,9 +102,9 @@ class EclipseBundleInstaller(repositoryDir: Path, groupId: String) : AutoCloseab
         throw IOException("Bundle file or directory $bundleFileOrDirectory does not exist")
       }
       Files.isDirectory(bundleFileOrDirectory) -> {
-        val jarFile = Files.createTempFile(tempDir, bundleFileOrDirectory.fileName.toString(), ".jar")
+        val jarFile = tempDir.createTempFile(bundleFileOrDirectory.fileName.toString(), ".jar")
         Files.newOutputStream(jarFile).buffered().use { outputStream ->
-          createJarFromDirectory(bundleFileOrDirectory, outputStream)
+          packJar(bundleFileOrDirectory, outputStream)
           outputStream.flush()
         }
         jarFile
@@ -114,7 +119,7 @@ class EclipseBundleInstaller(repositoryDir: Path, groupId: String) : AutoCloseab
     jarArtifact = jarArtifact.setFile(bundleJar.toFile())
     installRequest.addArtifact(jarArtifact)
 
-    val pomFile = Files.createTempFile(tempDir, "${metadata.artifactId}-${metadata.version}", ".pom")
+    val pomFile = tempDir.createTempFile("${metadata.artifactId}-${metadata.version}", ".pom")
     Files.newOutputStream(pomFile).buffered().use { outputStream ->
       PrintWriter(outputStream).use { writer ->
         metadata.toPomXml(writer)

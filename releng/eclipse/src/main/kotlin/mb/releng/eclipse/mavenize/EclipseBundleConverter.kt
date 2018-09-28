@@ -7,9 +7,13 @@ import java.util.jar.JarInputStream
 import java.util.jar.Manifest
 
 /**
- * Converts Eclipse bundle metadata from manifest files into Maven metadata.
+ * Converts Eclipse bundle metadata from manifest files into Maven metadata. Since Eclipse bundles have no consistent
+ * notion of group IDs, the given [groupId] is used.
  */
 class EclipseBundleConverter(private val groupId: String) {
+  /**
+   * Converts Eclipse bundle at [bundleJar] to Maven metadata.
+   */
   fun convert(bundleJar: Path): MavenMetadata {
     val manifest: Manifest
     when {
@@ -22,25 +26,27 @@ class EclipseBundleConverter(private val groupId: String) {
       else -> {
         manifest = Files.newInputStream(bundleJar).buffered().use {
           JarInputStream(it).manifest
-        }
-        if(manifest == null) {
-          throw IOException("Could not get bundle manifest in JAR file $bundleJar")
-        }
+        } ?: throw IOException("Could not get bundle manifest in JAR file $bundleJar")
       }
     }
-    return convert(manifest)
-  }
 
-  fun convert(manifest: Manifest): MavenMetadata {
     val symbolicName = manifest.mainAttributes.getValue("Bundle-SymbolicName")
+      ?: throw IOException("Cannot convert bundle $bundleJar, it does not have a Bundle-SymbolicName attribute")
     val artifactId = when {
       // Symbolic name can contain extra data such as: "org.eclipse.core.runtime; singleton:=true". Take everything before the ;.
       symbolicName.contains(';') -> symbolicName.split(';')[0]
       else -> symbolicName
     }.trim()
-    val version = manifest.mainAttributes.getValue("Bundle-Version").replace(".qualifier", "-SNAPSHOT").trim()
+
+    val version = manifest.mainAttributes.getValue("Bundle-Version")?.replace(".qualifier", "-SNAPSHOT")?.trim()
+      ?: throw IOException("Cannot convert bundle $bundleJar, it does not have a Bundle-Version attribute")
+
     val requireBundle = manifest.mainAttributes.getValue("Require-Bundle")
-    val dependencies = parseOuterRequireBundleString(requireBundle)
+    val dependencies = if(requireBundle != null) {
+      parseOuterRequireBundleString(requireBundle)
+    } else {
+      arrayListOf()
+    }
     return MavenMetadata(groupId, artifactId, version, dependencies)
   }
 
