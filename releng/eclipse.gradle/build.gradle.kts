@@ -4,7 +4,7 @@ plugins {
 gradlePlugin {
   plugins {
     create("eclipse-plugin") {
-      id = "mb.releng.eclipse.gradle.eclipse-plugin"
+      id = "org.metaborg.eclipse-plugin"
       implementationClass = "mb.releng.eclipse.gradle.EclipsePluginPlugin"
     }
   }
