@@ -10,7 +10,7 @@ internal class MavenizeTest {
   @Test
   fun mavenize() {
     val logger = StreamLogger()
-    val mavenizeDirectory = Paths.get("""C:\Users\Gohla\.mavenize\""")
+    val mavenizeDirectory = Paths.get(System.getProperty("user.home"), ".mavenize")
     // Choose path and filename from:
     // * Drops    - http://ftp.fau.de/eclipse/eclipse/downloads/drops4/R-4.8-201806110500/
     // * Releases - http://ftp.fau.de/eclipse/technology/epp/downloads/release/photon/R/
@@ -21,8 +21,8 @@ internal class MavenizeTest {
     val cacheDirectory = mavenizeDirectory.resolve("eclipse_archive_cache")
     val (eclipseBundlesPath, hasUnpacked) = retrieveEclipsePluginBundlesFromArchive(prefix, filenameWithoutExtension, extension, pluginPathInArchive, cacheDirectory, logger)
     if(hasUnpacked) {
-      EclipseBundleInstaller(mavenizeDirectory.resolve("repo"), "eclipse-photon").use {
-        it.installAllFromDirectory(eclipseBundlesPath, logger)
+      EclipseBundleInstaller(mavenizeDirectory.resolve("repo"), "eclipse-photon").use { installer ->
+        installer.installAllFromDirectory(eclipseBundlesPath, logger)
       }
     } else {
       logger.progress("Skipping installation of bundles, as directory $eclipseBundlesPath has not changed")

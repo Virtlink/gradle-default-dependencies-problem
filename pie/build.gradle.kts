@@ -10,9 +10,15 @@ subprojects {
     mavenCentral()
     jcenter()
   }
-  apply(plugin = "kotlin")
+  apply {
+    plugin("kotlin")
+  }
   tasks.withType<KotlinCompile>().all {
     kotlinOptions.jvmTarget = "1.8"
+  }
+  val compile by configurations
+  dependencies {
+    compile(kotlin("stdlib"))
   }
 }
 tasks {

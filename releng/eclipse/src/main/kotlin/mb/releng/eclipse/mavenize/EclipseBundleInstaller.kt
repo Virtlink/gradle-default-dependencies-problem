@@ -45,7 +45,7 @@ class EclipseBundleInstaller(repositoryDir: Path, groupId: String) : Closeable {
     // Uncomment for deployment over HTTP.
     //locator.addService(TransporterFactory::class.java, HttpTransporterFactory::class.java)
 
-    // Uncomment for routing error messages somewhere.
+    // Uncomment for routing service creation error messages somewhere.
     //locator.setErrorHandler(object : DefaultServiceLocator.ErrorHandler() {
     //  fun serviceCreationFailed(type: Class<*>, impl: Class<*>, exception: Throwable) {
     //    LOGGER.error("Service creation failed for {} implementation {}: {}",
