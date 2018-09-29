@@ -1,37 +1,42 @@
 package mb.releng.eclipse.mavenize
 
+import mb.releng.eclipse.util.Logger
+import mb.releng.eclipse.util.deleteNonEmptyDirectory
 import mb.releng.eclipse.util.downloadFileFromUrl
+import mb.releng.eclipse.util.unpack
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
 
 /**
- * Retrieves an Eclipse archive, from [URL] constructed from [mirrorUrl]/[path]/[filename], caching the result in
- * [cacheDirectory]. If an identical Eclipse archive exists in the cache directory (checked against the downloaded
- * sha512 file), nothing is downloaded. Always returns the path to the cached Eclipse archive file.
+ * Retrieves the path to Eclipse bundles by:
+ *
+ * - Using [cacheDirectory] as a directory to cache downloaded and unpacked archives.
+ * - Downloading the archive from [prefix]/[filenameWithoutExtension].[extension] into
+ *   [cacheDirectory]/[filenameWithoutExtension].[extension], if necessary.
+ * - Unpacking the archive into [cacheDirectory]/[filenameWithoutExtension], if necessary.
+ * - Returning [cacheDirectory]/[filenameWithoutExtension]/[pluginPathInArchive].
  */
-fun retrieveEclipseArchive(mirrorUrl: String, path: String, filename: String, cacheDirectory: Path): Path {
-  val cachedShaFile = cacheDirectory.resolve("$filename.sha512")
-  val shaUrl = URL("$mirrorUrl/$path/$filename.sha512")
-  val cachedFile = cacheDirectory.resolve(filename)
-  val url = URL("$mirrorUrl/$path/$filename")
-  val download = if(Files.exists(cachedShaFile) && Files.isRegularFile(cachedShaFile) && Files.exists(cachedFile) && Files.isRegularFile(cachedFile)) {
-    val shaBytes: ByteArray = Files.readAllBytes(cachedShaFile)
-    val downloadedShaBytes = downloadFileFromUrl(shaUrl)
-    !shaBytes.contentEquals(downloadedShaBytes)
-  } else {
-    true
-  }
-  if(download) {
-    Files.createDirectories(cacheDirectory)
-    Files.newOutputStream(cachedShaFile).use {
-      downloadFileFromUrl(shaUrl, it)
-      it.flush()
+fun retrieveEclipsePluginBundlesFromArchive(
+  prefix: String,
+  filenameWithoutExtension: String,
+  extension: String,
+  pluginPathInArchive: Path,
+  cacheDirectory: Path,
+  logger: Logger
+): PluginBundlesResult {
+  val cachedUnpackDirectory = cacheDirectory.resolve(filenameWithoutExtension)
+  val cachedUnpackDirectoryExists = Files.isDirectory(cachedUnpackDirectory)
+  val cachedFile = cacheDirectory.resolve("$filenameWithoutExtension.$extension")
+  val shouldUnpack = downloadFileFromUrl(URL("$prefix/$filenameWithoutExtension.$extension"), cachedFile, logger) || !cachedUnpackDirectoryExists
+  if(shouldUnpack) {
+    if(cachedUnpackDirectoryExists) {
+      deleteNonEmptyDirectory(cachedUnpackDirectory)
     }
-    Files.newOutputStream(cachedFile).use {
-      downloadFileFromUrl(url, it)
-      it.flush()
-    }
+    unpack(cachedFile, cachedUnpackDirectory, logger)
   }
-  return cachedFile
+  val pluginPath = cachedUnpackDirectory.resolve(pluginPathInArchive)
+  return PluginBundlesResult(pluginPath, shouldUnpack)
 }
+
+data class PluginBundlesResult(val pluginPath: Path, val hasUnpacked: Boolean)

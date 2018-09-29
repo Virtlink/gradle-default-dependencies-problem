@@ -1,5 +1,6 @@
 package mb.releng.eclipse.mavenize
 
+import mb.releng.eclipse.util.Logger
 import mb.releng.eclipse.util.TempDir
 import mb.releng.eclipse.util.packJar
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils
@@ -70,16 +71,16 @@ class EclipseBundleInstaller(repositoryDir: Path, groupId: String) : Closeable {
   /**
    * Installs bundle from JAR or directory [bundleJarOrDirectory] into the local repository.
    */
-  fun installOneFromJarOrDirectory(bundleJarOrDirectory: Path) {
+  fun installOneFromJarOrDirectory(bundleJarOrDirectory: Path, logger: Logger) {
     val installRequest = InstallRequest()
-    addToInstallRequest(bundleJarOrDirectory, installRequest)
+    addToInstallRequest(bundleJarOrDirectory, installRequest, logger)
     system.install(session, installRequest)
   }
 
   /**
    * Installs all bundles found in [directory] into the local repository.
    */
-  fun installAllFromDirectory(directory: Path) {
+  fun installAllFromDirectory(directory: Path, logger: Logger) {
     when {
       !Files.exists(directory) -> {
         throw IOException("Directory $directory does not exist")
@@ -88,25 +89,24 @@ class EclipseBundleInstaller(repositoryDir: Path, groupId: String) : Closeable {
         throw IOException("Directory $directory is not a directory")
       }
     }
+    logger.progress("Requesting installation for all bundles in $directory")
     val installRequest = InstallRequest()
     Files.list(directory).forEach {
-      addToInstallRequest(it, installRequest)
+      addToInstallRequest(it, installRequest, logger)
     }
+    logger.progress("Executing installation request")
     system.install(session, installRequest)
   }
 
 
-  private fun addToInstallRequest(bundleFileOrDirectory: Path, installRequest: InstallRequest) {
+  private fun addToInstallRequest(bundleFileOrDirectory: Path, installRequest: InstallRequest, logger: Logger) {
     val bundleJar = when {
       !Files.exists(bundleFileOrDirectory) -> {
         throw IOException("Bundle file or directory $bundleFileOrDirectory does not exist")
       }
       Files.isDirectory(bundleFileOrDirectory) -> {
         val jarFile = tempDir.createTempFile(bundleFileOrDirectory.fileName.toString(), ".jar")
-        Files.newOutputStream(jarFile).buffered().use { outputStream ->
-          packJar(bundleFileOrDirectory, outputStream)
-          outputStream.flush()
-        }
+        packJar(bundleFileOrDirectory, jarFile, logger)
         jarFile
       }
       else -> {
@@ -129,5 +129,7 @@ class EclipseBundleInstaller(repositoryDir: Path, groupId: String) : Closeable {
     var pomArtifact: Artifact = SubArtifact(jarArtifact, "", "pom")
     pomArtifact = pomArtifact.setFile(pomFile.toFile())
     installRequest.addArtifact(pomArtifact)
+
+    logger.progress("Requesting installation for ${bundleJar.fileName}")
   }
 }

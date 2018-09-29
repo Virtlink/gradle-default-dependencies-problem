@@ -34,10 +34,7 @@ class TempDir(prefix: String) : Closeable {
    */
   override fun close() {
     try {
-      // Delete contents of temporary directory, and the directory itself.
-      Files.walk(path)
-        .sorted(Comparator.reverseOrder())
-        .forEach { Files.deleteIfExists(it) }
+      deleteNonEmptyDirectory(path)
     } catch(e: DirectoryNotEmptyException) {
       // For some reason, this exception is thrown even though the directory is empty. Ignore it.
     }
