@@ -8,7 +8,7 @@ import java.nio.file.Path
 /**
  * Downloads file at given [url] into [file]. Skips download if file at [url] and [file] have the same size.
  */
-fun downloadFileFromUrl(url: URL, file: Path, logger: Logger): Boolean {
+fun downloadFileFromUrl(url: URL, file: Path, log: Log): Boolean {
   if(Files.isDirectory(file)) {
     throw IOException("Cannot download file (from $url) into $file, as it is a directory")
   }
@@ -29,10 +29,10 @@ fun downloadFileFromUrl(url: URL, file: Path, logger: Logger): Boolean {
     remoteContentLength != null && remoteContentLength != Files.size(file)
   }
   if(!download) {
-    logger.progress("Skipping download of $url, as file $file has the same size")
+    log.info("Skipping download of $url, as file $file has the same size")
     return false
   }
-  logger.progress("Downloading $url into $file")
+  log.progress("Downloading $url into $file")
   Files.newOutputStream(file).buffered().use { outputStream ->
     connection.getInputStream().buffered().use { inputStream ->
       inputStream.copyTo(outputStream)

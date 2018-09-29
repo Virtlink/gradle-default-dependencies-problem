@@ -1,12 +1,12 @@
-//pluginManagement {
-//  resolutionStrategy {
-//    eachPlugin {
-//      if (requested.id.id.startsWith("mb.releng.eclipse.gradle")) {
-//        useModule("org.metaborg:releng.eclipse.gradle:${requested.version}")
-//      }
-//    }
-//  }
-//}
+pluginManagement {
+  resolutionStrategy {
+    eachPlugin {
+      if(requested.id.id.startsWith("org.metaborg")) {
+        useModule("org.metaborg:releng.eclipse.gradle:${requested.version}")
+      }
+    }
+  }
+}
 
 rootProject.name = "spoofax.eclipse"
 

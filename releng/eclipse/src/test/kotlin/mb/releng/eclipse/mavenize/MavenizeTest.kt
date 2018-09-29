@@ -1,6 +1,6 @@
 package mb.releng.eclipse.mavenize
 
-import mb.releng.eclipse.util.StreamLogger
+import mb.releng.eclipse.util.StreamLog
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.nio.file.Paths
@@ -9,23 +9,23 @@ import java.nio.file.Paths
 internal class MavenizeTest {
   @Test
   fun mavenize() {
-    val logger = StreamLogger()
-    val mavenizeDirectory = Paths.get(System.getProperty("user.home"), ".mavenize")
-    // Choose path and filename from:
-    // * Drops    - http://ftp.fau.de/eclipse/eclipse/downloads/drops4/R-4.8-201806110500/
-    // * Releases - http://ftp.fau.de/eclipse/technology/epp/downloads/release/photon/R/
-    val prefix = "http://ftp.fau.de/eclipse/technology/epp/downloads/release/photon/R/"
-    val filenameWithoutExtension = "eclipse-committers-photon-R-win32-x86_64"
-    val extension = "zip"
-    val pluginPathInArchive = Paths.get("eclipse", "plugins")
-    val cacheDirectory = mavenizeDirectory.resolve("eclipse_archive_cache")
-    val (eclipseBundlesPath, hasUnpacked) = retrieveEclipsePluginBundlesFromArchive(prefix, filenameWithoutExtension, extension, pluginPathInArchive, cacheDirectory, logger)
+    val log = StreamLog()
+    val mavenizeDir = Paths.get(System.getProperty("user.home"), ".mavenize")
+    val eclipseArchiveRetriever = EclipseArchiveRetriever(
+      // Choose file from:
+      // * Drops    - http://ftp.fau.de/eclipse/eclipse/downloads/drops4/R-4.8-201806110500/
+      // * Releases - http://ftp.fau.de/eclipse/technology/epp/downloads/release/photon/R/
+      "http://ftp.fau.de/eclipse/technology/epp/downloads/release/photon/R/eclipse-committers-photon-R-win32-x86_64.zip",
+      mavenizeDir.resolve("eclipse_archive_cache")
+    )
+    val hasUnpacked = eclipseArchiveRetriever.getArchive(log)
+    val eclipseBundlesPath = eclipseArchiveRetriever.unpackDir.resolve(Paths.get("eclipse", "plugins"))
     if(hasUnpacked) {
-      EclipseBundleInstaller(mavenizeDirectory.resolve("repo"), "eclipse-photon").use { installer ->
-        installer.installAllFromDirectory(eclipseBundlesPath, logger)
+      EclipseBundleInstaller(mavenizeDir.resolve("repo"), "eclipse-photon").use { installer ->
+        installer.installAllFromDirectory(eclipseBundlesPath, log)
       }
     } else {
-      logger.progress("Skipping installation of bundles, as directory $eclipseBundlesPath has not changed")
+      log.progress("Skipping installation of bundles, as directory $eclipseBundlesPath has not changed")
     }
   }
 }

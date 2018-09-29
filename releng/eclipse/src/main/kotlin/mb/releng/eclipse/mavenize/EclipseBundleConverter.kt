@@ -14,7 +14,7 @@ class EclipseBundleConverter(private val groupId: String) {
   /**
    * Converts Eclipse bundle at [bundleJar] to Maven metadata.
    */
-  fun convert(bundleJar: Path): MavenMetadata {
+  fun convertBundleJarFile(bundleJar: Path): MavenMetadata {
     val manifest: Manifest
     when {
       !Files.exists(bundleJar) -> {
@@ -29,9 +29,25 @@ class EclipseBundleConverter(private val groupId: String) {
         } ?: throw IOException("Could not get bundle manifest in JAR file $bundleJar")
       }
     }
+    return convertManifest(manifest)
+  }
 
+  /**
+   * Converts Eclipse manifest file [manifestFile] to Maven metadata.
+   */
+  fun convertManifestFile(manifestFile: Path): MavenMetadata {
+    val manifest = Files.newInputStream(manifestFile).buffered().use { inputStream ->
+      Manifest(inputStream)
+    }
+    return convertManifest(manifest)
+  }
+
+  /**
+   * Converts Eclipse [manifest] to Maven metadata.
+   */
+  fun convertManifest(manifest: Manifest): MavenMetadata {
     val symbolicName = manifest.mainAttributes.getValue("Bundle-SymbolicName")
-      ?: throw IOException("Cannot convert bundle $bundleJar, it does not have a Bundle-SymbolicName attribute")
+      ?: throw IOException("Cannot convert manifest, it does not have a Bundle-SymbolicName attribute")
     val artifactId = when {
       // Symbolic name can contain extra data such as: "org.eclipse.core.runtime; singleton:=true". Take everything before the ;.
       symbolicName.contains(';') -> symbolicName.split(';')[0]
@@ -39,7 +55,7 @@ class EclipseBundleConverter(private val groupId: String) {
     }.trim()
 
     val version = manifest.mainAttributes.getValue("Bundle-Version")?.replace(".qualifier", "-SNAPSHOT")?.trim()
-      ?: throw IOException("Cannot convert bundle $bundleJar, it does not have a Bundle-Version attribute")
+      ?: throw IOException("Cannot convert manifest, it does not have a Bundle-Version attribute")
 
     val requireBundle = manifest.mainAttributes.getValue("Require-Bundle")
     val dependencies = if(requireBundle != null) {

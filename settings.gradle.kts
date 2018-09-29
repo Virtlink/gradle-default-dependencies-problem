@@ -5,4 +5,3 @@ includeBuild("log")
 includeBuild("pie")
 includeBuild("spoofax")
 includeBuild("spoofax.eclipse")
-

@@ -39,6 +39,8 @@ data class MavenDependency(
   val version: String,
   val optional: Boolean
 ) {
+  val dependencyString get() = "$groupId:$artifactId:$version"
+
   fun toPomXml(writer: PrintWriter) {
     writer.println("""    <dependency>""")
     writer.println("""      <groupId>$groupId</groupId>""")

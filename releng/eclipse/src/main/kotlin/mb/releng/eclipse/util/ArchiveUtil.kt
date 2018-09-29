@@ -15,34 +15,34 @@ import java.util.jar.Manifest
 /**
  * Unpacks archive from [archiveFile] into [unpackDirectory].
  */
-fun unpack(archiveFile: Path, unpackDirectory: Path, logger: Logger) {
-  logger.progress("Unpacking $archiveFile into $unpackDirectory")
+fun unpack(archiveFile: Path, unpackDirectory: Path, log: Log) {
+  log.progress("Unpacking $archiveFile into $unpackDirectory")
   val path = archiveFile.toString()
   Files.newInputStream(archiveFile).buffered().use { inputStream ->
     when {
       path.endsWith(".tar.gz") -> {
         GzipCompressorInputStream(inputStream).buffered().use { compressorInputStream ->
-          unarchive(compressorInputStream, unpackDirectory, logger)
+          unarchive(compressorInputStream, unpackDirectory, log)
         }
       }
       path.endsWith(".dmg") -> {
         throw TODO("Cannot unpack $path, unpacking DMG files is not yet supported")
       }
       else -> {
-        unarchive(inputStream, unpackDirectory, logger)
+        unarchive(inputStream, unpackDirectory, log)
       }
     }
   }
 }
 
-private fun unarchive(inputStream: InputStream, unpackDirectory: Path, logger: Logger) {
+private fun unarchive(inputStream: InputStream, unpackDirectory: Path, log: Log) {
   Files.createDirectories(unpackDirectory)
   ArchiveStreamFactory().createArchiveInputStream(inputStream).use { archiveInputStream ->
     while(true) {
       val entry = archiveInputStream.nextEntry ?: break
       val name = entry.name
       if(!archiveInputStream.canReadEntryData(entry)) {
-        logger.warning("Cannot unpack entry $name, format/variant not supported")
+        log.warning("Cannot unpack entry $name, format/variant not supported")
       }
       val path = unpackDirectory.resolve(Paths.get(name))
       if(!path.startsWith(unpackDirectory)) {
@@ -63,8 +63,8 @@ private fun unarchive(inputStream: InputStream, unpackDirectory: Path, logger: L
 /**
  * Packs [directory] into JAR file [jarFile].
  */
-fun packJar(directory: Path, jarFile: Path, logger: Logger) {
-  logger.progress("Packing directory $directory into JAR file $jarFile")
+fun packJar(directory: Path, jarFile: Path, log: Log) {
+  log.progress("Packing directory $directory into JAR file $jarFile")
   val manifestFile = directory.resolve("META-INF/MANIFEST.MF")
   val manifest = if(Files.exists(manifestFile) && Files.isRegularFile(manifestFile)) {
     Files.newInputStream(manifestFile).buffered().use {
