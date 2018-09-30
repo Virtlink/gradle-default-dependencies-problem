@@ -115,7 +115,7 @@ class EclipseBundleInstaller(repoDir: Path, groupId: String) : Closeable {
         bundleFileOrDirectory
       }
     }
-    val metadata = converter.convertBundleJarFile(bundleJar)
+    val metadata = converter.convertBundleJarFile(bundleJar, log)
 
     var jarArtifact: Artifact = DefaultArtifact(metadata.groupId, metadata.artifactId, "", "jar", metadata.version)
     jarArtifact = jarArtifact.setFile(bundleJar.toFile())

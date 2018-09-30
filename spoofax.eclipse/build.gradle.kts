@@ -13,6 +13,6 @@ tasks {
   register("cleanAll") {
   }
   register("testEclipsePluginBuild") {
-    dependsOn(project(":spoofax.eclipse.plugin").tasks["mavenizeTargetPlatform"])
+    //dependsOn(project(":spoofax.eclipse.plugin").tasks["mavenizeTargetPlatform"])
   }
 }
