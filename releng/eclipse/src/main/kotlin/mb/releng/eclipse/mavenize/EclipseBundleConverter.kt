@@ -1,168 +1,75 @@
 package mb.releng.eclipse.mavenize
 
 import mb.releng.eclipse.util.Log
-import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Path
-import java.util.jar.JarInputStream
-import java.util.jar.Manifest
 
-/**
- * Converts Eclipse bundle metadata from manifest files into Maven metadata. Since Eclipse bundles have no consistent
- * notion of group IDs, the given [groupId] is used.
- */
 class EclipseBundleConverter(private val groupId: String) {
-  /**
-   * Converts Eclipse bundle at [bundleJar] to Maven metadata.
-   */
-  fun convertBundleJarFile(bundleJar: Path, log: Log): MavenMetadata {
-    val manifest: Manifest
-    when {
-      !Files.exists(bundleJar) -> {
-        throw IOException("Bundle file $bundleJar does not exist")
-      }
-      Files.isDirectory(bundleJar) -> {
-        throw IOException("Bundle file $bundleJar is a directory")
-      }
-      else -> {
-        manifest = Files.newInputStream(bundleJar).buffered().use {
-          JarInputStream(it).manifest
-        } ?: throw IOException("Could not get bundle manifest in JAR file $bundleJar")
-      }
+  fun convert(bundle: Bundle, log: Log): MavenArtifact {
+    val coordinates = bundleToCoordinates(bundle)
+    val dependencies = bundle.requiredBundles.map { convertRequiredBundle(it) }
+    if(bundle.fragmentHost != null) {
+      log.warning("Converting single bundle; ignored fragment host dependency from ${bundle.fragmentHost.name} to ${bundle.name}")
     }
-    return convertManifest(manifest, log)
+    return MavenArtifact(coordinates, dependencies)
   }
 
-  /**
-   * Converts Eclipse manifest file [manifestFile] to Maven metadata.
-   */
-  fun convertManifestFile(manifestFile: Path, log: Log): MavenMetadata {
-    val manifest = Files.newInputStream(manifestFile).buffered().use { inputStream ->
-      Manifest(inputStream)
-    }
-    return convertManifest(manifest, log)
+  fun convertAll(bundles: Iterable<Bundle>): Collection<MavenArtifact> {
+    // TODO: handle fragment host dependencies
   }
 
-  /**
-   * Converts Eclipse [manifest] to Maven metadata.
-   */
-  fun convertManifest(manifest: Manifest, log: Log): MavenMetadata {
-    val symbolicName = manifest.mainAttributes.getValue("Bundle-SymbolicName")
-      ?: throw IOException("Cannot convert manifest, it does not have a Bundle-SymbolicName attribute")
-    val artifactId = when {
-      // Symbolic name can contain extra data such as: "org.eclipse.core.runtime; singleton:=true". Take everything
-      // before the ;.
-      symbolicName.contains(';') -> symbolicName.split(';')[0]
-      else -> symbolicName
-    }.trim()
+  fun convertToInstallable(bundle: BundleWithLocation): InstallableMavenArtifact {
 
-    val version = run {
-      var versionStr = manifest.mainAttributes.getValue("Bundle-Version")
-      if(versionStr == null) {
-        Version.zero()
-      } else {
-        versionStr = versionStr.trim()
-        val version = Version.parse(versionStr)
-        if(version != null) {
-          // Remove qualifier to fix version range matching in Maven and Gradle.
-          version.withoutQualifier()
-        } else {
-          val zero = Version.zero()
-          log.warning("Cannot parse version string $versionStr, defaulting to version $zero")
-          zero
-        }
-      }
-    }
+  }
 
-    val requireBundle = manifest.mainAttributes.getValue("Require-Bundle")
-    val dependencies = if(requireBundle != null) {
-      parseOuterRequireBundleString(requireBundle, log)
-    } else {
-      arrayListOf()
-    }
-    return MavenMetadata(groupId, artifactId, version.toString(), dependencies)
+  fun convertAllToInstallable(bundles: Iterable<BundleWithLocation>): Collection<InstallableMavenArtifact> {
+    // TODO: handle fragment host dependencies
   }
 
 
-  private fun parseOuterRequireBundleString(str: String, log: Log): ArrayList<MavenDependency> {
-    // Can't split on ',', because it also appears inside quoted version ranges. Manually parse to handle quotes.
-    val dependencies = arrayListOf<MavenDependency>()
-    if(str.isEmpty()) {
-      return dependencies
-    }
-    var quoted = false
-    var pos = 0
-    for(i in 0 until str.length) {
-      val char = str[i]
-      when {
-        char == '"' -> quoted = !quoted
-        char == ',' && !quoted -> {
-          val inner = str.substring(pos, i)
-          val dependency = parseInnerRequireBundleString(inner, log)
-          dependencies.add(dependency)
-          pos = i + 1
-        }
-      }
-    }
-    if(quoted) {
-      throw RequireBundleParseException("Failed to parse Require-Bundle string '$str': a quote was not closed")
-    }
-    if(pos < str.length) {
-      val inner = str.substring(pos, str.length)
-      val dependency = parseInnerRequireBundleString(inner, log)
-      dependencies.add(dependency)
-    }
-    return dependencies
+  private fun bundleToCoordinates(bundle: Bundle): Coordinates {
+    val version = convertVersion(bundle.version)
+    return Coordinates(groupId, bundle.name, version)
   }
 
-  private fun parseInnerRequireBundleString(str: String, log: Log): MavenDependency {
-    val elements = str.split(';')
-    if(elements.isEmpty()) {
-      throw RequireBundleParseException("Failed to parse part of Require-Bundle string '$str': it does not have a name element")
+  private fun convertRequiredBundle(requiredBundle: BundleDependency): MavenDependency {
+    val version = convertDependencyVersion(requiredBundle.version)
+    val coordinates = Coordinates(groupId, requiredBundle.name, version, null, null)
+    // TODO: should we set scope with requiredBundle.visibility?
+    return MavenDependency(coordinates, null, requiredBundle.resolution == DependencyResolution.Optional)
+  }
+
+  private fun convertVersion(version: Version?): String {
+    if(version == null) {
+      // Default to the minimum version: '0', when no version could be parsed.
+      return "0"
     }
-    val artifactId = elements[0].trim()
-    var version: String = VersionRange.anyVersionsRange().toString() // By default, depend on any version.
-    var optional = false
-    for(element in elements.subList(1, elements.size)) {
-      when {
-        element.startsWith("bundle-version") -> {
-          val versionStr = run {
-            var versionStr = element.substring(element.indexOf('=') + 1)
-            if(versionStr.startsWith('"')) {
-              versionStr = versionStr.substring(1)
-            }
-            if(versionStr.endsWith('"')) {
-              versionStr = versionStr.substring(0, versionStr.length - 1)
-            }
-            versionStr.trim()
-          }
-          val parsedVersion = Version.parse(versionStr)
-          val parsedVersionRange = VersionRange.parse(versionStr)
-          version = when {
-            parsedVersionRange != null -> parsedVersionRange.toString()
-            parsedVersion != null -> {
-              // Convert exact versions to range from that version to infinity, since that is its semantics in Maven and
-              // Gradle. Remove qualifier to fix version range matching in Maven and Gradle.
-              VersionRange(true, parsedVersion.withoutQualifier(), null, false).toString()
-            }
-            else -> {
-              val allVersionsRange = VersionRange.anyVersionsRange() // By default, depend on any version.
-              log.warning("Failed to parse version requirement $versionStr, defaulting to version requirement $allVersionsRange")
-              allVersionsRange.toString()
-            }
-          }
-        }
-        element.startsWith("resolution") -> {
-          val resolution = element.substring(element.indexOf('=') + 1).trim()
-          if(resolution == "optional") {
-            optional = true
-          }
-        }
-        // TODO: do we need to parse the visibility attribute and use it to set a scope?
+    // Remove qualifier to fix version range matching in Maven and Gradle.
+    @Suppress("NAME_SHADOWING") val version = version.withoutQualifier()
+    // Convert to Maven format. Qualifier can be ignored as it has been removed.
+    val major = version.major
+    val minor = if(version.minor != null) ".${version.minor}" else ""
+    val patch = if(version.micro != null) ".${version.micro}" else ""
+    return "$major$minor$patch"
+  }
+
+  private fun convertVersionRange(versionRange: VersionRange): String {
+    // Remove qualifier to fix version range matching in Maven and Gradle.
+    // Other than that, version ranges match, so just convert to a string.
+    return versionRange.withoutQualifiers().toString()
+  }
+
+  private fun convertDependencyVersion(version: DependencyVersion?): String {
+    return when(version) {
+      is Version -> {
+        // Bundle dependency versions mean version *or higher*, so we convert it into a version range from the version
+        // to anything.
+        convertVersionRange(VersionRange(true, version, null, false))
+      }
+      is VersionRange -> convertVersionRange(version)
+      null -> {
+        // No explicit bundle dependency version means *any version*, so we convert it into a version range from '0'
+        // to anything.
+        convertVersionRange(VersionRange(true, Version.zero(), null, false))
       }
     }
-    return MavenDependency(groupId, artifactId, version, optional)
   }
 }
-
-class RequireBundleParseException(message: String) : Exception(message)

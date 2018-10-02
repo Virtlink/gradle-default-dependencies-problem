@@ -4,7 +4,7 @@ import mb.releng.eclipse.gradle.util.GradleLog
 import mb.releng.eclipse.gradle.util.closureOf
 import mb.releng.eclipse.mavenize.EclipseArchiveRetriever
 import mb.releng.eclipse.mavenize.EclipseBundleConverter
-import mb.releng.eclipse.mavenize.EclipseBundleInstaller
+import mb.releng.eclipse.mavenize.MavenArtifactInstaller
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
@@ -35,11 +35,13 @@ class EclipsePlugin : Plugin<Project> {
     val eclipseArchiveRetriever = EclipseArchiveRetriever(url, mavenizeDir.resolve("eclipse_archive_cache"))
     val hasUnpacked = eclipseArchiveRetriever.getArchive(log)
     if(hasUnpacked) {
-      EclipseBundleInstaller(repoDir, groupId).use {
+      MavenArtifactInstaller(repoDir, groupId).use {
         val pluginsDir = eclipseArchiveRetriever.unpackDir.resolve(Paths.get("eclipse", "plugins"))
         it.installAllFromDirectory(pluginsDir, log)
       }
     }
+
+    // Add Mavenized repository to project repositories.
     project.repositories(closureOf<RepositoryHandler> {
       // HACK: get instance of BaseRepositoryFactory so that we can manually add a custom Maven repository.
       // From: https://discuss.gradle.org/t/how-can-i-get-hold-of-the-gradle-instance-of-the-repository-factory/6943/6

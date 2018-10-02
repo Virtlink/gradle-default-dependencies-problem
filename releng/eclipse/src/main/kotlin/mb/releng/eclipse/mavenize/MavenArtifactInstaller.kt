@@ -25,7 +25,7 @@ import java.nio.file.Path
  * Installs Eclipse bundles as Maven artifacts into the local repository at [repositoryDir]. Since Eclipse bundles have
  * no consistent notion of group IDs, the given [groupId] is used.
  */
-class EclipseBundleInstaller(repoDir: Path, groupId: String) : Closeable {
+class MavenArtifactInstaller(repoDir: Path, groupId: String) : Closeable {
   val repoGroupIdDir: Path = repoDir.resolve(groupId)
 
   private val converter = EclipseBundleConverter(groupId)

@@ -21,7 +21,7 @@ internal class MavenizeTest {
     val hasUnpacked = eclipseArchiveRetriever.getArchive(log)
     val eclipseBundlesPath = eclipseArchiveRetriever.unpackDir.resolve(Paths.get("eclipse", "plugins"))
     if(hasUnpacked) {
-      EclipseBundleInstaller(mavenizeDir.resolve("repo"), "eclipse-photon").use { installer ->
+      MavenArtifactInstaller(mavenizeDir.resolve("repo"), "eclipse-photon").use { installer ->
         installer.installAllFromDirectory(eclipseBundlesPath, log)
       }
     } else {
