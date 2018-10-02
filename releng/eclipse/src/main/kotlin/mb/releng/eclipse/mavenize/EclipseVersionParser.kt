@@ -47,7 +47,7 @@ data class VersionRange(val minInclusive: Boolean, val minVersion: Version, val 
       return VersionRange(minChr == "[", minVer, maxVer, maxChr == "]")
     }
 
-    fun allVersionsRange(): VersionRange {
+    fun anyVersionsRange(): VersionRange {
       return VersionRange(true, Version.zero(), null, false)
     }
   }

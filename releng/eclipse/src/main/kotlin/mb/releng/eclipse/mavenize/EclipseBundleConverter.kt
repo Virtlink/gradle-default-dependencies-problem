@@ -50,7 +50,8 @@ class EclipseBundleConverter(private val groupId: String) {
     val symbolicName = manifest.mainAttributes.getValue("Bundle-SymbolicName")
       ?: throw IOException("Cannot convert manifest, it does not have a Bundle-SymbolicName attribute")
     val artifactId = when {
-      // Symbolic name can contain extra data such as: "org.eclipse.core.runtime; singleton:=true". Take everything before the ;.
+      // Symbolic name can contain extra data such as: "org.eclipse.core.runtime; singleton:=true". Take everything
+      // before the ;.
       symbolicName.contains(';') -> symbolicName.split(';')[0]
       else -> symbolicName
     }.trim()
@@ -63,7 +64,7 @@ class EclipseBundleConverter(private val groupId: String) {
         versionStr = versionStr.trim()
         val version = Version.parse(versionStr)
         if(version != null) {
-          // Remove qualifier to fix version range matching.
+          // Remove qualifier to fix version range matching in Maven and Gradle.
           version.withoutQualifier()
         } else {
           val zero = Version.zero()
@@ -84,7 +85,7 @@ class EclipseBundleConverter(private val groupId: String) {
 
 
   private fun parseOuterRequireBundleString(str: String, log: Log): ArrayList<MavenDependency> {
-    // can't split on ',', because ',' also appears inside version ranges
+    // Can't split on ',', because it also appears inside quoted version ranges. Manually parse to handle quotes.
     val dependencies = arrayListOf<MavenDependency>()
     if(str.isEmpty()) {
       return dependencies
@@ -120,29 +121,32 @@ class EclipseBundleConverter(private val groupId: String) {
       throw RequireBundleParseException("Failed to parse part of Require-Bundle string '$str': it does not have a name element")
     }
     val artifactId = elements[0].trim()
-    var version: String = VersionRange.allVersionsRange().toString()
+    var version: String = VersionRange.anyVersionsRange().toString() // By default, depend on any version.
     var optional = false
     for(element in elements.subList(1, elements.size)) {
       when {
         element.startsWith("bundle-version") -> {
-          var versionStr = element.substring(element.indexOf('=') + 1)
-          if(versionStr.startsWith('"')) {
-            versionStr = versionStr.substring(1)
+          val versionStr = run {
+            var versionStr = element.substring(element.indexOf('=') + 1)
+            if(versionStr.startsWith('"')) {
+              versionStr = versionStr.substring(1)
+            }
+            if(versionStr.endsWith('"')) {
+              versionStr = versionStr.substring(0, versionStr.length - 1)
+            }
+            versionStr.trim()
           }
-          if(versionStr.endsWith('"')) {
-            versionStr = versionStr.substring(0, versionStr.length - 1)
-          }
-          versionStr = versionStr.trim()
           val parsedVersion = Version.parse(versionStr)
           val parsedVersionRange = VersionRange.parse(versionStr)
           version = when {
             parsedVersionRange != null -> parsedVersionRange.toString()
             parsedVersion != null -> {
-              // Convert exact functions to range from that version to infinity. Remove qualifier to fix range matching.
+              // Convert exact versions to range from that version to infinity, since that is its semantics in Maven and
+              // Gradle. Remove qualifier to fix version range matching in Maven and Gradle.
               VersionRange(true, parsedVersion.withoutQualifier(), null, false).toString()
             }
             else -> {
-              val allVersionsRange = VersionRange.allVersionsRange()
+              val allVersionsRange = VersionRange.anyVersionsRange() // By default, depend on any version.
               log.warning("Failed to parse version requirement $versionStr, defaulting to version requirement $allVersionsRange")
               allVersionsRange.toString()
             }

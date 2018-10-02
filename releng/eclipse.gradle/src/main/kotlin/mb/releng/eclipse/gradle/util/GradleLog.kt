@@ -1,4 +1,4 @@
-package mb.releng.eclipse.gradle
+package mb.releng.eclipse.gradle.util
 
 import mb.releng.eclipse.util.Log
 import org.gradle.api.logging.Logger
