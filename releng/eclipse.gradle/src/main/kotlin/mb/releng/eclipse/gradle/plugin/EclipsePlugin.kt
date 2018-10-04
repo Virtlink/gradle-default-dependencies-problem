@@ -2,9 +2,9 @@ package mb.releng.eclipse.gradle.plugin
 
 import mb.releng.eclipse.gradle.util.GradleLog
 import mb.releng.eclipse.gradle.util.closureOf
-import mb.releng.eclipse.mavenize.EclipseArchiveRetriever
-import mb.releng.eclipse.mavenize.EclipseBundleConverter
-import mb.releng.eclipse.mavenize.EclipseBundleInstaller
+import mb.releng.eclipse.mavenize.Bundle
+import mb.releng.eclipse.mavenize.EclipseBundleToMavenArtifact
+import mb.releng.eclipse.mavenize.Mavenizer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
@@ -19,10 +19,6 @@ class EclipsePlugin : Plugin<Project> {
 
     project.pluginManager.apply("java")
 
-    val groupId = "eclipse-photon"
-    val mavenizeDir = Paths.get(System.getProperty("user.home"), ".mavenize")
-    val repoDir = mavenizeDir.resolve("repo")
-
     // HACK: eagerly download and Mavenize bundles from Eclipse archive, as they must be available for dependency
     // resolution, which may or may not happen in the configuration phase. This costs at least one HTTP request per
     // configuration phase, to check if we need to download and Mavenize a new Eclipse archive.
@@ -32,14 +28,13 @@ class EclipsePlugin : Plugin<Project> {
      * - Releases : http://ftp.fau.de/eclipse/technology/epp/downloads/release/photon/R/
      */
     val url = "http://ftp.fau.de/eclipse/technology/epp/downloads/release/photon/R/eclipse-committers-photon-R-win32-x86_64.zip"
-    val eclipseArchiveRetriever = EclipseArchiveRetriever(url, mavenizeDir.resolve("eclipse_archive_cache"))
-    val hasUnpacked = eclipseArchiveRetriever.getArchive(log)
-    if(hasUnpacked) {
-      EclipseBundleInstaller(repoDir, groupId).use {
-        val pluginsDir = eclipseArchiveRetriever.unpackDir.resolve(Paths.get("eclipse", "plugins"))
-        it.installAllFromDirectory(pluginsDir, log)
-      }
-    }
+    val groupId = "eclipse-photon"
+    val mavenizeDir = Paths.get(System.getProperty("user.home"), ".mavenize")
+    val mavenizer = Mavenizer(mavenizeDir, groupId, log)
+    mavenizer.mavenize(url)
+    val repoDir = mavenizer.repoDir
+
+    // Add Mavenized repository to project repositories.
     project.repositories(closureOf<RepositoryHandler> {
       // HACK: get instance of BaseRepositoryFactory so that we can manually add a custom Maven repository.
       // From: https://discuss.gradle.org/t/how-can-i-get-hold-of-the-gradle-instance-of-the-repository-factory/6943/6
@@ -54,11 +49,13 @@ class EclipsePlugin : Plugin<Project> {
     // Apply dependencies from MANIFEST.MF file, if any.
     val manifestFile = project.file("META-INF/MANIFEST.MF").toPath()
     if(Files.isRegularFile(manifestFile)) {
-      val eclipseBundleConverter = EclipseBundleConverter(groupId)
-      val mavenMetadata = eclipseBundleConverter.convertManifestFile(manifestFile, log)
-      for(dependency in mavenMetadata.dependencies) {
+      val bundle = Bundle.readFromManifestFile(manifestFile, log)
+      val converter = EclipseBundleToMavenArtifact(groupId)
+      val mavenArtifact = converter.convert(bundle, log)
+
+      for(dependency in mavenArtifact.dependencies) {
         val configuration = if(dependency.optional) "compileOnly" else "compile"
-        project.dependencies.add(configuration, dependency.dependencyString)
+        project.dependencies.add(configuration, dependency.asGradleDependency)
       }
     } else {
       project.logger.warn("Project has no 'META-INF/MANIFEST.MF' file, cannot configure Eclipse plugin dependencies")

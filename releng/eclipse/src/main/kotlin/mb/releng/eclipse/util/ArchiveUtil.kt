@@ -16,7 +16,6 @@ import java.util.jar.Manifest
  * Unpacks archive from [archiveFile] into [unpackDirectory].
  */
 fun unpack(archiveFile: Path, unpackDirectory: Path, log: Log) {
-  log.progress("Unpacking $archiveFile into $unpackDirectory")
   val path = archiveFile.toString()
   Files.newInputStream(archiveFile).buffered().use { inputStream ->
     when {
@@ -63,8 +62,7 @@ private fun unarchive(inputStream: InputStream, unpackDirectory: Path, log: Log)
 /**
  * Packs [directory] into JAR file [jarFile].
  */
-fun packJar(directory: Path, jarFile: Path, log: Log) {
-  log.progress("Packing directory $directory into JAR file $jarFile")
+fun packJar(directory: Path, jarFile: Path) {
   val manifestFile = directory.resolve("META-INF/MANIFEST.MF")
   val manifest = if(Files.exists(manifestFile) && Files.isRegularFile(manifestFile)) {
     Files.newInputStream(manifestFile).buffered().use {
