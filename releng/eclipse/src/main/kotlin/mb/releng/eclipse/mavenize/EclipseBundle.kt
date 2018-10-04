@@ -32,7 +32,8 @@ data class Bundle(
   val name: String,
   val version: Version?,
   val requiredBundles: Collection<BundleDependency>,
-  val fragmentHost: BundleDependency?
+  val fragmentHost: BundleDependency?,
+  val sourceBundleFor: BundleDependency?
 ) {
   companion object {
     fun read(jarFileOrDir: Path, log: Log): Bundle {
@@ -101,7 +102,14 @@ data class Bundle(
         null
       }
 
-      return Bundle(name, version, requiredBundles, fragmentHost)
+      val sourceBundleStr = manifest.mainAttributes.getValue("Eclipse-SourceBundle")
+      val sourceBundleFor = if(sourceBundleStr != null) {
+        BundleDependency.parseInner(sourceBundleStr, log)
+      } else {
+        null
+      }
+
+      return Bundle(name, version, requiredBundles, fragmentHost, sourceBundleFor)
     }
   }
 }
@@ -156,7 +164,8 @@ data class BundleDependency(
       for(element in elements.subList(1, elements.size)) {
         @Suppress("NAME_SHADOWING") val element = element.trim()
         when {
-          element.startsWith("bundle-version") -> {
+          // HACK: support parsing Eclipse-SourceBundle by accepting 'version' elements.
+          element.startsWith("bundle-version") || element.startsWith("version") -> {
             // Expected format: version="<str>", strip to <str>.
             version = DependencyVersion.parse(stripElement(element), log)
           }

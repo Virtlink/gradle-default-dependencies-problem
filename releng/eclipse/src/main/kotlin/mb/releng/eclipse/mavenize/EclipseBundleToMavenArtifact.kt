@@ -40,6 +40,7 @@ class EclipseBundleToInstallableMavenArtifact(private val groupId: String, priva
 
   fun convertAll(bundles: Iterable<BundleWithLocation>, log: Log): Collection<InstallableMavenArtifact> {
     val fragmentEmulator = FragmentEmulator(bundles.map { it.bundle })
+    // TODO: add source bundles as subartifact.
     return bundles
       .map {
         val emulatedBundle = fragmentEmulator.emulateFor(it.bundle)
@@ -72,7 +73,8 @@ class EclipseBundleToInstallableMavenArtifact(private val groupId: String, priva
 internal interface EclipseBundleToMaven {
   fun bundleToCoordinates(bundle: Bundle, groupId: String): Coordinates {
     val version = convertVersion(bundle.version)
-    return Coordinates(groupId, bundle.name, version)
+    val classifier = if(bundle.sourceBundleFor != null) "sources" else null
+    return Coordinates(groupId, bundle.name, version, classifier)
   }
 
   fun convertRequiredBundle(requiredBundle: BundleDependency, groupId: String): MavenDependency {
