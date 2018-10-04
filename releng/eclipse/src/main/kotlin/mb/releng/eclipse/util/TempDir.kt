@@ -34,7 +34,7 @@ class TempDir(prefix: String) : Closeable {
    */
   override fun close() {
     try {
-      deleteNonEmptyDirectory(path)
+      deleteNonEmptyDirectoryIfExists(path)
     } catch(e: DirectoryNotEmptyException) {
       // For some reason, this exception is thrown even though the directory is empty. Ignore it.
     }

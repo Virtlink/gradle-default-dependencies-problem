@@ -1,8 +1,7 @@
 package mb.releng.eclipse.mavenize
 
 import mb.releng.eclipse.util.Log
-import mb.releng.eclipse.util.TempDir
-import mb.releng.eclipse.util.packJar
+import mb.releng.eclipse.util.deleteNonEmptyDirectoryIfExists
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils
 import org.eclipse.aether.RepositorySystem
 import org.eclipse.aether.RepositorySystemSession
@@ -15,21 +14,14 @@ import org.eclipse.aether.spi.connector.RepositoryConnectorFactory
 import org.eclipse.aether.spi.connector.transport.TransporterFactory
 import org.eclipse.aether.transport.file.FileTransporterFactory
 import org.eclipse.aether.util.artifact.SubArtifact
-import java.io.Closeable
 import java.io.IOException
-import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path
 
 /**
- * Installs Eclipse bundles as Maven artifacts into the local repository at [repositoryDir]. Since Eclipse bundles have
- * no consistent notion of group IDs, the given [groupId] is used.
+ * Installs Maven artifacts into [repoDir].
  */
-class MavenArtifactInstaller(repoDir: Path, groupId: String) : Closeable {
-  val repoGroupIdDir: Path = repoDir.resolve(groupId)
-
-  private val converter = EclipseBundleConverter(groupId)
-  private val tempDir = TempDir("bundle_installer")
+class MavenArtifactInstaller(val repoDir: Path) {
   private val system: RepositorySystem
   private val session: RepositorySystemSession
 
@@ -65,73 +57,38 @@ class MavenArtifactInstaller(repoDir: Path, groupId: String) : Closeable {
     //session.repositoryListener = ConsoleRepositoryListener()
   }
 
-  override fun close() {
-    tempDir.close()
-  }
 
-
-  /**
-   * Installs bundle from JAR or directory [bundleJarOrDirectory] into the local repository.
-   */
-  fun installOneFromJarOrDirectory(bundleJarOrDirectory: Path, log: Log) {
+  fun install(artifact: InstallableMavenArtifact, log: Log) {
     val installRequest = InstallRequest()
-    addToInstallRequest(bundleJarOrDirectory, installRequest, log)
+    installRequest.requestInstallOf(artifact)
+    log.progress("Executing installation request")
     system.install(session, installRequest)
   }
 
-  /**
-   * Installs all bundles found in [directory] into the local repository.
-   */
-  fun installAllFromDirectory(directory: Path, log: Log) {
-    when {
-      !Files.exists(directory) -> {
-        throw IOException("Directory $directory does not exist")
-      }
-      !Files.isDirectory(directory) -> {
-        throw IOException("Directory $directory is not a directory")
-      }
-    }
-    log.progress("Requesting installation for all bundles in $directory")
+  fun installAll(artifacts: Iterable<InstallableMavenArtifact>, log: Log) {
     val installRequest = InstallRequest()
-    Files.list(directory).forEach {
-      addToInstallRequest(it, installRequest, log)
+    artifacts.forEach { artifact ->
+      installRequest.requestInstallOf(artifact)
     }
     log.progress("Executing installation request")
     system.install(session, installRequest)
   }
 
+  fun delete(groupId: String) {
+    deleteNonEmptyDirectoryIfExists(repoDir.resolve(groupId))
+  }
 
-  private fun addToInstallRequest(bundleFileOrDirectory: Path, installRequest: InstallRequest, log: Log) {
-    val bundleJar = when {
-      !Files.exists(bundleFileOrDirectory) -> {
-        throw IOException("Bundle file or directory $bundleFileOrDirectory does not exist")
-      }
-      Files.isDirectory(bundleFileOrDirectory) -> {
-        val jarFile = tempDir.createTempFile(bundleFileOrDirectory.fileName.toString(), ".jar")
-        packJar(bundleFileOrDirectory, jarFile, log)
-        jarFile
-      }
-      else -> {
-        bundleFileOrDirectory
-      }
+
+  private fun InstallRequest.requestInstallOf(installableMavenArtifact: InstallableMavenArtifact) {
+    val artifact: Artifact = run {
+      val primaryArtifact = installableMavenArtifact.primaryArtifact
+      val coords = primaryArtifact.coordinates
+      DefaultArtifact(coords.groupId, coords.id, coords.classifier, coords.extension, coords.version, null, primaryArtifact.file.toFile())
     }
-    val metadata = converter.convertBundleJarFile(bundleJar, log)
+    addArtifact(artifact)
 
-    var jarArtifact: Artifact = DefaultArtifact(metadata.groupId, metadata.artifactId, "", "jar", metadata.version)
-    jarArtifact = jarArtifact.setFile(bundleJar.toFile())
-    installRequest.addArtifact(jarArtifact)
-
-    val pomFile = tempDir.createTempFile("${metadata.artifactId}-${metadata.version}", ".pom")
-    Files.newOutputStream(pomFile).buffered().use { outputStream ->
-      PrintWriter(outputStream).use { writer ->
-        metadata.toPomXml(writer)
-        writer.flush()
-      }
+    for(subArtifact in installableMavenArtifact.subArtifacts) {
+      addArtifact(SubArtifact(artifact, subArtifact.classifier, subArtifact.extension, subArtifact.file.toFile()))
     }
-    var pomArtifact: Artifact = SubArtifact(jarArtifact, "", "pom")
-    pomArtifact = pomArtifact.setFile(pomFile.toFile())
-    installRequest.addArtifact(pomArtifact)
-
-    log.debug("Requesting installation for ${bundleJar.fileName}")
   }
 }

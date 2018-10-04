@@ -1,41 +1,40 @@
 package mb.releng.eclipse.mavenize
 
-import mb.releng.eclipse.util.Log
-import mb.releng.eclipse.util.deleteNonEmptyDirectory
-import mb.releng.eclipse.util.downloadFileFromUrl
-import mb.releng.eclipse.util.unpack
+import mb.releng.eclipse.util.*
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
 
-class EclipseArchiveRetriever(private val url: String, cacheDir: Path) {
-  val archiveFile: Path
-  val unpackDir: Path
-
-  init {
-    val filename = run {
-      val index = url.lastIndexOf('/')
-      if(index == -1) {
-        error("Cannot retrieve Eclipse plugin bundles for URL $url, it has no filename")
-      }
-      url.substring(index + 1)
+/**
+ * Retrieves an Eclipse archive and unpacks it.
+ */
+fun retrieveEclipseArchive(urlStr: String, cacheDir: Path, forceDownload: Boolean, log: Log): EclipseArchive {
+  val filename = run {
+    val index = urlStr.lastIndexOf('/')
+    if(index == -1) {
+      error("Cannot retrieve Eclipse plugin bundles for URL $urlStr, it has no filename")
     }
-    unpackDir = cacheDir.resolve(filename.replace('.', '_'))
-    archiveFile = cacheDir.resolve(filename)
+    urlStr.substring(index + 1)
   }
+  val unpackDir = cacheDir.resolve(filename.replace('.', '_'))
+  val archiveFile = cacheDir.resolve(filename)
 
-  /**
-   * Retrieves an Eclipse archive and unpacks it. Returns true if something was unpacked, false otherwise.
-   */
-  fun getArchive(log: Log): Boolean {
-    val unpackDirExists = Files.isDirectory(unpackDir)
-    val shouldUnpack = downloadFileFromUrl(URL(url), archiveFile, log) || !unpackDirExists
-    if(shouldUnpack) {
-      if(unpackDirExists) {
-        deleteNonEmptyDirectory(unpackDir)
-      }
-      unpack(archiveFile, unpackDir, log)
-    }
-    return shouldUnpack
+  val url = URL(urlStr)
+  val shouldDownload = forceDownload || shouldDownload(url, archiveFile)
+  if(shouldDownload) {
+    log.progress("Downloading $url into $archiveFile")
+    downloadFileFromUrl(url, archiveFile)
   }
+  val unpackDirExists = Files.isDirectory(unpackDir)
+  val shouldUnpack = shouldDownload || !unpackDirExists
+  if(shouldUnpack) {
+    if(unpackDirExists) {
+      deleteNonEmptyDirectoryIfExists(unpackDir)
+    }
+    log.progress("Unpacking $archiveFile into $unpackDir")
+    unpack(archiveFile, unpackDir, log)
+  }
+  return EclipseArchive(unpackDir, shouldUnpack)
 }
+
+data class EclipseArchive(val unpackDir: Path, val wasUnpacked: Boolean)

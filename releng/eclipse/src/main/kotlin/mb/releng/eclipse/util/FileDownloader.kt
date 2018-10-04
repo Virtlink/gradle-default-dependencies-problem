@@ -6,14 +6,30 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 /**
- * Downloads file at given [url] into [file]. Skips download if file at [url] and [file] have the same size.
+ * Downloads file at given [url] into [file].
  */
-fun downloadFileFromUrl(url: URL, file: Path, log: Log): Boolean {
+fun downloadFileFromUrl(url: URL, file: Path) {
   if(Files.isDirectory(file)) {
     throw IOException("Cannot download file (from $url) into $file, as it is a directory")
   }
   val connection = url.openConnection()
-  val download = if(!Files.exists(file)) {
+  Files.newOutputStream(file).buffered().use { outputStream ->
+    connection.getInputStream().buffered().use { inputStream ->
+      inputStream.copyTo(outputStream)
+    }
+    outputStream.flush()
+  }
+}
+
+/**
+ * Checks if file at [url] should be downloaded into [file]. Returns false if files are of the same size.
+ */
+fun shouldDownload(url: URL, file: Path): Boolean {
+  if(Files.isDirectory(file)) {
+    throw IOException("Cannot check if $url should be downloaded into $file, as it is a directory")
+  }
+  val connection = url.openConnection()
+  return if(!Files.exists(file)) {
     val parent = file.parent
     if(parent != null) {
       Files.createDirectories(parent)
@@ -25,19 +41,7 @@ fun downloadFileFromUrl(url: URL, file: Path, log: Log): Boolean {
     } catch(_: NumberFormatException) {
       null
     }
-    // TODO: also check last modified date?
     remoteContentLength != null && remoteContentLength != Files.size(file)
+    // TODO: also check last modified date?
   }
-  if(!download) {
-    log.info("Skipping download of $url, as file $file has the same size")
-    return false
-  }
-  log.progress("Downloading $url into $file")
-  Files.newOutputStream(file).buffered().use { outputStream ->
-    connection.getInputStream().buffered().use { inputStream ->
-      inputStream.copyTo(outputStream)
-    }
-    outputStream.flush()
-  }
-  return true
 }
