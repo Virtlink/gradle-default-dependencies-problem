@@ -10,5 +10,7 @@ dependencies {
   testRuntime("org.junit.jupiter:junit-jupiter-engine:5.3.1")
 }
 tasks.withType<Test> {
-  useJUnitPlatform {}
+  useJUnitPlatform {
+    excludeTags.add("longRunning")
+  }
 }

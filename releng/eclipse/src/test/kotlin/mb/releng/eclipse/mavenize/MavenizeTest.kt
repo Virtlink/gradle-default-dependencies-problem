@@ -1,13 +1,14 @@
 package mb.releng.eclipse.mavenize
 
 import mb.releng.eclipse.util.StreamLog
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.nio.file.Paths
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MavenizeTest {
-  @Test
+  @Test @Tag("longRunning")
   fun mavenize() {
     val log = StreamLog()
     /**
@@ -19,6 +20,6 @@ class MavenizeTest {
     val groupId = "eclipse-photon"
     val mavenizeDir = Paths.get(System.getProperty("user.home"), ".mavenize")
     val mavenizer = Mavenizer(mavenizeDir, groupId, log)
-    //mavenizer.mavenize(url, true, true)
+    mavenizer.mavenize(url, true, true)
   }
 }

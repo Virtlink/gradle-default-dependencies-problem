@@ -2,8 +2,8 @@ package mb.releng.eclipse.gradle.util
 
 import groovy.lang.Closure
 
-// It seems to be impossible to use the `kotlin-dsl` plugin, causing all kinds of compiler errors. Importing functions
-// from the Kotlin DSL project directly also seems impossible. For now, we copy them.
+// HACK: it seems to be impossible to use the `kotlin-dsl` plugin, causing all kinds of compiler errors. Importing
+// functions from the Kotlin DSL project directly also seems impossible. For now, we copy them.
 
 /*
  * Copyright 2016 the original author or authors.
