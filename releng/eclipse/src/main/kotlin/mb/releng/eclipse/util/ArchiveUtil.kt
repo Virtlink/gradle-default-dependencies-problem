@@ -73,6 +73,7 @@ fun packJar(directory: Path, jarFile: Path) {
     manifest.mainAttributes[Attributes.Name.MANIFEST_VERSION] = "1.0"
     manifest
   }
+  createParentDirectories(jarFile)
   Files.newOutputStream(jarFile).buffered().use { outputStream ->
     JarOutputStream(outputStream, manifest).use { jarOutputStream ->
       val paths = Files.walk(directory)

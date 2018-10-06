@@ -51,7 +51,7 @@ class EclipsePlugin : Plugin<Project> {
     if(Files.isRegularFile(manifestFile)) {
       val bundle = Bundle.readFromManifestFile(manifestFile, log)
       val converter = EclipseBundleToMavenArtifact(groupId)
-      val mavenArtifact = converter.convert(bundle, log)
+      val mavenArtifact = converter.convert(bundle)
 
       for(dependency in mavenArtifact.dependencies) {
         val configuration = if(dependency.optional) "compileOnly" else "compile"

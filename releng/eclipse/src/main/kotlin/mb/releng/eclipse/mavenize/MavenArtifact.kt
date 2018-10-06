@@ -58,10 +58,10 @@ data class PrimaryArtifact(
  */
 data class SubArtifact(
   val classifier: String?,
-  val extension: String,
+  val extension: String?,
   val file: Path
 ) {
-  override fun toString() = "${classifier ?: ""}.$extension"
+  override fun toString() = "${classifier ?: ""}${if(extension != null) ".$extension" else ""}@$file"
 }
 
 /**

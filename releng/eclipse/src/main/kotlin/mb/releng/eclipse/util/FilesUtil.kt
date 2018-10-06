@@ -10,3 +10,10 @@ fun deleteNonEmptyDirectoryIfExists(directory: Path) {
     .sorted(Comparator.reverseOrder())
     .forEach { Files.deleteIfExists(it) }
 }
+
+fun createParentDirectories(path: Path) {
+  val parent = path.parent
+  if(parent != null) {
+    Files.createDirectories(parent)
+  }
+}

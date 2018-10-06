@@ -12,6 +12,7 @@ fun downloadFileFromUrl(url: URL, file: Path) {
   if(Files.isDirectory(file)) {
     throw IOException("Cannot download file (from $url) into $file, as it is a directory")
   }
+  createParentDirectories(file)
   val connection = url.openConnection()
   Files.newOutputStream(file).buffered().use { outputStream ->
     connection.getInputStream().buffered().use { inputStream ->
@@ -30,10 +31,6 @@ fun shouldDownload(url: URL, file: Path): Boolean {
   }
   val connection = url.openConnection()
   return if(!Files.exists(file)) {
-    val parent = file.parent
-    if(parent != null) {
-      Files.createDirectories(parent)
-    }
     true
   } else {
     val remoteContentLength = try {
