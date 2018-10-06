@@ -1,5 +1,6 @@
 plugins {
   `java-gradle-plugin`
+  `kotlin-dsl`
 }
 dependencies {
   compile(project(":releng.eclipse"))

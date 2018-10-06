@@ -11,7 +11,7 @@ public class SampleHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		MessageDialog.openInformation(window.getShell(), "Spoofax Eclipse Plugin", "Hello, Eclipse world");
+		MessageDialog.openInformation(window.getShell(), "Spoofax Eclipse Plugin", "Hello, Eclipse world, from Gradle!");
 		return null;
 	}
 }
