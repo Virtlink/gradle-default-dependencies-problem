@@ -12,8 +12,8 @@ rootProject.name = "spoofax.eclipse"
 
 include("spoofax.eclipse.plugin")
 include("spoofax.eclipse.feature")
-include("spoofax.eclipse.updatesite")
+include("spoofax.eclipse.repository")
 
 project(":spoofax.eclipse.plugin").projectDir = file("plugin")
 project(":spoofax.eclipse.feature").projectDir = file("feature")
-project(":spoofax.eclipse.updatesite").projectDir = file("updatesite")
+project(":spoofax.eclipse.repository").projectDir = file("repository")
