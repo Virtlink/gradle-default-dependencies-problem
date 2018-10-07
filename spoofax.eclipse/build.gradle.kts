@@ -9,11 +9,10 @@ subprojects {
 tasks {
   register("buildAll") {
     dependsOn(project(":spoofax.eclipse.plugin").tasks["build"])
+    dependsOn(project(":spoofax.eclipse.feature").tasks["build"])
   }
   register("cleanAll") {
     dependsOn(project(":spoofax.eclipse.plugin").tasks["clean"])
-  }
-  register("testEclipsePluginBuild") {
-    //dependsOn(project(":spoofax.eclipse.plugin").tasks["mavenizeTargetPlatform"])
+    dependsOn(project(":spoofax.eclipse.feature").tasks["clean"])
   }
 }

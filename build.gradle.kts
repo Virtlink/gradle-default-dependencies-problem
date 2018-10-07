@@ -8,7 +8,4 @@ tasks {
   register("runSpoofaxCli") {
     dependsOn(gradle.includedBuild("spoofax").task(":spoofax.cli:run"))
   }
-  register("testEclipsePluginBuild") {
-    dependsOn(gradle.includedBuild("spoofax.eclipse").task(":testEclipsePluginBuild"))
-  }
 }
