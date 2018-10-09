@@ -1,5 +1,6 @@
 package mb.releng.eclipse.mavenize
 
+import mb.releng.eclipse.model.Version
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path
@@ -130,3 +131,6 @@ fun createPomSubArtifact(pomFile: Path, coordinates: Coordinates, dependencies: 
   }
   return SubArtifact(null, "pom", pomFile)
 }
+
+fun Version.toMavenVersion() =
+  "$major${if(minor != null) ".$minor" else ""}${if(micro != null) ".$micro" else ""}${if(qualifier != null) "-$qualifier" else ""}"

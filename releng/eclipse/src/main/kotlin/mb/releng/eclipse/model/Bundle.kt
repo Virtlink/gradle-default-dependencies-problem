@@ -1,4 +1,4 @@
-package mb.releng.eclipse.mavenize
+package mb.releng.eclipse.model
 
 import mb.releng.eclipse.util.Log
 import java.io.IOException
@@ -7,7 +7,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.jar.JarInputStream
 import java.util.jar.Manifest
-import java.util.regex.Pattern
 import java.util.stream.Collectors
 
 data class BundleWithLocation(val bundle: Bundle, val location: Path) {
@@ -116,7 +115,7 @@ data class Bundle(
 
 data class BundleDependency(
   val name: String,
-  val version: DependencyVersion?,
+  val versionOrRange: VersionOrRange?,
   val resolution: DependencyResolution,
   val visibility: DependencyVisibility
 ) {
@@ -158,7 +157,7 @@ data class BundleDependency(
         throw RequireBundleParseException("Failed to parse part of Require-Bundle string '$str': it does not have a name element")
       }
       val name = elements[0].trim()
-      var version: DependencyVersion? = null
+      var versionOrRange: VersionOrRange? = null
       var resolution = DependencyResolution.Mandatory
       var visibility = DependencyVisibility.Private
       for(element in elements.subList(1, elements.size)) {
@@ -167,7 +166,7 @@ data class BundleDependency(
           // HACK: support parsing Eclipse-SourceBundle by accepting 'version' elements.
           element.startsWith("bundle-version") || element.startsWith("version") -> {
             // Expected format: version="<str>", strip to <str>.
-            version = DependencyVersion.parse(stripElement(element), log)
+            versionOrRange = VersionOrRange.parse(stripElement(element), log)
           }
           element.startsWith("resolution") -> {
             // Expected format: resolution:="<str>", strip to <str>.
@@ -180,7 +179,7 @@ data class BundleDependency(
           // TODO: do we need to parse the visibility attribute and use it to set a scope?
         }
       }
-      return BundleDependency(name, version, resolution, visibility)
+      return BundleDependency(name, versionOrRange, resolution, visibility)
     }
 
     private fun stripElement(element: String): String {
@@ -196,8 +195,8 @@ data class BundleDependency(
   }
 
   override fun toString(): String {
-    val versionStr = if(version != null) {
-      "bundle-version=\"$version\","
+    val versionStr = if(versionOrRange != null) {
+      "bundle-version=\"$versionOrRange\","
     } else {
       ""
     }
@@ -208,23 +207,6 @@ data class BundleDependency(
 }
 
 class RequireBundleParseException(message: String) : Exception(message)
-
-sealed class DependencyVersion {
-  companion object {
-    internal fun parse(str: String, log: Log): DependencyVersion? {
-      val parsedVersion = Version.parse(str)
-      if(parsedVersion != null) {
-        return parsedVersion
-      }
-      val parsedVersionRange = VersionRange.parse(str)
-      if(parsedVersionRange != null) {
-        return parsedVersionRange
-      }
-      log.warning("Failed to parse dependency version '$str', defaulting to no version (matches any version)")
-      return null
-    }
-  }
-}
 
 enum class DependencyResolution {
   Mandatory,
@@ -242,8 +224,8 @@ enum class DependencyResolution {
 
     internal fun toString(resolution: DependencyResolution): String {
       return when(resolution) {
-        DependencyResolution.Mandatory -> "mandatory"
-        DependencyResolution.Optional -> "optional"
+        Mandatory -> "mandatory"
+        Optional -> "optional"
       }
     }
   }
@@ -265,69 +247,10 @@ enum class DependencyVisibility {
 
     internal fun toString(visibility: DependencyVisibility): String {
       return when(visibility) {
-        DependencyVisibility.Private -> "private"
-        DependencyVisibility.Reexport -> "reexport"
+        Private -> "private"
+        Reexport -> "reexport"
       }
     }
   }
 }
 
-data class Version(
-  val major: Int,
-  val minor: Int?,
-  val micro: Int?,
-  val qualifier: String?
-) : DependencyVersion() {
-  companion object {
-    private val pattern = Pattern.compile("""(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:\.(.+))?""")
-
-    fun parse(str: String): Version? {
-      val matcher = pattern.matcher(str)
-      if(!matcher.matches()) return null
-      val major = matcher.group(1)?.toInt() ?: return null
-      val minor = matcher.group(2)?.toInt()
-      val micro = matcher.group(3)?.toInt()
-      val qualifier = matcher.group(4)
-      return Version(major, minor, micro, qualifier)
-    }
-
-    fun zero() = Version(0, null, null, null)
-  }
-
-  fun withoutQualifier() = Version(major, minor, micro, null)
-
-  override fun toString() =
-    "$major${if(minor != null) ".$minor" else ""}${if(micro != null) ".$micro" else ""}${if(qualifier != null) ".$qualifier" else ""}"
-}
-
-data class VersionRange(
-  val minInclusive: Boolean,
-  val minVersion: Version,
-  val maxVersion: Version?,
-  val maxInclusive: Boolean
-) : DependencyVersion() {
-  companion object {
-    private val pattern = Pattern.compile("""([\[\(])(.+)\w*,\w*(.*)([\]\)])""")
-
-    fun parse(str: String): VersionRange? {
-      val matcher = pattern.matcher(str)
-      if(!matcher.matches()) return null
-      val minChr = matcher.group(1) ?: return null
-      val minVerStr = matcher.group(2) ?: return null
-      val minVer = Version.parse(minVerStr) ?: return null
-      val maxVerStr = matcher.group(3)
-      val maxVer = Version.parse(maxVerStr)
-      val maxChr = matcher.group(4) ?: return null
-      return VersionRange(minChr == "[", minVer, maxVer, maxChr == "]")
-    }
-
-    fun anyVersionsRange() = VersionRange(true, Version.zero(), null, false)
-  }
-
-  fun withoutQualifiers() =
-    VersionRange(minInclusive, minVersion.withoutQualifier(), maxVersion?.withoutQualifier(), maxInclusive)
-
-  override fun toString(): String {
-    return "${if(minInclusive) "[" else "("}$minVersion,${maxVersion ?: ""}${if(maxInclusive) "]" else ")"}"
-  }
-}

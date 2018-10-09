@@ -2,8 +2,8 @@ package mb.releng.eclipse.gradle.plugin
 
 import mb.releng.eclipse.gradle.util.GradleLog
 import mb.releng.eclipse.gradle.util.closureOf
-import mb.releng.eclipse.mavenize.Bundle
-import mb.releng.eclipse.mavenize.EclipseBuildProperties
+import mb.releng.eclipse.model.Bundle
+import mb.releng.eclipse.model.BuildProperties
 import mb.releng.eclipse.mavenize.EclipseBundleToMavenArtifact
 import mb.releng.eclipse.mavenize.Mavenizer
 import org.gradle.api.Plugin
@@ -20,23 +20,17 @@ import org.gradle.kotlin.dsl.getByName
 import org.gradle.language.jvm.tasks.ProcessResources
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.*
 
 class EclipsePlugin : Plugin<Project> {
   override fun apply(project: Project) {
-    project.addExtensions()
     project.afterEvaluate { this.configure() }
   }
 
-
-  private fun Project.addExtensions() {
-
-  }
-
   private fun Project.configure() {
-    val log = GradleLog(this.logger)
-
+    this.pluginManager.apply(EclipseBasePlugin::class)
     this.pluginManager.apply(JavaPlugin::class)
+
+    val log = GradleLog(this.logger)
 
     // HACK: eagerly download and Mavenize bundles from Eclipse archive, as they must be available for dependency
     // resolution, which may or may not happen in the configuration phase. This costs at least one HTTP request per
@@ -67,7 +61,7 @@ class EclipsePlugin : Plugin<Project> {
       })
     }
 
-    val jarTask = this.tasks.getByName<Jar>("jar")
+    val jarTask = this.tasks.getByName<Jar>(JavaPlugin.JAR_TASK_NAME)
 
     // Process META-INF/MANIFEST.MF file, if any.
     val manifestFile = this.file("META-INF/MANIFEST.MF").toPath()
@@ -88,9 +82,9 @@ class EclipsePlugin : Plugin<Project> {
     val properties = run {
       val propertiesFile = this.file("build.properties").toPath()
       if(Files.isRegularFile(propertiesFile)) {
-        EclipseBuildProperties.read(propertiesFile)
+        BuildProperties.read(propertiesFile)
       } else {
-        EclipseBuildProperties.eclipsePluginDefaults()
+        BuildProperties.eclipsePluginDefaults()
       }
     }
     configure<SourceSetContainer> {
@@ -104,12 +98,16 @@ class EclipsePlugin : Plugin<Project> {
         }
       }
     }
-    this.tasks.getByName<ProcessResources>("processResources") {
+    this.tasks.getByName<ProcessResources>(JavaPlugin.PROCESS_RESOURCES_TASK_NAME) {
       from(this@configure.projectDir) {
         for(resource in properties.binaryIncludes) {
           include(resource)
         }
       }
+    }
+
+    artifacts {
+      add("plugin", jarTask)
     }
   }
 }

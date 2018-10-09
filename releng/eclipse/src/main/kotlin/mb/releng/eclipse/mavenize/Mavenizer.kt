@@ -1,5 +1,6 @@
 package mb.releng.eclipse.mavenize
 
+import mb.releng.eclipse.model.BundleWithLocation
 import mb.releng.eclipse.util.Log
 import mb.releng.eclipse.util.TempDir
 import java.nio.file.Path

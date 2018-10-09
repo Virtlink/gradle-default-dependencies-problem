@@ -1,5 +1,6 @@
 package mb.releng.eclipse.mavenize
 
+import mb.releng.eclipse.model.*
 import mb.releng.eclipse.util.Log
 import mb.releng.eclipse.util.TempDir
 import mb.releng.eclipse.util.packJar
@@ -138,7 +139,7 @@ private fun bundleToCoordinates(bundle: Bundle, groupId: String): Coordinates {
 }
 
 private fun convertRequiredBundle(requiredBundle: BundleDependency, groupId: String): MavenDependency {
-  val version = convertDependencyVersion(requiredBundle.version)
+  val version = convertDependencyVersion(requiredBundle.versionOrRange)
   val coordinates = Coordinates(groupId, requiredBundle.name, version, null, null)
   // HACK: Ignore requiredBundle.visibility, since it cannot be supported by Maven, because it would require a scope
   // that IS included in the compile classpath, IS NOT transitively propagated in the compile classpath, BUT IS
@@ -167,14 +168,14 @@ private fun convertVersionRange(versionRange: VersionRange): String {
   return versionRange.withoutQualifiers().toString()
 }
 
-private fun convertDependencyVersion(version: DependencyVersion?): String {
-  return when(version) {
+private fun convertDependencyVersion(versionOrRange: VersionOrRange?): String {
+  return when(versionOrRange) {
     is Version -> {
       // Bundle dependency versions mean version *or higher*, so we convert it into a version range from the version
       // to anything.
-      convertVersionRange(VersionRange(true, version, null, false))
+      convertVersionRange(VersionRange(true, versionOrRange, null, false))
     }
-    is VersionRange -> convertVersionRange(version)
+    is VersionRange -> convertVersionRange(versionOrRange)
     null -> {
       // No explicit bundle dependency version means *any version*, so we convert it into a version range from '0'
       // to anything.
