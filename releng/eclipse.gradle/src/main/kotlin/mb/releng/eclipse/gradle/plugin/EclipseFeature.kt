@@ -1,5 +1,6 @@
 package mb.releng.eclipse.gradle.plugin
 
+import mb.releng.eclipse.gradle.util.GradleLog
 import mb.releng.eclipse.mavenize.toMavenVersion
 import mb.releng.eclipse.model.BuildProperties
 import mb.releng.eclipse.model.Feature
@@ -21,11 +22,15 @@ class EclipseFeature : Plugin<Project> {
     project.pluginManager.apply(BasePlugin::class)
     project.pluginManager.apply(EclipseBasePlugin::class)
 
+    val log = GradleLog(project.logger)
+
     // Process feature.xml file.
     val featureXmlFile = project.file("feature.xml").toPath()
     if(Files.isRegularFile(featureXmlFile)) {
       val feature = Feature.read(featureXmlFile)
-      // TODO: id is ignored, since we cannot change name of the project any more at this point.
+      if(project.name != feature.id) {
+        log.warning("Project name ${project.name} and feature ID ${feature.id} do no match; feature JAR name will not match the feature ID")
+      }
       // Set project version if it it has not been set yet.
       if(project.version == Project.DEFAULT_VERSION) {
         project.version = feature.version.toMavenVersion()
