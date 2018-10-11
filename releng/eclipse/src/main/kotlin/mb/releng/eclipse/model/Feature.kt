@@ -35,10 +35,10 @@ data class Feature(
       val label = featureNode.attributes.getNamedItem("label")?.nodeValue
 
       val pluginNodes = featureNode.childNodes
-      val pluginDependencies = mutableListOf<PluginDependency>()
+      val dependencies = mutableListOf<PluginDependency>()
       for(i in 0 until pluginNodes.length) {
         val pluginNode = pluginNodes.item(i)
-        if (pluginNode.nodeType != Node.ELEMENT_NODE) continue
+        if(pluginNode.nodeType != Node.ELEMENT_NODE) continue
         val depId = pluginNode.attributes.getNamedItem("id")?.nodeValue
           ?: error("Cannot parse feature XML; plugin node has no 'id' attribute")
         val depVersionStr = pluginNode.attributes.getNamedItem("version")?.nodeValue
@@ -46,10 +46,10 @@ data class Feature(
         val depVersion = Version.parse(depVersionStr)
           ?: error("Cannot parse feature XML; could not parse version '$depVersionStr'")
         val unpack = pluginNode.attributes.getNamedItem("unpack")?.nodeValue?.toBoolean() ?: false
-        pluginDependencies.add(PluginDependency(depId, depVersion, unpack))
+        dependencies.add(PluginDependency(depId, depVersion, unpack))
       }
 
-      return Feature(id, version, label, pluginDependencies)
+      return Feature(id, version, label, dependencies)
     }
   }
 }

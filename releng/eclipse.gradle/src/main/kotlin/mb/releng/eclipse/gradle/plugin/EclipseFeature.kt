@@ -31,11 +31,10 @@ class EclipseFeature : Plugin<Project> {
       if(project.name != feature.id) {
         log.warning("Project name ${project.name} and feature ID ${feature.id} do no match; feature JAR name will not match the feature ID")
       }
-      // Set project version if it it has not been set yet.
       if(project.version == Project.DEFAULT_VERSION) {
+        // Set project version only if it it has not been set yet.
         project.version = feature.version.toMavenVersion()
       }
-      // Add plugin dependencies.
       for(dependency in feature.dependencies) {
         val depNotation = "${project.group}:${dependency.id}:${dependency.version.toMavenVersion()}"
         project.dependencies.add(EclipseBasePlugin.pluginConfigurationName, depNotation)

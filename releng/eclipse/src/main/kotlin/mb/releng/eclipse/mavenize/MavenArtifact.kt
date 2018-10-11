@@ -133,4 +133,4 @@ fun createPomSubArtifact(pomFile: Path, coordinates: Coordinates, dependencies: 
 }
 
 fun Version.toMavenVersion() =
-  "$major${if(minor != null) ".$minor" else ""}${if(micro != null) ".$micro" else ""}${if(qualifier != null) "-$qualifier" else ""}"
+  "$major${if(minor != null) ".$minor" else ""}${if(micro != null) ".$micro" else ""}${if(qualifier != null) "-${qualifier.replace("qualifier", "SNAPSHOT")}" else ""}"

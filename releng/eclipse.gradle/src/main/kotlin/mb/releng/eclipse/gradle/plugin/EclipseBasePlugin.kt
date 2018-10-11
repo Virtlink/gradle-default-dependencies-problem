@@ -5,8 +5,9 @@ import org.gradle.api.Project
 
 class EclipseBasePlugin : Plugin<Project> {
   companion object {
-    const val pluginConfigurationName = "plugin"
-    const val featureConfigurationName = "feature"
+    const val pluginConfigurationName = "eclipse-plugin"
+    const val featureConfigurationName = "eclipse-feature"
+    const val repositoryConfigurationName = "eclipse-repository"
   }
 
   override fun apply(project: Project) {
@@ -14,6 +15,9 @@ class EclipseBasePlugin : Plugin<Project> {
       setTransitive(false)
     }
     project.configurations.create(featureConfigurationName) {
+      setTransitive(false)
+    }
+    project.configurations.create(repositoryConfigurationName) {
       setTransitive(false)
     }
   }

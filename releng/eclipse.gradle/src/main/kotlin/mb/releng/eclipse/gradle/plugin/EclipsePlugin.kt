@@ -4,6 +4,7 @@ import mb.releng.eclipse.gradle.util.GradleLog
 import mb.releng.eclipse.gradle.util.closureOf
 import mb.releng.eclipse.mavenize.EclipseBundleToMavenArtifact
 import mb.releng.eclipse.mavenize.Mavenizer
+import mb.releng.eclipse.mavenize.toMavenVersion
 import mb.releng.eclipse.model.BuildProperties
 import mb.releng.eclipse.model.Bundle
 import org.gradle.api.Plugin
@@ -70,6 +71,11 @@ class EclipsePlugin : Plugin<Project> {
       val bundle = Bundle.readFromManifestFile(manifestFile, log)
       val converter = EclipseBundleToMavenArtifact(mavenizeGroupId)
       val mavenArtifact = converter.convert(bundle)
+      if(project.version == Project.DEFAULT_VERSION) {
+        // Set project version only if it it has not been set yet.
+        // TODO: version from EclipseBundleToMavenArtifact does not have a qualifier as it has been stripped; fix this!
+        project.version = mavenArtifact.coordinates.version
+      }
       for(dependency in mavenArtifact.dependencies) {
         val configuration = if(dependency.optional) {
           JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
