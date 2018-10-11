@@ -2,16 +2,17 @@ package mb.releng.eclipse.gradle.plugin
 
 import mb.releng.eclipse.gradle.util.GradleLog
 import mb.releng.eclipse.gradle.util.closureOf
-import mb.releng.eclipse.model.Bundle
-import mb.releng.eclipse.model.BuildProperties
 import mb.releng.eclipse.mavenize.EclipseBundleToMavenArtifact
 import mb.releng.eclipse.mavenize.Mavenizer
+import mb.releng.eclipse.model.BuildProperties
+import mb.releng.eclipse.model.Bundle
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.internal.artifacts.BaseRepositoryFactory
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.apply
@@ -23,14 +24,14 @@ import java.nio.file.Paths
 
 class EclipsePlugin : Plugin<Project> {
   override fun apply(project: Project) {
-    project.afterEvaluate { this.configure() }
+    project.afterEvaluate { configure(this) }
   }
 
-  private fun Project.configure() {
-    this.pluginManager.apply(EclipseBasePlugin::class)
-    this.pluginManager.apply(JavaPlugin::class)
+  private fun configure(project: Project) {
+    project.pluginManager.apply(EclipseBasePlugin::class)
+    project.pluginManager.apply(JavaPlugin::class)
 
-    val log = GradleLog(this.logger)
+    val log = GradleLog(project.logger)
 
     // HACK: eagerly download and Mavenize bundles from Eclipse archive, as they must be available for dependency
     // resolution, which may or may not happen in the configuration phase. This costs at least one HTTP request per
@@ -50,7 +51,7 @@ class EclipsePlugin : Plugin<Project> {
     // Add Mavenized repository to project repositories.
     // HACK: get instance of BaseRepositoryFactory so that we can manually add a custom Maven repository.
     // From: https://discuss.gradle.org/t/how-can-i-get-hold-of-the-gradle-instance-of-the-repository-factory/6943/6
-    run {
+    project.run {
       val repositoryFactory = (this as ProjectInternal).services.get(BaseRepositoryFactory::class.java)
       this.repositories(closureOf<RepositoryHandler> {
         val mavenRepo = repositoryFactory.createMavenRepository()
@@ -61,53 +62,56 @@ class EclipsePlugin : Plugin<Project> {
       })
     }
 
-    val jarTask = this.tasks.getByName<Jar>(JavaPlugin.JAR_TASK_NAME)
+    val jarTask = project.tasks.getByName<Jar>(JavaPlugin.JAR_TASK_NAME)
 
     // Process META-INF/MANIFEST.MF file, if any.
-    val manifestFile = this.file("META-INF/MANIFEST.MF").toPath()
+    val manifestFile = project.file("META-INF/MANIFEST.MF").toPath()
     if(Files.isRegularFile(manifestFile)) {
       val bundle = Bundle.readFromManifestFile(manifestFile, log)
       val converter = EclipseBundleToMavenArtifact(mavenizeGroupId)
       val mavenArtifact = converter.convert(bundle)
       for(dependency in mavenArtifact.dependencies) {
-        val configuration = if(dependency.optional) "compileOnly" else "compile"
-        dependencies.add(configuration, dependency.asGradleDependency)
+        val configuration = if(dependency.optional) {
+          JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
+        } else {
+          JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME
+        }
+        project.dependencies.add(configuration, dependency.asGradleDependency)
       }
       jarTask.manifest.from(manifestFile)
     } else {
-      error("Cannot configure Eclipse plugin; project $this has no 'META-INF/MANIFEST.MF' file")
+      error("Cannot configure Eclipse plugin; project $project has no 'META-INF/MANIFEST.MF' file")
     }
 
     // Process build properties.
     val properties = run {
-      val propertiesFile = this.file("build.properties").toPath()
+      val propertiesFile = project.file("build.properties").toPath()
       if(Files.isRegularFile(propertiesFile)) {
         BuildProperties.read(propertiesFile)
       } else {
         BuildProperties.eclipsePluginDefaults()
       }
     }
-    configure<SourceSetContainer> {
-      val main = getByName("main")
-      main.java {
+    project.configure<SourceSetContainer> {
+      val mainSourceSet = getByName(SourceSet.MAIN_SOURCE_SET_NAME)
+      mainSourceSet.java {
         if(!properties.sourceDirs.isEmpty()) {
           setSrcDirs(properties.sourceDirs)
         }
         if(properties.outputDir != null) {
-          outputDir = this@configure.file(properties.outputDir!!)
+          outputDir = project.file(properties.outputDir!!)
         }
       }
     }
-    this.tasks.getByName<ProcessResources>(JavaPlugin.PROCESS_RESOURCES_TASK_NAME) {
-      from(this@configure.projectDir) {
+    project.tasks.getByName<ProcessResources>(JavaPlugin.PROCESS_RESOURCES_TASK_NAME) {
+      from(project.projectDir) {
         for(resource in properties.binaryIncludes) {
           include(resource)
         }
       }
     }
-
-    artifacts {
-      add("plugin", jarTask)
+    project.artifacts {
+      add(EclipseBasePlugin.pluginConfigurationName, jarTask)
     }
   }
 }
