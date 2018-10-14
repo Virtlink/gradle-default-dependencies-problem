@@ -1,0 +1,1085 @@
+Initialized native services in: C:\Users\Gohla\.gradle\native
+Found daemon DaemonInfo{pid=14576, address=[2b4400db-41f1-4636-a044-fc7d6d8cb50e port:54746, addresses:[/127.0.0.1, /0:0:0:0:0:0:0:1]], state=Idle, lastBusy=1539541032496, context=DefaultDaemonContext[uid=57a09825-ca74-46a5-9f3d-7ba79e4288b7,javaHome=C:\Program Files\Java\jdk1.8.0_181,daemonRegistryDir=C:\Users\Gohla\.gradle\daemon,pid=14576,idleTimeout=10800000,daemonOpts=-Dfile.encoding=windows-1252,-Duser.country=US,-Duser.language=en,-Duser.variant]} however its context does not match the desired criteria.
+At least one daemon option is different.
+Wanted: DefaultDaemonContext[uid=null,javaHome=C:\Program Files\Java\jdk1.8.0_181,daemonRegistryDir=C:\Users\Gohla\.gradle\daemon,pid=15568,idleTimeout=null,daemonOpts=-XX:+HeapDumpOnOutOfMemoryError,-Xmx1024m,-Dfile.encoding=windows-1252,-Duser.country=US,-Duser.language=en,-Duser.variant]
+Actual: DefaultDaemonContext[uid=57a09825-ca74-46a5-9f3d-7ba79e4288b7,javaHome=C:\Program Files\Java\jdk1.8.0_181,daemonRegistryDir=C:\Users\Gohla\.gradle\daemon,pid=14576,idleTimeout=10800000,daemonOpts=-Dfile.encoding=windows-1252,-Duser.country=US,-Duser.language=en,-Duser.variant]
+
+  Looking for a different daemon...
+The client will now receive all logging from the daemon (pid: 1284). The daemon log file: C:\Users\Gohla\.gradle\daemon\4.10.2\daemon-1284.out.log
+Starting 26th build in daemon [uptime: 1 hrs 22 mins 47.067 secs, performance: 100%, no major garbage collections]
+Using 12 worker leases.
+Starting Build
+Settings evaluated using settings file 'C:\Dev\spoofax-composite-build\settings.gradle.kts'.
+Projects loaded. Root project using build file 'C:\Dev\spoofax-composite-build\build.gradle.kts'.
+Included projects: [root project 'spoofax-composite-build']
+[composite-build] Configuring build: C:\Dev\spoofax-composite-build\releng
+
+> Configure project :releng
+Evaluating project ':releng' using build file 'C:\Dev\spoofax-composite-build\releng\build.gradle.kts'.
+
+> Configure project :releng:releng.eclipse
+Evaluating project ':releng:releng.eclipse' using build file 'C:\Dev\spoofax-composite-build\releng\eclipse\build.gradle.kts'.
+
+> Configure project :releng:releng.eclipse.gradle
+Evaluating project ':releng:releng.eclipse.gradle' using build file 'C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build.gradle.kts'.
+Registering project ':releng' in composite build. Will substitute for module ':releng'.
+Registering project ':releng:releng.eclipse' in composite build. Will substitute for module 'org.metaborg:releng.eclipse'.
+Registering project ':releng:releng.eclipse.gradle' in composite build. Will substitute for module 'org.metaborg:releng.eclipse.gradle'.
+[composite-build] Configuring build: C:\Dev\spoofax-composite-build\log
+
+> Configure project :log
+Evaluating project ':log' using build file 'C:\Dev\spoofax-composite-build\log\build.gradle.kts'.
+
+> Configure project :log:log.api
+Evaluating project ':log:log.api' using build file 'C:\Dev\spoofax-composite-build\log\api\build.gradle.kts'.
+
+> Configure project :log:log.slf4j
+Evaluating project ':log:log.slf4j' using build file 'C:\Dev\spoofax-composite-build\log\slf4j\build.gradle.kts'.
+Registering project ':log' in composite build. Will substitute for module ':log'.
+Registering project ':log:log.api' in composite build. Will substitute for module 'org.metaborg:log.api'.
+Registering project ':log:log.slf4j' in composite build. Will substitute for module 'org.metaborg:log.slf4j'.
+[composite-build] Configuring build: C:\Dev\spoofax-composite-build\pie
+
+> Configure project :pie
+Evaluating project ':pie' using build file 'C:\Dev\spoofax-composite-build\pie\build.gradle.kts'.
+
+> Configure project :pie:pie.api
+Evaluating project ':pie:pie.api' using build file 'C:\Dev\spoofax-composite-build\pie\api\build.gradle.kts'.
+
+> Configure project :pie:pie.runtime
+Evaluating project ':pie:pie.runtime' using build file 'C:\Dev\spoofax-composite-build\pie\runtime\build.gradle.kts'.
+Registering project ':pie' in composite build. Will substitute for module ':pie'.
+Registering project ':pie:pie.api' in composite build. Will substitute for module 'org.metaborg:pie.api'.
+Registering project ':pie:pie.runtime' in composite build. Will substitute for module 'org.metaborg:pie.runtime'.
+[composite-build] Configuring build: C:\Dev\spoofax-composite-build\spoofax
+
+> Configure project :spoofax
+Evaluating project ':spoofax' using build file 'C:\Dev\spoofax-composite-build\spoofax\build.gradle.kts'.
+
+> Configure project :spoofax:spoofax.api
+Evaluating project ':spoofax:spoofax.api' using build file 'C:\Dev\spoofax-composite-build\spoofax\api\build.gradle.kts'.
+
+> Configure project :spoofax:spoofax.cli
+Evaluating project ':spoofax:spoofax.cli' using build file 'C:\Dev\spoofax-composite-build\spoofax\cli\build.gradle.kts'.
+
+> Configure project :spoofax:spoofax.pie
+Evaluating project ':spoofax:spoofax.pie' using build file 'C:\Dev\spoofax-composite-build\spoofax\pie\build.gradle.kts'.
+
+> Configure project :spoofax:spoofax.runtime
+Evaluating project ':spoofax:spoofax.runtime' using build file 'C:\Dev\spoofax-composite-build\spoofax\runtime\build.gradle.kts'.
+Registering project ':spoofax' in composite build. Will substitute for module ':spoofax'.
+Registering project ':spoofax:spoofax.api' in composite build. Will substitute for module 'org.metaborg:spoofax.api'.
+Registering project ':spoofax:spoofax.cli' in composite build. Will substitute for module 'org.metaborg:spoofax.cli'.
+Registering project ':spoofax:spoofax.pie' in composite build. Will substitute for module 'org.metaborg:spoofax.pie'.
+Registering project ':spoofax:spoofax.runtime' in composite build. Will substitute for module 'org.metaborg:spoofax.runtime'.
+[composite-build] Configuring build: C:\Dev\spoofax-composite-build\spoofax.eclipse
+
+> Configure project :spoofax.eclipse
+Evaluating project ':spoofax.eclipse' using build file 'C:\Dev\spoofax-composite-build\spoofax.eclipse\build.gradle.kts'.
+Executing releng tasks [:releng.eclipse.gradle:jar, :releng.eclipse:jar]
+:releng:releng.eclipse:compileKotlin (Thread[Task worker for ':releng',5,main]) started.
+
+> Task :releng:releng.eclipse:compileKotlin UP-TO-DATE
+Skipping task ':releng:releng.eclipse:compileKotlin' as it is up-to-date.
+:releng:releng.eclipse:compileKotlin (Thread[Task worker for ':releng',5,main]) completed. Took 0.01 secs.
+:releng:releng.eclipse:compileJava (Thread[Task worker for ':releng',5,main]) started.
+
+> Task :releng:releng.eclipse:compileJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse\src\main\java', not found
+Skipping task ':releng:releng.eclipse:compileJava' as it has no source files and no previous output files.
+:releng:releng.eclipse:compileJava (Thread[Task worker for ':releng',5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse:processResources (Thread[Task worker for ':releng' Thread 3,5,main]) started.
+
+> Task :releng:releng.eclipse:processResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse\src\main\resources', not found
+Skipping task ':releng:releng.eclipse:processResources' as it has no source files and no previous output files.
+:releng:releng.eclipse:processResources (Thread[Task worker for ':releng' Thread 3,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse:classes (Thread[Task worker for ':releng' Thread 3,5,main]) started.
+
+> Task :releng:releng.eclipse:classes UP-TO-DATE
+Skipping task ':releng:releng.eclipse:classes' as it has no actions.
+:releng:releng.eclipse:classes (Thread[Task worker for ':releng' Thread 3,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse:inspectClassesForKotlinIC (Thread[Task worker for ':releng' Thread 3,5,main]) started.
+
+> Task :releng:releng.eclipse:inspectClassesForKotlinIC UP-TO-DATE
+Skipping task ':releng:releng.eclipse:inspectClassesForKotlinIC' as it is up-to-date.
+:releng:releng.eclipse:inspectClassesForKotlinIC (Thread[Task worker for ':releng' Thread 3,5,main]) completed. Took 0.005 secs.
+:releng:releng.eclipse:jar (Thread[Task worker for ':releng' Thread 3,5,main]) started.
+
+> Task :releng:releng.eclipse:jar UP-TO-DATE
+Skipping task ':releng:releng.eclipse:jar' as it is up-to-date.
+:releng:releng.eclipse:jar (Thread[Task worker for ':releng' Thread 3,5,main]) completed. Took 0.001 secs.
+:releng:releng.eclipse.gradle:compileKotlin (Thread[Task worker for ':releng' Thread 3,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:compileKotlin
+Task ':releng:releng.eclipse.gradle:compileKotlin' is not up-to-date because:
+  Input property 'source' file C:\Dev\spoofax-composite-build\releng\eclipse.gradle\src\main\kotlin\mb\releng\eclipse\gradle\plugin\EclipseRepository.kt has changed.
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse.gradle\src\main\java', not found
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse.gradle\src\main\java', not found
+Using Kotlin incremental compilation
+Options for KOTLIN DAEMON: IncrementalCompilationOptions(super=CompilationOptions(compilerMode=INCREMENTAL_COMPILER, targetPlatform=JVM, reportCategories=[0], reportSeverity=2, requestedCompilationResults=[0]), areFileChangesKnown=true, modifiedFiles=[C:\Dev\spoofax-composite-build\releng\eclipse.gradle\src\main\kotlin\mb\releng\eclipse\gradle\plugin\EclipseRepository.kt], deletedFiles=[], workingDir=C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\kotlin\compileKotlin, customCacheVersionFileName='gradle-format-version.txt', customCacheVersion=4, multiModuleICSettings=MultiModuleICSettings(buildHistoryFile=C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\kotlin\compileKotlin\build-history.bin, useModuleDetection=false), usePreciseJavaTracking=truelocalStateDirs=[C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\classes\kotlin\main])
+:releng:releng.eclipse.gradle:compileKotlin (Thread[Task worker for ':releng' Thread 3,5,main]) completed. Took 0.533 secs.
+:releng:releng.eclipse.gradle:compileJava (Thread[Task worker for ':releng' Thread 3,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:compileJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse.gradle\src\main\java', not found
+Skipping task ':releng:releng.eclipse.gradle:compileJava' as it has no source files and no previous output files.
+:releng:releng.eclipse.gradle:compileJava (Thread[Task worker for ':releng' Thread 3,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:pluginDescriptors (Thread[Task worker for ':releng' Thread 3,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:pluginDescriptors UP-TO-DATE
+Skipping task ':releng:releng.eclipse.gradle:pluginDescriptors' as it is up-to-date.
+:releng:releng.eclipse.gradle:pluginDescriptors (Thread[Task worker for ':releng' Thread 3,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:processResources (Thread[Task worker for ':releng' Thread 3,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:processResources UP-TO-DATE
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse.gradle\src\main\resources', not found
+Skipping task ':releng:releng.eclipse.gradle:processResources' as it is up-to-date.
+:releng:releng.eclipse.gradle:processResources (Thread[Task worker for ':releng' Thread 3,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:classes (Thread[Task worker for ':releng' Thread 3,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:classes UP-TO-DATE
+Skipping task ':releng:releng.eclipse.gradle:classes' as it has no actions.
+:releng:releng.eclipse.gradle:classes (Thread[Task worker for ':releng' Thread 3,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:inspectClassesForKotlinIC (Thread[Task worker for ':releng' Thread 4,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:inspectClassesForKotlinIC
+Task ':releng:releng.eclipse.gradle:inspectClassesForKotlinIC' is not up-to-date because:
+  Input property 'classFiles$kotlin_gradle_plugin' file C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\classes\kotlin\main\mb\releng\eclipse\gradle\plugin\EclipseRepository$configure$1.class has changed.
+  Input property 'classFiles$kotlin_gradle_plugin' file C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\classes\kotlin\main\mb\releng\eclipse\gradle\plugin\EclipseRepository$configure$unpackFeaturesTask$1.class has changed.
+  Input property 'classFiles$kotlin_gradle_plugin' file C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\classes\kotlin\main\mb\releng\eclipse\gradle\plugin\EclipseRepository$configure$zipRepositoryTask$1.class has changed.
+:releng:releng.eclipse.gradle:inspectClassesForKotlinIC (Thread[Task worker for ':releng' Thread 4,5,main]) completed. Took 0.006 secs.
+:releng:releng.eclipse.gradle:jar (Thread[Task worker for ':releng' Thread 4,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:jar
+Task ':releng:releng.eclipse.gradle:jar' is not up-to-date because:
+  Input property 'rootSpec$1' file C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\classes\kotlin\main\mb\releng\eclipse\gradle\plugin\EclipseRepository$configure$1.class has changed.
+  Input property 'rootSpec$1' file C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\classes\kotlin\main\mb\releng\eclipse\gradle\plugin\EclipseRepository$configure$unpackFeaturesTask$1.class has changed.
+  Input property 'rootSpec$1' file C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\classes\kotlin\main\mb\releng\eclipse\gradle\plugin\EclipseRepository$configure$zipRepositoryTask$1.class has changed.
+:releng:releng.eclipse.gradle:jar (Thread[Task worker for ':releng' Thread 4,5,main]) completed. Took 0.021 secs.
+
+> Configure project :spoofax.eclipse:spoofax.eclipse.feature
+Evaluating project ':spoofax.eclipse:spoofax.eclipse.feature' using build file 'C:\Dev\spoofax-composite-build\spoofax.eclipse\feature\build.gradle.kts'.
+Found project 'project :releng:releng.eclipse.gradle' as substitute for module 'org.metaborg:releng.eclipse.gradle'.
+Found project 'project :releng:releng.eclipse' as substitute for module 'org.metaborg:releng.eclipse'.
+Selected primary task ':releng.eclipse.gradle:jar' from project :releng.eclipse.gradle
+Selected primary task ':releng.eclipse:jar' from project :releng.eclipse
+
+> Configure project :spoofax.eclipse:spoofax.eclipse.plugin
+Evaluating project ':spoofax.eclipse:spoofax.eclipse.plugin' using build file 'C:\Dev\spoofax-composite-build\spoofax.eclipse\plugin\build.gradle.kts'.
+Found project 'project :releng:releng.eclipse.gradle' as substitute for module 'org.metaborg:releng.eclipse.gradle'.
+Found project 'project :releng:releng.eclipse' as substitute for module 'org.metaborg:releng.eclipse'.
+
+> Configure project :spoofax.eclipse:spoofax.eclipse.repository
+Evaluating project ':spoofax.eclipse:spoofax.eclipse.repository' using build file 'C:\Dev\spoofax-composite-build\spoofax.eclipse\repository\build.gradle.kts'.
+Found project 'project :releng:releng.eclipse.gradle' as substitute for module 'org.metaborg:releng.eclipse.gradle'.
+Found project 'project :releng:releng.eclipse' as substitute for module 'org.metaborg:releng.eclipse'.
+Registering project ':spoofax.eclipse' in composite build. Will substitute for module ':spoofax.eclipse'.
+Registering project ':spoofax.eclipse:spoofax.eclipse.feature' in composite build. Will substitute for module 'org.metaborg:spoofax.eclipse.feature'.
+Registering project ':spoofax.eclipse:spoofax.eclipse.plugin' in composite build. Will substitute for module 'org.metaborg:spoofax.eclipse.plugin'.
+Registering project ':spoofax.eclipse:spoofax.eclipse.repository' in composite build. Will substitute for module 'org.metaborg:spoofax.eclipse.repository'.
+
+> Configure project :
+Evaluating root project 'spoofax-composite-build' using build file 'C:\Dev\spoofax-composite-build\build.gradle.kts'.
+All projects evaluated.
+Selected primary task 'buildAll' from project :
+Selected primary task ':buildAll' from project :
+Selected primary task ':buildAll' from project :
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :pie:pie.runtime' as substitute for module 'org.metaborg:pie.runtime'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :pie:pie.runtime' as substitute for module 'org.metaborg:pie.runtime'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :pie:pie.runtime' as substitute for module 'org.metaborg:pie.runtime'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.slf4j' as substitute for module 'org.metaborg:log.slf4j'.
+Found project 'project :pie:pie.runtime' as substitute for module 'org.metaborg:pie.runtime'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.slf4j' as substitute for module 'org.metaborg:log.slf4j'.
+Found project 'project :pie:pie.runtime' as substitute for module 'org.metaborg:pie.runtime'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.slf4j' as substitute for module 'org.metaborg:log.slf4j'.
+Found project 'project :pie:pie.runtime' as substitute for module 'org.metaborg:pie.runtime'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.slf4j' as substitute for module 'org.metaborg:log.slf4j'.
+Found project 'project :pie:pie.runtime' as substitute for module 'org.metaborg:pie.runtime'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Selected primary task ':buildAll' from project :
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Found project 'project :log:log.api' as substitute for module 'org.metaborg:log.api'.
+Selected primary task ':pie.api:jar' from project :pie.api
+Selected primary task ':pie.runtime:jar' from project :pie.runtime
+Selected primary task ':buildAll' from project :
+Found project 'project :spoofax.eclipse:spoofax.eclipse.plugin' as substitute for module 'org.metaborg:spoofax.eclipse.plugin'.
+Selected primary task ':releng.eclipse.gradle:jar' from project :releng.eclipse.gradle
+Selected primary task ':releng.eclipse:jar' from project :releng.eclipse
+Selected primary task ':buildAll' from project :
+Selected primary task ':buildAll' from project :
+Selected primary task ':log.api:compileJava' from project :log.api
+Selected primary task ':log.api:jar' from project :log.api
+Selected primary task ':log.slf4j:jar' from project :log.slf4j
+Selected primary task ':log.slf4j:compileJava' from project :log.slf4j
+Tasks to be executed: [task ':buildAll']
+Executing log tasks [:buildAll, :log.api:compileJava, :log.api:jar, :log.slf4j:jar, :log.slf4j:compileJava]
+Executing spoofax tasks [:buildAll]
+Executing pie tasks [:buildAll, :pie.api:jar, :pie.runtime:jar]
+Executing spoofax.eclipse tasks [:buildAll]
+Executing releng tasks [:buildAll]
+:spoofax.eclipse:spoofax.eclipse.plugin:compileJava (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+:spoofax:spoofax.api:processResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+:pie:pie.api:processResources (Thread[Task worker for ':pie' Thread 5,5,main]) started.
+:log:log.api:compileJava (Thread[Task worker for ':log' Thread 2,5,main]) started.
+
+> Task :spoofax:spoofax.api:processResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax\api\src\main\resources', not found
+Skipping task ':spoofax:spoofax.api:processResources' as it has no source files and no previous output files.
+:spoofax:spoofax.api:processResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.013 secs.
+:spoofax:spoofax.api:processTestResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.api:processTestResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax\api\src\test\resources', not found
+Skipping task ':spoofax:spoofax.api:processTestResources' as it has no source files and no previous output files.
+:spoofax:spoofax.api:processTestResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+
+> Task :pie:pie.api:processResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\pie\api\src\main\resources', not found
+Skipping task ':pie:pie.api:processResources' as it has no source files and no previous output files.
+:spoofax:spoofax.cli:processResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+:pie:pie.api:processResources (Thread[Task worker for ':pie' Thread 5,5,main]) completed. Took 0.014 secs.
+:pie:pie.api:processTestResources (Thread[Task worker for ':pie' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.cli:processResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax\cli\src\main\resources', not found
+Skipping task ':spoofax:spoofax.cli:processResources' as it has no source files and no previous output files.
+:spoofax:spoofax.cli:processResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+
+> Task :pie:pie.api:processTestResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\pie\api\src\test\resources', not found
+Skipping task ':pie:pie.api:processTestResources' as it has no source files and no previous output files.
+:pie:pie.api:processTestResources (Thread[Task worker for ':pie' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.cli:startScripts (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+:pie:pie.runtime:processResources (Thread[Task worker for ':pie' Thread 5,5,main]) started.
+
+> Task :pie:pie.runtime:processResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\pie\runtime\src\main\resources', not found
+Skipping task ':pie:pie.runtime:processResources' as it has no source files and no previous output files.
+:pie:pie.runtime:processResources (Thread[Task worker for ':pie' Thread 5,5,main]) completed. Took 0.0 secs.
+
+> Task :spoofax:spoofax.cli:startScripts UP-TO-DATE
+Skipping task ':spoofax:spoofax.cli:startScripts' as it is up-to-date.
+:spoofax:spoofax.cli:startScripts (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.001 secs.
+:pie:pie.runtime:processTestResources (Thread[Task worker for ':pie' Thread 5,5,main]) started.
+
+> Task :pie:pie.runtime:processTestResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\pie\runtime\src\test\resources', not found
+Skipping task ':pie:pie.runtime:processTestResources' as it has no source files and no previous output files.
+:pie:pie.runtime:processTestResources (Thread[Task worker for ':pie' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.pie:processResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.pie:processResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax\pie\src\main\resources', not found
+Skipping task ':spoofax:spoofax.pie:processResources' as it has no source files and no previous output files.
+:spoofax:spoofax.pie:processResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.runtime:processResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.runtime:processResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax\runtime\src\main\resources', not found
+Skipping task ':spoofax:spoofax.runtime:processResources' as it has no source files and no previous output files.
+:spoofax:spoofax.runtime:processResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.cli:processTestResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.cli:processTestResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax\cli\src\test\resources', not found
+Skipping task ':spoofax:spoofax.cli:processTestResources' as it has no source files and no previous output files.
+:spoofax:spoofax.cli:processTestResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.pie:processTestResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.pie:processTestResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax\pie\src\test\resources', not found
+Skipping task ':spoofax:spoofax.pie:processTestResources' as it has no source files and no previous output files.
+:spoofax:spoofax.pie:processTestResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.runtime:processTestResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :log:log.api:compileJava UP-TO-DATE
+Skipping task ':log:log.api:compileJava' as it is up-to-date.
+:log:log.api:compileJava (Thread[Task worker for ':log' Thread 2,5,main]) completed. Took 0.019 secs.
+
+> Task :spoofax:spoofax.runtime:processTestResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax\runtime\src\test\resources', not found
+Skipping task ':spoofax:spoofax.runtime:processTestResources' as it has no source files and no previous output files.
+:spoofax:spoofax.runtime:processTestResources (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.api:compileJava (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+:pie:pie.api:compileKotlin (Thread[Task worker for ':pie' Thread 5,5,main]) started.
+:log:log.api:processResources (Thread[Task worker for ':log' Thread 6,5,main]) started.
+
+> Task :log:log.api:processResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\log\api\src\main\resources', not found
+Skipping task ':log:log.api:processResources' as it has no source files and no previous output files.
+:log:log.api:processResources (Thread[Task worker for ':log' Thread 6,5,main]) completed. Took 0.0 secs.
+:log:log.api:classes (Thread[Task worker for ':log' Thread 6,5,main]) started.
+
+> Task :log:log.api:classes UP-TO-DATE
+Skipping task ':log:log.api:classes' as it has no actions.
+:log:log.api:classes (Thread[Task worker for ':log' Thread 6,5,main]) completed. Took 0.0 secs.
+:log:log.api:jar (Thread[Task worker for ':log' Thread 6,5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.plugin:compileJava UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.plugin:compileJava' as it is up-to-date.
+:spoofax.eclipse:spoofax.eclipse.plugin:compileJava (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.023 secs.
+
+> Task :spoofax:spoofax.api:compileJava UP-TO-DATE
+Skipping task ':spoofax:spoofax.api:compileJava' as it is up-to-date.
+:spoofax:spoofax.api:compileJava (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.002 secs.
+:spoofax.eclipse:spoofax.eclipse.plugin:processResources (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+:spoofax:spoofax.api:classes (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.api:classes UP-TO-DATE
+Skipping task ':spoofax:spoofax.api:classes' as it has no actions.
+:spoofax:spoofax.api:classes (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.api:jar (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :log:log.api:jar UP-TO-DATE
+Skipping task ':log:log.api:jar' as it is up-to-date.
+:log:log.api:jar (Thread[Task worker for ':log' Thread 6,5,main]) completed. Took 0.002 secs.
+:log:log.api:assemble (Thread[Task worker for ':log' Thread 6,5,main]) started.
+
+> Task :log:log.api:assemble UP-TO-DATE
+Skipping task ':log:log.api:assemble' as it has no actions.
+:log:log.api:assemble (Thread[Task worker for ':log' Thread 6,5,main]) completed. Took 0.0 secs.
+
+> Task :spoofax.eclipse:spoofax.eclipse.plugin:processResources UP-TO-DATE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax.eclipse\plugin\src\main\resources', not found
+Skipping task ':spoofax.eclipse:spoofax.eclipse.plugin:processResources' as it is up-to-date.
+:spoofax.eclipse:spoofax.eclipse.plugin:processResources (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.001 secs.
+:log:log.api:compileTestJava (Thread[Task worker for ':log' Thread 6,5,main]) started.
+
+> Task :log:log.api:compileTestJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\log\api\src\test\java', not found
+Skipping task ':log:log.api:compileTestJava' as it has no source files and no previous output files.
+:log:log.api:compileTestJava (Thread[Task worker for ':log' Thread 6,5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.plugin:classes (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.plugin:classes UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.plugin:classes' as it has no actions.
+:spoofax.eclipse:spoofax.eclipse.plugin:classes (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.0 secs.
+
+> Task :spoofax:spoofax.api:jar UP-TO-DATE
+Skipping task ':spoofax:spoofax.api:jar' as it is up-to-date.
+:spoofax:spoofax.api:jar (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.001 secs.
+:log:log.api:processTestResources (Thread[Task worker for ':log' Thread 6,5,main]) started.
+:spoofax:spoofax.api:assemble (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.api:assemble UP-TO-DATE
+Skipping task ':spoofax:spoofax.api:assemble' as it has no actions.
+:spoofax:spoofax.api:assemble (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+
+> Task :log:log.api:processTestResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\log\api\src\test\resources', not found
+Skipping task ':log:log.api:processTestResources' as it has no source files and no previous output files.
+:log:log.api:processTestResources (Thread[Task worker for ':log' Thread 6,5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.plugin:jar (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+:log:log.api:testClasses (Thread[Task worker for ':log' Thread 6,5,main]) started.
+
+> Task :log:log.api:testClasses UP-TO-DATE
+Skipping task ':log:log.api:testClasses' as it has no actions.
+:log:log.api:testClasses (Thread[Task worker for ':log' Thread 6,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.api:compileTestJava (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.api:compileTestJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax\api\src\test\java', not found
+Skipping task ':spoofax:spoofax.api:compileTestJava' as it has no source files and no previous output files.
+:spoofax:spoofax.api:compileTestJava (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+
+> Task :pie:pie.api:compileKotlin UP-TO-DATE
+Skipping task ':pie:pie.api:compileKotlin' as it is up-to-date.
+:pie:pie.api:compileKotlin (Thread[Task worker for ':pie' Thread 5,5,main]) completed. Took 0.006 secs.
+:log:log.api:test (Thread[Task worker for ':log' Thread 6,5,main]) started.
+
+> Task :log:log.api:test NO-SOURCE
+Skipping task ':log:log.api:test' as it has no source files and no previous output files.
+:log:log.api:test (Thread[Task worker for ':log' Thread 6,5,main]) completed. Took 0.0 secs.
+:pie:pie.api:compileJava (Thread[Task worker for ':pie' Thread 5,5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.plugin:jar UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.plugin:jar' as it is up-to-date.
+:spoofax.eclipse:spoofax.eclipse.plugin:jar (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.002 secs.
+:spoofax:spoofax.api:testClasses (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.api:testClasses UP-TO-DATE
+Skipping task ':spoofax:spoofax.api:testClasses' as it has no actions.
+:spoofax:spoofax.api:testClasses (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+
+> Task :pie:pie.api:compileJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\pie\api\src\main\java', not found
+Skipping task ':pie:pie.api:compileJava' as it has no source files and no previous output files.
+:pie:pie.api:compileJava (Thread[Task worker for ':pie' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.feature:copyPlugins (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+:pie:pie.api:classes (Thread[Task worker for ':pie' Thread 5,5,main]) started.
+
+> Task :pie:pie.api:classes UP-TO-DATE
+Skipping task ':pie:pie.api:classes' as it has no actions.
+:pie:pie.api:classes (Thread[Task worker for ':pie' Thread 5,5,main]) completed. Took 0.0 secs.
+
+> Task :spoofax.eclipse:spoofax.eclipse.feature:copyPlugins UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.feature:copyPlugins' as it is up-to-date.
+:spoofax.eclipse:spoofax.eclipse.feature:copyPlugins (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.api:test (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+:log:log.api:check (Thread[Task worker for ':log' Thread 6,5,main]) started.
+
+> Task :log:log.api:check UP-TO-DATE
+Skipping task ':log:log.api:check' as it has no actions.
+:log:log.api:check (Thread[Task worker for ':log' Thread 6,5,main]) completed. Took 0.0 secs.
+:log:log.api:build (Thread[Task worker for ':log' Thread 2,5,main]) started.
+
+> Task :log:log.api:build UP-TO-DATE
+Skipping task ':log:log.api:build' as it has no actions.
+:log:log.api:build (Thread[Task worker for ':log' Thread 2,5,main]) completed. Took 0.0 secs.
+
+> Task :spoofax:spoofax.api:test NO-SOURCE
+Skipping task ':spoofax:spoofax.api:test' as it has no source files and no previous output files.
+:spoofax:spoofax.api:test (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:log:log.slf4j:compileJava (Thread[Task worker for ':log' Thread 2,5,main]) started.
+:spoofax:spoofax.api:check (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.api:check UP-TO-DATE
+Skipping task ':spoofax:spoofax.api:check' as it has no actions.
+:spoofax:spoofax.api:check (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.api:build (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.api:build UP-TO-DATE
+Skipping task ':spoofax:spoofax.api:build' as it has no actions.
+:spoofax:spoofax.api:build (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.runtime:compileJava (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+:spoofax.eclipse:spoofax.eclipse.feature:featureJar (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+:pie:pie.api:inspectClassesForKotlinIC (Thread[Task worker for ':pie' Thread 5,5,main]) started.
+
+> Task :pie:pie.api:inspectClassesForKotlinIC UP-TO-DATE
+Skipping task ':pie:pie.api:inspectClassesForKotlinIC' as it is up-to-date.
+:pie:pie.api:inspectClassesForKotlinIC (Thread[Task worker for ':pie' Thread 5,5,main]) completed. Took 0.001 secs.
+:pie:pie.api:jar (Thread[Task worker for ':pie' Thread 5,5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.feature:featureJar UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.feature:featureJar' as it is up-to-date.
+:spoofax.eclipse:spoofax.eclipse.feature:featureJar (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.002 secs.
+:spoofax.eclipse:spoofax.eclipse.feature:jar (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+
+> Task :spoofax:spoofax.runtime:compileJava UP-TO-DATE
+Skipping task ':spoofax:spoofax.runtime:compileJava' as it is up-to-date.
+:spoofax:spoofax.runtime:compileJava (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.003 secs.
+:spoofax:spoofax.runtime:classes (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.runtime:classes UP-TO-DATE
+Skipping task ':spoofax:spoofax.runtime:classes' as it has no actions.
+:spoofax:spoofax.runtime:classes (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+
+> Task :log:log.slf4j:compileJava UP-TO-DATE
+Skipping task ':log:log.slf4j:compileJava' as it is up-to-date.
+:log:log.slf4j:compileJava (Thread[Task worker for ':log' Thread 2,5,main]) completed. Took 0.004 secs.
+:spoofax:spoofax.runtime:jar (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :pie:pie.api:jar UP-TO-DATE
+Skipping task ':pie:pie.api:jar' as it is up-to-date.
+:pie:pie.api:jar (Thread[Task worker for ':pie' Thread 5,5,main]) completed. Took 0.002 secs.
+:log:log.slf4j:processResources (Thread[Task worker for ':log' Thread 2,5,main]) started.
+
+> Task :log:log.slf4j:processResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\log\slf4j\src\main\resources', not found
+Skipping task ':log:log.slf4j:processResources' as it has no source files and no previous output files.
+:log:log.slf4j:processResources (Thread[Task worker for ':log' Thread 2,5,main]) completed. Took 0.0 secs.
+:log:log.slf4j:classes (Thread[Task worker for ':log' Thread 2,5,main]) started.
+
+> Task :log:log.slf4j:classes UP-TO-DATE
+Skipping task ':log:log.slf4j:classes' as it has no actions.
+:log:log.slf4j:classes (Thread[Task worker for ':log' Thread 2,5,main]) completed. Took 0.0 secs.
+
+> Task :spoofax.eclipse:spoofax.eclipse.feature:jar UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.feature:jar' as it is up-to-date.
+:spoofax.eclipse:spoofax.eclipse.feature:jar (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.001 secs.
+:log:log.slf4j:jar (Thread[Task worker for ':log' Thread 2,5,main]) started.
+:spoofax.eclipse:spoofax.eclipse.feature:assemble (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.feature:assemble UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.feature:assemble' as it has no actions.
+:spoofax.eclipse:spoofax.eclipse.feature:assemble (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.feature:check (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.feature:check UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.feature:check' as it has no actions.
+:spoofax.eclipse:spoofax.eclipse.feature:check (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.feature:build (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.feature:build UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.feature:build' as it has no actions.
+:spoofax.eclipse:spoofax.eclipse.feature:build (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.plugin:assemble (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+
+> Task :spoofax:spoofax.runtime:jar UP-TO-DATE
+Skipping task ':spoofax:spoofax.runtime:jar' as it is up-to-date.
+
+> Task :spoofax.eclipse:spoofax.eclipse.plugin:assemble UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.plugin:assemble' as it has no actions.
+:spoofax.eclipse:spoofax.eclipse.plugin:assemble (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.0 secs.
+:pie:pie.api:assemble (Thread[Task worker for ':pie' Thread 5,5,main]) started.
+:spoofax:spoofax.runtime:jar (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.001 secs.
+
+> Task :pie:pie.api:assemble UP-TO-DATE
+Skipping task ':pie:pie.api:assemble' as it has no actions.
+:pie:pie.api:assemble (Thread[Task worker for ':pie' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.runtime:assemble (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.runtime:assemble UP-TO-DATE
+Skipping task ':spoofax:spoofax.runtime:assemble' as it has no actions.
+:spoofax:spoofax.runtime:assemble (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:pie:pie.api:compileTestKotlin (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:pie.api:compileTestKotlin NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\pie\api\src\test\kotlin', not found
+file or directory 'C:\Dev\spoofax-composite-build\pie\api\src\test\java', not found
+Skipping task ':pie:pie.api:compileTestKotlin' as it has no source files and no previous output files.
+:pie:pie.api:compileTestKotlin (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.runtime:compileTestJava (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :log:log.slf4j:jar UP-TO-DATE
+Skipping task ':log:log.slf4j:jar' as it is up-to-date.
+:log:log.slf4j:jar (Thread[Task worker for ':log' Thread 2,5,main]) completed. Took 0.002 secs.
+
+> Task :spoofax:spoofax.runtime:compileTestJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax\runtime\src\test\java', not found
+Skipping task ':spoofax:spoofax.runtime:compileTestJava' as it has no source files and no previous output files.
+:spoofax:spoofax.runtime:compileTestJava (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.plugin:compileTestJava (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+:spoofax:spoofax.runtime:testClasses (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+:log:log.slf4j:assemble (Thread[Task worker for ':log' Thread 2,5,main]) started.
+
+> Task :spoofax:spoofax.runtime:testClasses UP-TO-DATE
+Skipping task ':spoofax:spoofax.runtime:testClasses' as it has no actions.
+
+> Task :spoofax.eclipse:spoofax.eclipse.plugin:compileTestJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax.eclipse\plugin\src\test\java', not found
+Skipping task ':spoofax.eclipse:spoofax.eclipse.plugin:compileTestJava' as it has no source files and no previous output files.
+:spoofax:spoofax.runtime:testClasses (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.plugin:compileTestJava (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.0 secs.
+
+> Task :log:log.slf4j:assemble UP-TO-DATE
+Skipping task ':log:log.slf4j:assemble' as it has no actions.
+:log:log.slf4j:assemble (Thread[Task worker for ':log' Thread 2,5,main]) completed. Took 0.0 secs.
+:pie:pie.api:compileTestJava (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:pie.api:compileTestJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\pie\api\src\test\java', not found
+Skipping task ':pie:pie.api:compileTestJava' as it has no source files and no previous output files.
+:pie:pie.api:compileTestJava (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+:log:log.slf4j:compileTestJava (Thread[Task worker for ':log' Thread 2,5,main]) started.
+
+> Task :log:log.slf4j:compileTestJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\log\slf4j\src\test\java', not found
+Skipping task ':log:log.slf4j:compileTestJava' as it has no source files and no previous output files.
+:log:log.slf4j:compileTestJava (Thread[Task worker for ':log' Thread 2,5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.plugin:processTestResources (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.plugin:processTestResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax.eclipse\plugin\src\test\resources', not found
+Skipping task ':spoofax.eclipse:spoofax.eclipse.plugin:processTestResources' as it has no source files and no previous output files.
+:spoofax.eclipse:spoofax.eclipse.plugin:processTestResources (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.runtime:test (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+:spoofax.eclipse:spoofax.eclipse.plugin:testClasses (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.plugin:testClasses UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.plugin:testClasses' as it has no actions.
+:spoofax.eclipse:spoofax.eclipse.plugin:testClasses (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.0 secs.
+
+> Task :spoofax:spoofax.runtime:test NO-SOURCE
+Skipping task ':spoofax:spoofax.runtime:test' as it has no source files and no previous output files.
+:spoofax:spoofax.runtime:test (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:log:log.slf4j:processTestResources (Thread[Task worker for ':log' Thread 2,5,main]) started.
+:pie:pie.api:testClasses (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:pie.api:testClasses UP-TO-DATE
+Skipping task ':pie:pie.api:testClasses' as it has no actions.
+:pie:pie.api:testClasses (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+
+> Task :log:log.slf4j:processTestResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\log\slf4j\src\test\resources', not found
+Skipping task ':log:log.slf4j:processTestResources' as it has no source files and no previous output files.
+:log:log.slf4j:processTestResources (Thread[Task worker for ':log' Thread 2,5,main]) completed. Took 0.0 secs.
+:pie:pie.api:test (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+:log:log.slf4j:testClasses (Thread[Task worker for ':log' Thread 2,5,main]) started.
+
+> Task :log:log.slf4j:testClasses UP-TO-DATE
+Skipping task ':log:log.slf4j:testClasses' as it has no actions.
+:log:log.slf4j:testClasses (Thread[Task worker for ':log' Thread 2,5,main]) completed. Took 0.0 secs.
+
+> Task :pie:pie.api:test NO-SOURCE
+Skipping task ':pie:pie.api:test' as it has no source files and no previous output files.
+:pie:pie.api:test (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+:log:log.slf4j:test (Thread[Task worker for ':log' Thread 2,5,main]) started.
+:spoofax:spoofax.runtime:check (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.runtime:check UP-TO-DATE
+Skipping task ':spoofax:spoofax.runtime:check' as it has no actions.
+:spoofax:spoofax.runtime:check (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+
+> Task :log:log.slf4j:test NO-SOURCE
+Skipping task ':log:log.slf4j:test' as it has no source files and no previous output files.
+:log:log.slf4j:test (Thread[Task worker for ':log' Thread 2,5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.plugin:test (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+:log:log.slf4j:check (Thread[Task worker for ':log' Thread 2,5,main]) started.
+:spoofax:spoofax.runtime:build (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.runtime:build UP-TO-DATE
+Skipping task ':spoofax:spoofax.runtime:build' as it has no actions.
+
+> Task :log:log.slf4j:check UP-TO-DATE
+Skipping task ':log:log.slf4j:check' as it has no actions.
+:spoofax:spoofax.runtime:build (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:log:log.slf4j:check (Thread[Task worker for ':log' Thread 2,5,main]) completed. Took 0.0 secs.
+:pie:pie.api:check (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+:log:log.slf4j:build (Thread[Task worker for ':log' Thread 2,5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.plugin:test NO-SOURCE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.plugin:test' as it has no source files and no previous output files.
+
+> Task :log:log.slf4j:build UP-TO-DATE
+Skipping task ':log:log.slf4j:build' as it has no actions.
+:spoofax.eclipse:spoofax.eclipse.plugin:test (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.0 secs.
+
+> Task :pie:pie.api:check UP-TO-DATE
+Skipping task ':pie:pie.api:check' as it has no actions.
+:spoofax.eclipse:spoofax.eclipse.plugin:check (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.plugin:check UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.plugin:check' as it has no actions.
+:log:log.slf4j:build (Thread[Task worker for ':log' Thread 2,5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.plugin:check (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.0 secs.
+:pie:pie.api:check (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+:log:buildAll (Thread[Task worker for ':log' Thread 9,5,main]) started.
+:spoofax.eclipse:spoofax.eclipse.plugin:build (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+:pie:pie.api:build (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:pie.api:build UP-TO-DATE
+Skipping task ':pie:pie.api:build' as it has no actions.
+
+> Task :spoofax.eclipse:spoofax.eclipse.plugin:build UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.plugin:build' as it has no actions.
+:spoofax.eclipse:spoofax.eclipse.plugin:build (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.0 secs.
+
+> Task :log:buildAll UP-TO-DATE
+Skipping task ':log:buildAll' as it has no actions.
+:log:buildAll (Thread[Task worker for ':log' Thread 9,5,main]) completed. Took 0.0 secs.
+:pie:pie.api:build (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+
+> Configure project :releng
+Evaluating project ':releng' using build file 'C:\Dev\spoofax-composite-build\releng\build.gradle.kts'.
+:pie:pie.runtime:compileKotlin (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+:spoofax.eclipse:spoofax.eclipse.repository:unpackFeatures (Thread[Task worker for ':spoofax.eclipse',5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.repository:unpackFeatures NO-SOURCE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.repository:unpackFeatures' as it has no source files and no previous output files.
+:spoofax.eclipse:spoofax.eclipse.repository:unpackFeatures (Thread[Task worker for ':spoofax.eclipse',5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.repository:zipRepository (Thread[Task worker for ':spoofax.eclipse' Thread 5,5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.repository:zipRepository NO-SOURCE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.repository:zipRepository' as it has no source files and no previous output files.
+:spoofax.eclipse:spoofax.eclipse.repository:zipRepository (Thread[Task worker for ':spoofax.eclipse' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.repository:assemble (Thread[Task worker for ':spoofax.eclipse' Thread 5,5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.repository:assemble UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.repository:assemble' as it has no actions.
+:spoofax.eclipse:spoofax.eclipse.repository:assemble (Thread[Task worker for ':spoofax.eclipse' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.repository:check (Thread[Task worker for ':spoofax.eclipse' Thread 5,5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.repository:check UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.repository:check' as it has no actions.
+:spoofax.eclipse:spoofax.eclipse.repository:check (Thread[Task worker for ':spoofax.eclipse' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:spoofax.eclipse.repository:build (Thread[Task worker for ':spoofax.eclipse' Thread 5,5,main]) started.
+
+> Task :spoofax.eclipse:spoofax.eclipse.repository:build UP-TO-DATE
+Skipping task ':spoofax.eclipse:spoofax.eclipse.repository:build' as it has no actions.
+:spoofax.eclipse:spoofax.eclipse.repository:build (Thread[Task worker for ':spoofax.eclipse' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax.eclipse:buildAll (Thread[Task worker for ':spoofax.eclipse' Thread 5,5,main]) started.
+
+> Task :spoofax.eclipse:buildAll UP-TO-DATE
+Skipping task ':spoofax.eclipse:buildAll' as it has no actions.
+:spoofax.eclipse:buildAll (Thread[Task worker for ':spoofax.eclipse' Thread 5,5,main]) completed. Took 0.0 secs.
+
+> Configure project :releng:releng.eclipse
+Evaluating project ':releng:releng.eclipse' using build file 'C:\Dev\spoofax-composite-build\releng\eclipse\build.gradle.kts'.
+
+> Task :pie:pie.runtime:compileKotlin UP-TO-DATE
+Skipping task ':pie:pie.runtime:compileKotlin' as it is up-to-date.
+:pie:pie.runtime:compileKotlin (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.004 secs.
+:pie:pie.runtime:compileJava (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:pie.runtime:compileJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\pie\runtime\src\main\java', not found
+Skipping task ':pie:pie.runtime:compileJava' as it has no source files and no previous output files.
+:pie:pie.runtime:compileJava (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+:pie:pie.runtime:classes (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:pie.runtime:classes UP-TO-DATE
+Skipping task ':pie:pie.runtime:classes' as it has no actions.
+:pie:pie.runtime:classes (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+:pie:pie.runtime:inspectClassesForKotlinIC (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:pie.runtime:inspectClassesForKotlinIC UP-TO-DATE
+Skipping task ':pie:pie.runtime:inspectClassesForKotlinIC' as it is up-to-date.
+:pie:pie.runtime:inspectClassesForKotlinIC (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+:pie:pie.runtime:jar (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:pie.runtime:jar UP-TO-DATE
+Skipping task ':pie:pie.runtime:jar' as it is up-to-date.
+:pie:pie.runtime:jar (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.001 secs.
+:pie:pie.runtime:assemble (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:pie.runtime:assemble UP-TO-DATE
+Skipping task ':pie:pie.runtime:assemble' as it has no actions.
+:pie:pie.runtime:assemble (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.pie:compileJava (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+:pie:pie.runtime:compileTestKotlin (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:pie.runtime:compileTestKotlin NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\pie\runtime\src\test\kotlin', not found
+file or directory 'C:\Dev\spoofax-composite-build\pie\runtime\src\test\java', not found
+Skipping task ':pie:pie.runtime:compileTestKotlin' as it has no source files and no previous output files.
+:pie:pie.runtime:compileTestKotlin (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+:pie:pie.runtime:compileTestJava (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:pie.runtime:compileTestJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\pie\runtime\src\test\java', not found
+Skipping task ':pie:pie.runtime:compileTestJava' as it has no source files and no previous output files.
+:pie:pie.runtime:compileTestJava (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+:pie:pie.runtime:testClasses (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:pie.runtime:testClasses UP-TO-DATE
+Skipping task ':pie:pie.runtime:testClasses' as it has no actions.
+:pie:pie.runtime:testClasses (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+:pie:pie.runtime:test (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :spoofax:spoofax.pie:compileJava UP-TO-DATE
+Skipping task ':spoofax:spoofax.pie:compileJava' as it is up-to-date.
+
+> Task :pie:pie.runtime:test NO-SOURCE
+Skipping task ':pie:pie.runtime:test' as it has no source files and no previous output files.
+:spoofax:spoofax.pie:compileJava (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.002 secs.
+:pie:pie.runtime:test (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.cli:compileJava (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+:pie:pie.runtime:check (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:pie.runtime:check UP-TO-DATE
+Skipping task ':pie:pie.runtime:check' as it has no actions.
+:pie:pie.runtime:check (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+:pie:pie.runtime:build (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:pie.runtime:build UP-TO-DATE
+Skipping task ':pie:pie.runtime:build' as it has no actions.
+:pie:pie.runtime:build (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+:pie:buildAll (Thread[Task worker for ':pie' Thread 7,5,main]) started.
+
+> Task :pie:buildAll UP-TO-DATE
+Skipping task ':pie:buildAll' as it has no actions.
+:pie:buildAll (Thread[Task worker for ':pie' Thread 7,5,main]) completed. Took 0.0 secs.
+
+> Task :spoofax:spoofax.cli:compileJava UP-TO-DATE
+Skipping task ':spoofax:spoofax.cli:compileJava' as it is up-to-date.
+:spoofax:spoofax.cli:compileJava (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.002 secs.
+:spoofax:spoofax.cli:classes (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.cli:classes UP-TO-DATE
+Skipping task ':spoofax:spoofax.cli:classes' as it has no actions.
+:spoofax:spoofax.cli:classes (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.cli:jar (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.cli:jar UP-TO-DATE
+Skipping task ':spoofax:spoofax.cli:jar' as it is up-to-date.
+:spoofax:spoofax.cli:jar (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.001 secs.
+:spoofax:spoofax.pie:classes (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.pie:classes UP-TO-DATE
+Skipping task ':spoofax:spoofax.pie:classes' as it has no actions.
+:spoofax:spoofax.pie:classes (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.pie:jar (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.pie:jar UP-TO-DATE
+Skipping task ':spoofax:spoofax.pie:jar' as it is up-to-date.
+:spoofax:spoofax.pie:jar (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.001 secs.
+
+> Configure project :releng:releng.eclipse.gradle
+Evaluating project ':releng:releng.eclipse.gradle' using build file 'C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build.gradle.kts'.
+Selected primary task ':buildAll' from project :
+:spoofax:spoofax.cli:distTar (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.cli:distTar UP-TO-DATE
+Skipping task ':spoofax:spoofax.cli:distTar' as it is up-to-date.
+:spoofax:spoofax.cli:distTar (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.002 secs.
+:spoofax:spoofax.cli:distZip (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.cli:distZip UP-TO-DATE
+Skipping task ':spoofax:spoofax.cli:distZip' as it is up-to-date.
+:spoofax:spoofax.cli:distZip (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.002 secs.
+:spoofax:spoofax.cli:assemble (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.cli:assemble UP-TO-DATE
+Skipping task ':spoofax:spoofax.cli:assemble' as it has no actions.
+:spoofax:spoofax.cli:assemble (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.cli:compileTestJava (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.cli:compileTestJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax\cli\src\test\java', not found
+Skipping task ':spoofax:spoofax.cli:compileTestJava' as it has no source files and no previous output files.
+:spoofax:spoofax.cli:compileTestJava (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.cli:testClasses (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.cli:testClasses UP-TO-DATE
+Skipping task ':spoofax:spoofax.cli:testClasses' as it has no actions.
+:spoofax:spoofax.cli:testClasses (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.cli:test (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.cli:test NO-SOURCE
+Skipping task ':spoofax:spoofax.cli:test' as it has no source files and no previous output files.
+:spoofax:spoofax.cli:test (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.cli:check (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.cli:check UP-TO-DATE
+Skipping task ':spoofax:spoofax.cli:check' as it has no actions.
+:spoofax:spoofax.cli:check (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.cli:build (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.cli:build UP-TO-DATE
+Skipping task ':spoofax:spoofax.cli:build' as it has no actions.
+:spoofax:spoofax.cli:build (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.pie:assemble (Thread[Task worker for ':spoofax' Thread 5,5,main]) started.
+
+> Task :spoofax:spoofax.pie:assemble UP-TO-DATE
+Skipping task ':spoofax:spoofax.pie:assemble' as it has no actions.
+:spoofax:spoofax.pie:assemble (Thread[Task worker for ':spoofax' Thread 5,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.pie:compileTestJava (Thread[Task worker for ':spoofax' Thread 9,5,main]) started.
+
+> Task :spoofax:spoofax.pie:compileTestJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\spoofax\pie\src\test\java', not found
+Skipping task ':spoofax:spoofax.pie:compileTestJava' as it has no source files and no previous output files.
+:spoofax:spoofax.pie:compileTestJava (Thread[Task worker for ':spoofax' Thread 9,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.pie:testClasses (Thread[Task worker for ':spoofax' Thread 9,5,main]) started.
+
+> Task :spoofax:spoofax.pie:testClasses UP-TO-DATE
+Skipping task ':spoofax:spoofax.pie:testClasses' as it has no actions.
+:spoofax:spoofax.pie:testClasses (Thread[Task worker for ':spoofax' Thread 9,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.pie:test (Thread[Task worker for ':spoofax' Thread 10,5,main]) started.
+
+> Task :spoofax:spoofax.pie:test NO-SOURCE
+Skipping task ':spoofax:spoofax.pie:test' as it has no source files and no previous output files.
+:spoofax:spoofax.pie:test (Thread[Task worker for ':spoofax' Thread 10,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.pie:check (Thread[Task worker for ':spoofax' Thread 10,5,main]) started.
+
+> Task :spoofax:spoofax.pie:check UP-TO-DATE
+Skipping task ':spoofax:spoofax.pie:check' as it has no actions.
+:spoofax:spoofax.pie:check (Thread[Task worker for ':spoofax' Thread 10,5,main]) completed. Took 0.0 secs.
+:spoofax:spoofax.pie:build (Thread[Task worker for ':spoofax' Thread 10,5,main]) started.
+
+> Task :spoofax:spoofax.pie:build UP-TO-DATE
+Skipping task ':spoofax:spoofax.pie:build' as it has no actions.
+:spoofax:spoofax.pie:build (Thread[Task worker for ':spoofax' Thread 10,5,main]) completed. Took 0.0 secs.
+:spoofax:buildAll (Thread[Task worker for ':spoofax' Thread 10,5,main]) started.
+
+> Task :spoofax:buildAll UP-TO-DATE
+Skipping task ':spoofax:buildAll' as it has no actions.
+:spoofax:buildAll (Thread[Task worker for ':spoofax' Thread 10,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse:compileKotlin (Thread[Task worker for ':releng',5,main]) started.
+
+> Task :releng:releng.eclipse:compileKotlin UP-TO-DATE
+Skipping task ':releng:releng.eclipse:compileKotlin' as it is up-to-date.
+:releng:releng.eclipse:compileKotlin (Thread[Task worker for ':releng',5,main]) completed. Took 0.026 secs.
+:releng:releng.eclipse:compileJava (Thread[Task worker for ':releng',5,main]) started.
+
+> Task :releng:releng.eclipse:compileJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse\src\main\java', not found
+Skipping task ':releng:releng.eclipse:compileJava' as it has no source files and no previous output files.
+:releng:releng.eclipse:compileJava (Thread[Task worker for ':releng',5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse:processResources (Thread[Task worker for ':releng',5,main]) started.
+
+> Task :releng:releng.eclipse:processResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse\src\main\resources', not found
+Skipping task ':releng:releng.eclipse:processResources' as it has no source files and no previous output files.
+:releng:releng.eclipse:processResources (Thread[Task worker for ':releng',5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse:classes (Thread[Task worker for ':releng',5,main]) started.
+
+> Task :releng:releng.eclipse:classes UP-TO-DATE
+Skipping task ':releng:releng.eclipse:classes' as it has no actions.
+:releng:releng.eclipse:classes (Thread[Task worker for ':releng',5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse:inspectClassesForKotlinIC (Thread[Task worker for ':releng',5,main]) started.
+
+> Task :releng:releng.eclipse:inspectClassesForKotlinIC UP-TO-DATE
+Skipping task ':releng:releng.eclipse:inspectClassesForKotlinIC' as it is up-to-date.
+:releng:releng.eclipse:inspectClassesForKotlinIC (Thread[Task worker for ':releng',5,main]) completed. Took 0.005 secs.
+:releng:releng.eclipse:jar (Thread[Task worker for ':releng',5,main]) started.
+
+> Task :releng:releng.eclipse:jar UP-TO-DATE
+Skipping task ':releng:releng.eclipse:jar' as it is up-to-date.
+:releng:releng.eclipse:jar (Thread[Task worker for ':releng',5,main]) completed. Took 0.002 secs.
+:releng:releng.eclipse:assemble (Thread[Task worker for ':releng',5,main]) started.
+
+> Task :releng:releng.eclipse:assemble UP-TO-DATE
+Skipping task ':releng:releng.eclipse:assemble' as it has no actions.
+:releng:releng.eclipse:assemble (Thread[Task worker for ':releng',5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse:compileTestKotlin (Thread[Task worker for ':releng' Thread 2,5,main]) started.
+
+> Task :releng:releng.eclipse:compileTestKotlin UP-TO-DATE
+Skipping task ':releng:releng.eclipse:compileTestKotlin' as it is up-to-date.
+:releng:releng.eclipse:compileTestKotlin (Thread[Task worker for ':releng' Thread 2,5,main]) completed. Took 0.005 secs.
+:releng:releng.eclipse:compileTestJava (Thread[Task worker for ':releng' Thread 2,5,main]) started.
+
+> Task :releng:releng.eclipse:compileTestJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse\src\test\java', not found
+Skipping task ':releng:releng.eclipse:compileTestJava' as it has no source files and no previous output files.
+:releng:releng.eclipse:compileTestJava (Thread[Task worker for ':releng' Thread 2,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse:processTestResources (Thread[Task worker for ':releng' Thread 2,5,main]) started.
+
+> Task :releng:releng.eclipse:processTestResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse\src\test\resources', not found
+Skipping task ':releng:releng.eclipse:processTestResources' as it has no source files and no previous output files.
+:releng:releng.eclipse:processTestResources (Thread[Task worker for ':releng' Thread 2,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse:testClasses (Thread[Task worker for ':releng' Thread 2,5,main]) started.
+
+> Task :releng:releng.eclipse:testClasses UP-TO-DATE
+Skipping task ':releng:releng.eclipse:testClasses' as it has no actions.
+:releng:releng.eclipse:testClasses (Thread[Task worker for ':releng' Thread 2,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse:test (Thread[Task worker for ':releng' Thread 9,5,main]) started.
+
+> Task :releng:releng.eclipse:test UP-TO-DATE
+Skipping task ':releng:releng.eclipse:test' as it is up-to-date.
+:releng:releng.eclipse:test (Thread[Task worker for ':releng' Thread 9,5,main]) completed. Took 0.002 secs.
+:releng:releng.eclipse:check (Thread[Task worker for ':releng' Thread 9,5,main]) started.
+
+> Task :releng:releng.eclipse:check UP-TO-DATE
+Skipping task ':releng:releng.eclipse:check' as it has no actions.
+:releng:releng.eclipse:check (Thread[Task worker for ':releng' Thread 9,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse:build (Thread[Task worker for ':releng' Thread 9,5,main]) started.
+
+> Task :releng:releng.eclipse:build UP-TO-DATE
+Skipping task ':releng:releng.eclipse:build' as it has no actions.
+:releng:releng.eclipse:build (Thread[Task worker for ':releng' Thread 9,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:compileKotlin (Thread[Task worker for ':releng' Thread 9,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:compileKotlin UP-TO-DATE
+Skipping task ':releng:releng.eclipse.gradle:compileKotlin' as it is up-to-date.
+:releng:releng.eclipse.gradle:compileKotlin (Thread[Task worker for ':releng' Thread 9,5,main]) completed. Took 0.006 secs.
+:releng:releng.eclipse.gradle:compileJava (Thread[Task worker for ':releng' Thread 9,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:compileJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse.gradle\src\main\java', not found
+Skipping task ':releng:releng.eclipse.gradle:compileJava' as it has no source files and no previous output files.
+:releng:releng.eclipse.gradle:compileJava (Thread[Task worker for ':releng' Thread 9,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:pluginDescriptors (Thread[Task worker for ':releng' Thread 9,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:pluginDescriptors UP-TO-DATE
+Skipping task ':releng:releng.eclipse.gradle:pluginDescriptors' as it is up-to-date.
+:releng:releng.eclipse.gradle:pluginDescriptors (Thread[Task worker for ':releng' Thread 9,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:processResources (Thread[Task worker for ':releng' Thread 9,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:processResources UP-TO-DATE
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse.gradle\src\main\resources', not found
+Skipping task ':releng:releng.eclipse.gradle:processResources' as it is up-to-date.
+:releng:releng.eclipse.gradle:processResources (Thread[Task worker for ':releng' Thread 9,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:classes (Thread[Task worker for ':releng' Thread 9,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:classes UP-TO-DATE
+Skipping task ':releng:releng.eclipse.gradle:classes' as it has no actions.
+:releng:releng.eclipse.gradle:classes (Thread[Task worker for ':releng' Thread 9,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:inspectClassesForKotlinIC (Thread[included builds,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:inspectClassesForKotlinIC UP-TO-DATE
+Skipping task ':releng:releng.eclipse.gradle:inspectClassesForKotlinIC' as it is up-to-date.
+:releng:releng.eclipse.gradle:inspectClassesForKotlinIC (Thread[included builds,5,main]) completed. Took 0.003 secs.
+:releng:releng.eclipse.gradle:jar (Thread[included builds,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:jar UP-TO-DATE
+Skipping task ':releng:releng.eclipse.gradle:jar' as it is up-to-date.
+:releng:releng.eclipse.gradle:jar (Thread[included builds,5,main]) completed. Took 0.002 secs.
+:releng:releng.eclipse.gradle:assemble (Thread[included builds,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:assemble UP-TO-DATE
+Skipping task ':releng:releng.eclipse.gradle:assemble' as it has no actions.
+:releng:releng.eclipse.gradle:assemble (Thread[included builds,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:compileTestKotlin (Thread[included builds,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:compileTestKotlin NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse.gradle\src\test\kotlin', not found
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse.gradle\src\test\java', not found
+Skipping task ':releng:releng.eclipse.gradle:compileTestKotlin' as it has no source files and no previous output files.
+:releng:releng.eclipse.gradle:compileTestKotlin (Thread[included builds,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:pluginUnderTestMetadata (Thread[included builds,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:pluginUnderTestMetadata
+Task ':releng:releng.eclipse.gradle:pluginUnderTestMetadata' is not up-to-date because:
+  Input property 'pluginClasspath' file C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\classes\kotlin\main\mb\releng\eclipse\gradle\plugin\EclipseRepository$configure$1.class has changed.
+  Input property 'pluginClasspath' file C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\classes\kotlin\main\mb\releng\eclipse\gradle\plugin\EclipseRepository$configure$unpackFeaturesTask$1.class has changed.
+  Input property 'pluginClasspath' file C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\classes\kotlin\main\mb\releng\eclipse\gradle\plugin\EclipseRepository$configure$zipRepositoryTask$1.class has changed.
+:releng:releng.eclipse.gradle:pluginUnderTestMetadata (Thread[included builds,5,main]) completed. Took 0.03 secs.
+:releng:releng.eclipse.gradle:compileTestJava (Thread[included builds,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:compileTestJava NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse.gradle\src\test\java', not found
+Skipping task ':releng:releng.eclipse.gradle:compileTestJava' as it has no source files and no previous output files.
+:releng:releng.eclipse.gradle:compileTestJava (Thread[included builds,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:processTestResources (Thread[included builds,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:processTestResources NO-SOURCE
+file or directory 'C:\Dev\spoofax-composite-build\releng\eclipse.gradle\src\test\resources', not found
+Skipping task ':releng:releng.eclipse.gradle:processTestResources' as it has no source files and no previous output files.
+:releng:releng.eclipse.gradle:processTestResources (Thread[included builds,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:testClasses (Thread[included builds,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:testClasses UP-TO-DATE
+Skipping task ':releng:releng.eclipse.gradle:testClasses' as it has no actions.
+:releng:releng.eclipse.gradle:testClasses (Thread[included builds,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:test (Thread[Task worker for ':releng' Thread 3,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:test NO-SOURCE
+Skipping task ':releng:releng.eclipse.gradle:test' as it has no source files and no previous output files.
+:releng:releng.eclipse.gradle:test (Thread[Task worker for ':releng' Thread 3,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:validateTaskProperties (Thread[Task worker for ':releng' Thread 3,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:validateTaskProperties
+Task ':releng:releng.eclipse.gradle:validateTaskProperties' is not up-to-date because:
+  Input property 'classes' file C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\classes\kotlin\main\mb\releng\eclipse\gradle\plugin\EclipseRepository$configure$1.class has changed.
+  Input property 'classes' file C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\classes\kotlin\main\mb\releng\eclipse\gradle\plugin\EclipseRepository$configure$unpackFeaturesTask$1.class has changed.
+  Input property 'classes' file C:\Dev\spoofax-composite-build\releng\eclipse.gradle\build\classes\kotlin\main\mb\releng\eclipse\gradle\plugin\EclipseRepository$configure$zipRepositoryTask$1.class has changed.
+Task property validation finished without warnings.
+:releng:releng.eclipse.gradle:validateTaskProperties (Thread[Task worker for ':releng' Thread 3,5,main]) completed. Took 0.023 secs.
+:releng:releng.eclipse.gradle:check (Thread[Task worker for ':releng' Thread 3,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:check
+Skipping task ':releng:releng.eclipse.gradle:check' as it has no actions.
+:releng:releng.eclipse.gradle:check (Thread[Task worker for ':releng' Thread 3,5,main]) completed. Took 0.0 secs.
+:releng:releng.eclipse.gradle:build (Thread[Task worker for ':releng' Thread 3,5,main]) started.
+
+> Task :releng:releng.eclipse.gradle:build
+Skipping task ':releng:releng.eclipse.gradle:build' as it has no actions.
+:releng:releng.eclipse.gradle:build (Thread[Task worker for ':releng' Thread 3,5,main]) completed. Took 0.0 secs.
+:releng:buildAll (Thread[Task worker for ':releng' Thread 10,5,main]) started.
+
+> Task :releng:buildAll
+Skipping task ':releng:buildAll' as it has no actions.
+:releng:buildAll (Thread[Task worker for ':releng' Thread 10,5,main]) completed. Took 0.0 secs.
+:buildAll (Thread[Task worker for ':' Thread 4,5,main]) started.
+
+> Task :buildAll
+Skipping task ':buildAll' as it has no actions.
+:buildAll (Thread[Task worker for ':' Thread 4,5,main]) completed. Took 0.001 secs.
+
+BUILD SUCCESSFUL in 2s

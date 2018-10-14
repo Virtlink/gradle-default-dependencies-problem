@@ -1,5 +1,6 @@
 package mb.releng.eclipse.mavenize
 
+import mb.releng.eclipse.model.maven.InstallableMavenArtifact
 import mb.releng.eclipse.util.Log
 import mb.releng.eclipse.util.deleteNonEmptyDirectoryIfExists
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils
@@ -21,7 +22,7 @@ import java.nio.file.Path
 /**
  * Installs Maven artifacts into [repoDir].
  */
-class MavenArtifactInstaller(val repoDir: Path) {
+class MavenArtifactInstaller(repoDir: Path) {
   private val system: RepositorySystem
   private val session: RepositorySystemSession
 
@@ -74,16 +75,11 @@ class MavenArtifactInstaller(val repoDir: Path) {
     system.install(session, installRequest)
   }
 
-  fun delete(groupId: String) {
-    deleteNonEmptyDirectoryIfExists(repoDir.resolve(groupId))
-  }
-
-
   private fun InstallRequest.requestInstallOf(installableMavenArtifact: InstallableMavenArtifact) {
     val artifact: Artifact = run {
       val primaryArtifact = installableMavenArtifact.primaryArtifact
       val coords = primaryArtifact.coordinates
-      DefaultArtifact(coords.groupId, coords.id, coords.classifier, coords.extension, coords.version, null, primaryArtifact.file.toFile())
+      DefaultArtifact(coords.groupId, coords.id, coords.classifier, coords.extension, coords.version.toString(), null, primaryArtifact.file.toFile())
     }
     addArtifact(artifact)
 

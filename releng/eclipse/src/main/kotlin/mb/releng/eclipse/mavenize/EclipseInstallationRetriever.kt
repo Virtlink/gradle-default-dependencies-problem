@@ -6,9 +6,9 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 /**
- * Retrieves an Eclipse archive and unpacks it.
+ * Retrieves an Eclipse installation and unpacks it.
  */
-fun retrieveEclipseArchive(urlStr: String, cacheDir: Path, forceDownload: Boolean, log: Log): EclipseArchive {
+fun retrieveEclipseInstallation(urlStr: String, cacheDir: Path, forceDownload: Boolean, log: Log): EclipseInstallation {
   val filename = run {
     val index = urlStr.lastIndexOf('/')
     if(index == -1) {
@@ -34,7 +34,7 @@ fun retrieveEclipseArchive(urlStr: String, cacheDir: Path, forceDownload: Boolea
     log.progress("Unpacking $archiveFile into $unpackDir")
     unpack(archiveFile, unpackDir, log)
   }
-  return EclipseArchive(unpackDir, shouldUnpack)
+  return EclipseInstallation(unpackDir, shouldUnpack)
 }
 
-data class EclipseArchive(val unpackDir: Path, val wasUnpacked: Boolean)
+data class EclipseInstallation(val unpackDir: Path, val wasUnpacked: Boolean)
