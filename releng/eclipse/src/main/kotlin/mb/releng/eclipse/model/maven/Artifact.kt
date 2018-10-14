@@ -1,10 +1,8 @@
-package mb.releng.eclipse.mavenize
+package mb.releng.eclipse.model.maven
 
-import mb.releng.eclipse.model.Version
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 /**
  * A Maven artifact.
@@ -25,25 +23,6 @@ data class InstallableMavenArtifact(
   val dependencies: Collection<MavenDependency>
 ) {
   override fun toString() = primaryArtifact.toString()
-}
-
-/**
- * Maven artifact co-ordinates.
- */
-data class Coordinates(
-  val groupId: String,
-  val id: String,
-  val version: String,
-  val classifier: String? = null,
-  val extension: String? = null
-) {
-  fun withExtension(newExtension: String?): Coordinates {
-    return Coordinates(groupId, id, version, classifier, newExtension)
-  }
-
-  fun toPath() = Paths.get("$groupId-$id-$version${if(classifier != null) "-$classifier" else ""}${if(extension != null) ".$extension" else ""}")
-
-  override fun toString() = "$groupId:$id:$version${if(classifier != null) ":$classifier" else ""}${if(extension != null) ".$extension" else ""}"
 }
 
 /**
@@ -69,12 +48,10 @@ data class SubArtifact(
  * A Maven dependency.
  */
 data class MavenDependency(
-  val coordinates: Coordinates,
+  val coordinates: DependencyCoordinates,
   val scope: String?,
   val optional: Boolean
 ) {
-  val asGradleDependency get() = coordinates.run { "$groupId:$id:$version${if(classifier != null) ":$classifier" else ""}" }
-
   override fun toString() = coordinates.toString()
 }
 
@@ -131,6 +108,3 @@ fun createPomSubArtifact(pomFile: Path, coordinates: Coordinates, dependencies: 
   }
   return SubArtifact(null, "pom", pomFile)
 }
-
-fun Version.toMavenVersion() =
-  "$major${if(minor != null) ".$minor" else ""}${if(micro != null) ".$micro" else ""}${if(qualifier != null) "-$qualifier" else ""}"

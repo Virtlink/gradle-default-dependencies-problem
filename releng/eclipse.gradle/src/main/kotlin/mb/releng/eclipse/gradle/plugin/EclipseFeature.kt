@@ -1,9 +1,10 @@
 package mb.releng.eclipse.gradle.plugin
 
 import mb.releng.eclipse.gradle.util.GradleLog
-import mb.releng.eclipse.mavenize.toMavenVersion
-import mb.releng.eclipse.model.BuildProperties
-import mb.releng.eclipse.model.Feature
+import mb.releng.eclipse.mavenize.toGradleDependencyNotation
+import mb.releng.eclipse.mavenize.toMaven
+import mb.releng.eclipse.model.eclipse.BuildProperties
+import mb.releng.eclipse.model.eclipse.Feature
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.BasePlugin
@@ -15,14 +16,15 @@ import java.nio.file.Files
 
 class EclipseFeature : Plugin<Project> {
   override fun apply(project: Project) {
+    project.pluginManager.apply(EclipseBasePlugin::class)
     project.afterEvaluate { configure(this) }
   }
 
   private fun configure(project: Project) {
     project.pluginManager.apply(BasePlugin::class)
-    project.pluginManager.apply(EclipseBasePlugin::class)
 
     val log = GradleLog(project.logger)
+    val mavenized = project.mavenizedEclipseInstallation()
 
     // Process feature.xml file.
     val featureXmlFile = project.file("feature.xml").toPath()
@@ -31,13 +33,14 @@ class EclipseFeature : Plugin<Project> {
       if(project.name != feature.id) {
         log.warning("Project name ${project.name} and feature ID ${feature.id} do no match; feature JAR name will not match the feature ID")
       }
-      // Set project version if it it has not been set yet.
       if(project.version == Project.DEFAULT_VERSION) {
-        project.version = feature.version.toMavenVersion()
+        // Set project version only if it it has not been set yet.
+        project.version = feature.version.toMaven()
       }
-      // Add plugin dependencies.
+      val converter = mavenized.createConverter(project.group.toString())
       for(dependency in feature.dependencies) {
-        val depNotation = "${project.group}:${dependency.id}:${dependency.version.toMavenVersion()}"
+        val dependencyCoordinates = converter.convert(dependency.coordinates)
+        val depNotation = dependencyCoordinates.toGradleDependencyNotation()
         project.dependencies.add(EclipseBasePlugin.pluginConfigurationName, depNotation)
       }
     } else {

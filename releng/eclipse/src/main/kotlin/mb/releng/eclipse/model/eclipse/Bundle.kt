@@ -1,4 +1,4 @@
-package mb.releng.eclipse.model
+package mb.releng.eclipse.model.eclipse
 
 import mb.releng.eclipse.util.Log
 import java.io.IOException
@@ -9,27 +9,12 @@ import java.util.jar.JarInputStream
 import java.util.jar.Manifest
 import java.util.stream.Collectors
 
-data class BundleWithLocation(val bundle: Bundle, val location: Path) {
-  companion object {
-    fun read(jarFileOrDir: Path, log: Log): BundleWithLocation {
-      val bundle = Bundle.read(jarFileOrDir, log)
-      return BundleWithLocation(bundle, jarFileOrDir)
-    }
-
-    fun readAll(dir: Path, log: Log): Collection<BundleWithLocation> {
-      val bundlePaths = Files.list(dir)
-      val bundles = bundlePaths
-        .map { read(it, log) }
-        .collect(Collectors.toList())
-      bundlePaths.close()
-      return bundles
-    }
-  }
+data class BundleCoordinates(val name: String, val version: BundleVersion) {
+  override fun toString() = "$name@$version"
 }
 
 data class Bundle(
-  val name: String,
-  val version: Version?,
+  val coordinates: BundleCoordinates,
   val requiredBundles: Collection<BundleDependency>,
   val fragmentHost: BundleDependency?,
   val sourceBundleFor: BundleDependency?
@@ -63,59 +48,76 @@ data class Bundle(
     }
 
     fun readFromManifest(manifest: Manifest, log: Log): Bundle {
-      val symbolicName = manifest.mainAttributes.getValue("Bundle-SymbolicName")
-        ?: throw IOException("Cannot read bundle from manifest, it does not have a Bundle-SymbolicName attribute")
-      val name = when {
-        // Symbolic name can contain extra data such as: "org.eclipse.core.runtime; singleton:=true". Take everything
-        // before the ;.
-        symbolicName.contains(';') -> symbolicName.split(';')[0]
-        else -> symbolicName
-      }.trim()
+      val name = run {
+        val symbolicName = manifest.mainAttributes.getValue("Bundle-SymbolicName")
+          ?: throw BundleParseException("Cannot read bundle from manifest, it does not have a Bundle-SymbolicName attribute")
+        when {
+          // Symbolic name can contain extra data such as: "org.eclipse.core.runtime; singleton:=true". Take everything
+          // before the ;.
+          symbolicName.contains(';') -> symbolicName.split(';')[0]
+          else -> symbolicName
+        }.trim()
+      }
 
       val version = run {
-        val versionStr = manifest.mainAttributes.getValue("Bundle-Version")
+        val versionStr = manifest.mainAttributes.getValue("Bundle-Version")?.trim()
         if(versionStr == null) {
-          Version.zero()
+          throw BundleParseException("Cannot read bundle '$name' from manifest, it does not have a Bundle-Version attribute")
         } else {
-          val version = Version.parse(versionStr.trim())
-          if(version != null) {
-            version
-          } else {
-            log.warning("Failed to parse version '$versionStr', defaulting to no version (matches minimum version)")
-            null
-          }
+          BundleVersion.parse(versionStr)
+            ?: throw BundleParseException("Cannot read bundle '$name' from manifest, failed to parse Bundle-Version '$versionStr'")
         }
       }
 
+      val coordinates = BundleCoordinates(name, version)
+
       val requireBundleStr = manifest.mainAttributes.getValue("Require-Bundle")
       val requiredBundles = if(requireBundleStr != null) {
-        BundleDependency.parse(requireBundleStr, log)
+        try {
+          BundleDependency.parse(requireBundleStr, log)
+        } catch(e: RequireBundleParseException) {
+          throw BundleParseException("Cannot read bundle '$name' from manifest, failed to parse Require-Bundle '$requireBundleStr'", e)
+        }
       } else {
         arrayListOf()
       }
 
       val fragmentHostStr = manifest.mainAttributes.getValue("Fragment-Host")
       val fragmentHost = if(fragmentHostStr != null) {
-        BundleDependency.parseInner(fragmentHostStr, log)
+        try {
+          BundleDependency.parseInner(fragmentHostStr, log)
+        } catch(e: RequireBundleParseException) {
+          throw BundleParseException("Cannot read bundle '$name' from manifest, failed to parse Fragment-Host '$fragmentHostStr'", e)
+        }
       } else {
         null
       }
 
       val sourceBundleStr = manifest.mainAttributes.getValue("Eclipse-SourceBundle")
       val sourceBundleFor = if(sourceBundleStr != null) {
-        BundleDependency.parseInner(sourceBundleStr, log)
+        try {
+          BundleDependency.parseInner(sourceBundleStr, log)
+        } catch(e: RequireBundleParseException) {
+          throw BundleParseException("Cannot read bundle '$name' from manifest, failed to parse Eclipse-SourceBundle '$sourceBundleStr'", e)
+        }
       } else {
         null
       }
 
-      return Bundle(name, version, requiredBundles, fragmentHost, sourceBundleFor)
+      return Bundle(coordinates, requiredBundles, fragmentHost, sourceBundleFor)
     }
   }
+
+  override fun toString() = coordinates.toString()
+}
+
+class BundleParseException(message: String, cause: Throwable?) : Exception(message, cause) {
+  constructor(message: String) : this(message, null)
 }
 
 data class BundleDependency(
   val name: String,
-  val versionOrRange: VersionOrRange?,
+  val version: BundleVersionOrRange?,
   val resolution: DependencyResolution,
   val visibility: DependencyVisibility
 ) {
@@ -157,7 +159,7 @@ data class BundleDependency(
         throw RequireBundleParseException("Failed to parse part of Require-Bundle string '$str': it does not have a name element")
       }
       val name = elements[0].trim()
-      var versionOrRange: VersionOrRange? = null
+      var versionOrRange: BundleVersionOrRange? = null
       var resolution = DependencyResolution.Mandatory
       var visibility = DependencyVisibility.Private
       for(element in elements.subList(1, elements.size)) {
@@ -166,7 +168,7 @@ data class BundleDependency(
           // HACK: support parsing Eclipse-SourceBundle by accepting 'version' elements.
           element.startsWith("bundle-version") || element.startsWith("version") -> {
             // Expected format: version="<str>", strip to <str>.
-            versionOrRange = VersionOrRange.parse(stripElement(element), log)
+            versionOrRange = BundleVersionOrRange.parse(stripElement(element), log)
           }
           element.startsWith("resolution") -> {
             // Expected format: resolution:="<str>", strip to <str>.
@@ -176,7 +178,6 @@ data class BundleDependency(
             // Expected format: visibility:="<str>", strip to <str>.
             visibility = DependencyVisibility.parse(stripElement(element))
           }
-          // TODO: do we need to parse the visibility attribute and use it to set a scope?
         }
       }
       return BundleDependency(name, versionOrRange, resolution, visibility)
@@ -195,8 +196,8 @@ data class BundleDependency(
   }
 
   override fun toString(): String {
-    val versionStr = if(versionOrRange != null) {
-      "bundle-version=\"$versionOrRange\","
+    val versionStr = if(version != null) {
+      "bundle-version=\"$version\","
     } else {
       ""
     }
@@ -213,20 +214,17 @@ enum class DependencyResolution {
   Optional;
 
   companion object {
-    internal fun parse(str: String): DependencyResolution {
-
-      return when(str) {
-        "mandatory" -> Mandatory
-        "optional" -> Optional
-        else -> Mandatory
-      }
+    fun parse(str: String) = when(str) {
+      "mandatory" -> Mandatory
+      "optional" -> Optional
+      else -> Mandatory
     }
 
-    internal fun toString(resolution: DependencyResolution): String {
-      return when(resolution) {
-        Mandatory -> "mandatory"
-        Optional -> "optional"
-      }
+    val default get() = Mandatory
+
+    fun toString(resolution: DependencyResolution) = when(resolution) {
+      Mandatory -> "mandatory"
+      Optional -> "optional"
     }
   }
 }
@@ -236,20 +234,17 @@ enum class DependencyVisibility {
   Reexport;
 
   companion object {
-    internal fun parse(str: String): DependencyVisibility {
-
-      return when(str) {
-        "private" -> Private
-        "reexport" -> Reexport
-        else -> Private
-      }
+    fun parse(str: String) = when(str) {
+      "private" -> Private
+      "reexport" -> Reexport
+      else -> Private
     }
 
-    internal fun toString(visibility: DependencyVisibility): String {
-      return when(visibility) {
-        Private -> "private"
-        Reexport -> "reexport"
-      }
+    val default get() = Private
+
+    fun toString(visibility: DependencyVisibility) = when(visibility) {
+      Private -> "private"
+      Reexport -> "reexport"
     }
   }
 }

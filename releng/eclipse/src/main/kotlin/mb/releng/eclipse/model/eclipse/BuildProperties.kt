@@ -1,4 +1,4 @@
-package mb.releng.eclipse.model
+package mb.releng.eclipse.model.eclipse
 
 import java.io.InputStream
 import java.nio.file.Files

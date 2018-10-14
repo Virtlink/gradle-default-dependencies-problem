@@ -15,6 +15,10 @@ gradlePlugin {
       id = "org.metaborg.eclipse-feature"
       implementationClass = "mb.releng.eclipse.gradle.plugin.EclipseFeature"
     }
+    create("eclipse-repository") {
+      id = "org.metaborg.eclipse-repository"
+      implementationClass = "mb.releng.eclipse.gradle.plugin.EclipseRepository"
+    }
   }
 }
 kotlinDslPluginOptions {
