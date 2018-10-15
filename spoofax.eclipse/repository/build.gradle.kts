@@ -27,6 +27,6 @@ apply {
 //plugins {
 //  id("org.metaborg.eclipse-repository") version "develop-SNAPSHOT"
 //}
-dependencies {
-  "eclipse-feature"(project(":spoofax.eclipse.feature", "eclipse-feature"))
-}
+//dependencies {
+//  "eclipse-feature"(project(":spoofax.eclipse.feature", "eclipse-feature"))
+//}
