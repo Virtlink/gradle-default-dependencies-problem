@@ -17,12 +17,14 @@ import java.nio.file.Files
 class EclipseFeature : Plugin<Project> {
   override fun apply(project: Project) {
     project.pluginManager.apply(EclipseBasePlugin::class)
+    project.pluginManager.apply(MavenizeDslPlugin::class)
     project.afterEvaluate { configure(this) }
   }
 
   private fun configure(project: Project) {
     project.pluginManager.apply(BasePlugin::class)
-
+    project.pluginManager.apply(MavenizePlugin::class)
+    
     val log = GradleLog(project.logger)
     val mavenized = project.mavenizedEclipseInstallation()
 
@@ -41,6 +43,7 @@ class EclipseFeature : Plugin<Project> {
       for(dependency in feature.dependencies) {
         val dependencyCoordinates = converter.convert(dependency.coordinates)
         val depNotation = dependencyCoordinates.toGradleDependencyNotation()
+        // NOTE: for some reason, this dependency gets automatically converted into a project dependency when needed.
         project.dependencies.add(EclipseBasePlugin.pluginConfigurationName, depNotation)
       }
     } else {

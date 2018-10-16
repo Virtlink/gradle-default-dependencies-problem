@@ -4,14 +4,15 @@ import mb.releng.eclipse.model.eclipse.*
 import mb.releng.eclipse.util.Log
 import mb.releng.eclipse.util.TempDir
 import mb.releng.eclipse.util.deleteNonEmptyDirectoryIfExists
+import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.stream.Collectors
 
 fun mavenizeEclipseInstallation(
-  archiveUrl: String,
   mavenizeDir: Path,
+  installationArchiveUrl: String,
+  installationPluginsDirRelative: Path,
   groupId: String,
   log: Log,
   forceDownload: Boolean = false,
@@ -23,18 +24,16 @@ fun mavenizeEclipseInstallation(
   val archiveCacheDir = mavenizeDir.resolve("eclipse_archive_cache")
 
   // Retrieve an Eclipse installation.
-  val (unpackDir, wasUnpacked) = retrieveEclipseInstallation(archiveUrl, archiveCacheDir, forceDownload, log)
+  val (installationDir, wasUnpacked) = retrieveEclipseInstallation(installationArchiveUrl, archiveCacheDir, forceDownload, log)
+  val installationPluginsDir = installationDir.resolve(installationPluginsDirRelative)
 
   // Install bundles if needed.
   if(wasUnpacked || forceInstall) {
     // Delete repository entries for the group ID.
     deleteNonEmptyDirectoryIfExists(repoGroupIdDir)
 
-    // TODO: this directory is different on macOS.
-    val eclipseBundlesPath = unpackDir.resolve(Paths.get("eclipse", "plugins"))
-
     // Read bundles and pre-process them.
-    val bundles = MavenInstallableBundle.readAll(eclipseBundlesPath, groupId, log).map { installableBundle ->
+    val bundles = MavenInstallableBundle.readAll(installationPluginsDir, groupId, log).map { installableBundle ->
       val (bundle, bundleGroupId, location) = installableBundle
 
       // Remove qualifiers to fix version range matching in Maven and Gradle.
@@ -68,22 +67,36 @@ fun mavenizeEclipseInstallation(
 
   // Collect names of Eclipse installation bundles by directory listing of all installed artifacts.
   val installedBundleDirs = Files.list(repoGroupIdDir)
-  val eclipseInstallationBundleNames = installedBundleDirs.map { it.fileName.toString() }.collect(Collectors.toList())
+  val installationBundleNames = installedBundleDirs.map { it.fileName.toString() }.collect(Collectors.toList())
   installedBundleDirs.close()
-  return MavenizedEclipseInstallation(groupId, unpackDir, repoDir, eclipseInstallationBundleNames)
+  return MavenizedEclipseInstallation(groupId, repoDir, installationDir, installationPluginsDir, installationBundleNames)
 }
 
 data class MavenizedEclipseInstallation(
   val groupId: String,
-  val eclipseInstallationDir: Path,
   val repoDir: Path,
-  val eclipseInstallationBundleNames: Collection<String>
+  val installationDir: Path,
+  val installationPluginsDir: Path,
+  val installationBundleNames: Collection<String>
 ) {
   fun createConverter(fallbackGroupId: String): EclipseConverter {
     val converter = EclipseConverter(fallbackGroupId)
-    for(bundleName in eclipseInstallationBundleNames) {
+    for(bundleName in installationBundleNames) {
       converter.recordGroupId(bundleName, groupId)
     }
     return converter
+  }
+
+  fun launcherPath(): Path? {
+    val matcher = FileSystems.getDefault().getPathMatcher("glob:org.eclipse.equinox.launcher_*.jar")
+    val plugins = Files.list(installationPluginsDir)
+    val launcher = plugins.filter {
+      matcher.matches(it.fileName)
+    }.findFirst()
+    return if(!launcher.isPresent) {
+      null
+    } else {
+      launcher.get()
+    }
   }
 }

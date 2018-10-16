@@ -13,16 +13,13 @@ class MavenizeTest {
   @Tag("longRunning")
   fun mavenize() {
     val log = StreamLog()
-    /**
-     * Choose url from:
-     * - Drops    : http://ftp.fau.de/eclipse/eclipse/downloads/drops4/R-4.8-201806110500/
-     * - Releases : http://ftp.fau.de/eclipse/technology/epp/downloads/release/photon/R/
-     */
-    val url = "http://ftp.fau.de/eclipse/technology/epp/downloads/release/photon/R/eclipse-committers-photon-R-win32-x86_64.zip"
-    val groupId = "eclipse-photon"
     val mavenizeDir = Paths.get(System.getProperty("user.home"), ".mavenize")
-    val mavenizedEclipseInstallation1 = mavenizeEclipseInstallation(url, mavenizeDir, groupId, log, true, true)
-    val mavenizedEclipseInstallation2 = mavenizeEclipseInstallation(url, mavenizeDir, groupId, log)
+    val installationArchiveUrl = "http://ftp.fau.de/eclipse/technology/epp/downloads/release/photon/R/eclipse-committers-photon-R-win32-x86_64.zip"
+    val installationPluginsDirRelative = Paths.get("eclipse", "plugins")
+    val groupId = "eclipse-photon"
+
+    val mavenizedEclipseInstallation1 = mavenizeEclipseInstallation(mavenizeDir, installationArchiveUrl, installationPluginsDirRelative, groupId, log, true, true)
+    val mavenizedEclipseInstallation2 = mavenizeEclipseInstallation(mavenizeDir, installationArchiveUrl, installationPluginsDirRelative, groupId, log)
     Assertions.assertEquals(mavenizedEclipseInstallation1, mavenizedEclipseInstallation2)
   }
 }
