@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-  <feature
-    id="spoofax.eclipse.feature"
-    version="1.0.0.qualifier"
-  />
+  <feature id="spoofax.eclipse.feature" version="1.0.0.qualifier">
+    <category name="spoofax.eclipse.category"/>
+  </feature>
+  <category-def name="spoofax.eclipse.category" label="Spoofax">
+    <description>Spoofax</description>
+  </category-def>
 </site>

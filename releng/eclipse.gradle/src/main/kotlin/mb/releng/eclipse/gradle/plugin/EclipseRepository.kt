@@ -1,22 +1,34 @@
 package mb.releng.eclipse.gradle.plugin
 
-import mb.releng.eclipse.mavenize.toGradleDependencyNotation
 import mb.releng.eclipse.model.eclipse.Site
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.BasePlugin
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Zip
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.project
+import org.gradle.kotlin.dsl.*
 import java.nio.file.Files
+
+open class EclipseRepositoryExtension(objects: ObjectFactory) {
+  var repositoryDescriptionFile: String
+    get() = _repositoryDescriptionFile.get()
+    set(value) {
+      _repositoryDescriptionFile.set(value)
+    }
+
+  private val _repositoryDescriptionFile: Property<String> = objects.property()
+}
 
 class EclipseRepository : Plugin<Project> {
   override fun apply(project: Project) {
     project.pluginManager.apply(EclipseBasePlugin::class)
     project.pluginManager.apply(MavenizeDslPlugin::class)
+
+    val extension = project.extensions.create<EclipseRepositoryExtension>("eclipseRepository", project.objects)
+    extension.repositoryDescriptionFile = "site.xml"
+
     project.afterEvaluate { configure(this) }
   }
 
@@ -26,24 +38,29 @@ class EclipseRepository : Plugin<Project> {
 
     val mavenized = project.mavenizedEclipseInstallation()
 
-    // Process site.xml file.
-    val siteXmlFile = project.file("site.xml").toPath()
-    if(Files.isRegularFile(siteXmlFile)) {
-      val site = Site.read(siteXmlFile)
+    val extension = project.extensions.getByType<EclipseRepositoryExtension>()
+
+    // Process repository description (site.xml) file.
+    val repositoryDescriptionFile = project.file(extension.repositoryDescriptionFile).toPath()
+    if(Files.isRegularFile(repositoryDescriptionFile)) {
+      val site = Site.read(repositoryDescriptionFile)
       val converter = mavenized.createConverter(project.group.toString())
-      for(dependency in site.dependencies) {
-        val dependencyCoordinates = converter.convert(dependency)
-        val depProjectPath = ":${dependencyCoordinates.id}"
-        val depProject = project.findProject(depProjectPath)
-        if(depProject != null) {
-          project.dependencies.add(EclipseBasePlugin.featureConfigurationName, project.dependencies.project(depProjectPath, EclipseBasePlugin.featureConfigurationName))
-        } else {
-          val depNotation = dependencyCoordinates.toGradleDependencyNotation()
-          project.dependencies.add(EclipseBasePlugin.featureConfigurationName, depNotation)
+      val configuration = project.featureConfiguration
+      configuration.defaultDependencies {
+        for(dependency in site.dependencies) {
+          val depCoords = converter.convert(dependency)
+          val depProjectPath = ":${depCoords.id}"
+          val depProject = project.findProject(depProjectPath)
+          val dep = if(depProject != null) {
+            project.dependencies.project(depProjectPath, EclipseBasePlugin.featureConfigurationName)
+          } else {
+            project.dependencies.create(depCoords.groupId, depCoords.id, depCoords.version.toString(), configuration.name)
+          }
+          this.add(dep)
         }
       }
     } else {
-      error("Cannot configure Eclipse repository; project $project has no 'site.xml' file")
+      error("Cannot configure Eclipse repository; project $project has no '$repositoryDescriptionFile' file")
     }
 
     // Build the repository.
@@ -55,23 +72,40 @@ class EclipseRepository : Plugin<Project> {
       }
     }
     val repositoryDir = project.buildDir.resolve("repository")
-    val createRepositoryTask = project.tasks.create<JavaExec>("createRepository") {
+    val eclipseLauncherPath = mavenized.launcherPath()?.toString() ?: error("Could not find Eclipse launcher")
+    val createRepositoryTask = project.tasks.create("createRepository") {
       dependsOn(unpackFeaturesTask)
-      val launcherPath = mavenized.launcherPath()?.toString() ?: error("Could not find Eclipse launcher")
-      inputs.file(launcherPath)
+      inputs.file(eclipseLauncherPath)
       inputs.dir(unpackFeaturesDir)
+      inputs.file(repositoryDescriptionFile)
       outputs.dir(repositoryDir)
-      main = "-jar"
-      args = mutableListOf(
-        launcherPath,
-        "-application", "org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher",
-        "-metadataRepository", "file:/$repositoryDir",
-        "-artifactRepository", "file:/$repositoryDir",
-        "-source", "$unpackFeaturesDir",
-        "-configs", "ANY",
-        "-compress",
-        "-publishArtifacts"
-      )
+      doLast {
+        project.javaexec {
+          main = "-jar"
+          args = mutableListOf(
+            eclipseLauncherPath,
+            "-application", "org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher",
+            "-metadataRepository", "file:/$repositoryDir",
+            "-artifactRepository", "file:/$repositoryDir",
+            "-source", "$unpackFeaturesDir",
+            "-configs", "ANY",
+            "-compress",
+            "-publishArtifacts"
+          )
+        }
+        project.javaexec {
+          main = "-jar"
+          args = mutableListOf(
+            eclipseLauncherPath,
+            "-application", "org.eclipse.equinox.p2.publisher.CategoryPublisher",
+            "-metadataRepository", "file:/$repositoryDir",
+            "-categoryDefinition", "file:/$repositoryDescriptionFile",
+            "-source", "$unpackFeaturesDir",
+            "-categoryQualifier",
+            "-compress"
+          )
+        }
+      }
     }
     val zipRepositoryTask = project.tasks.create<Zip>("zipRepository") {
       dependsOn(createRepositoryTask)

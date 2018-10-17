@@ -27,14 +27,15 @@ data class Site(
       val doc = builder.parse(inputStream)
 
       val siteNode = doc.firstChild ?: error("Cannot parse site XML; no root node")
-      val featureNodes = siteNode.childNodes
+      val subNodes = siteNode.childNodes
       val dependencies = mutableListOf<Dependency>()
-      for(i in 0 until featureNodes.length) {
-        val featureNode = featureNodes.item(i)
-        if(featureNode.nodeType != Node.ELEMENT_NODE) continue
-        val depId = featureNode.attributes.getNamedItem("id")?.nodeValue
+      for(i in 0 until subNodes.length) {
+        val subNode = subNodes.item(i)
+        if(subNode.nodeType != Node.ELEMENT_NODE) continue
+        if(subNode.nodeName != "feature") continue
+        val depId = subNode.attributes.getNamedItem("id")?.nodeValue
           ?: error("Cannot parse site XML; feature node has no 'id' attribute")
-        val depVersionStr = featureNode.attributes.getNamedItem("version")?.nodeValue
+        val depVersionStr = subNode.attributes.getNamedItem("version")?.nodeValue
           ?: error("Cannot parse site XML; feature node has no 'version' attribute")
         val depVersion = BundleVersion.parse(depVersionStr)
           ?: error("Cannot parse site XML; could not parse version '$depVersionStr'")

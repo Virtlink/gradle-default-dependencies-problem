@@ -1,3 +1,5 @@
+import mb.releng.eclipse.gradle.plugin.EclipseRepositoryExtension
+
 buildscript {
   repositories {
     // HACK: add our plugin's JAR and its dependencies as a repository, to make it available in IntelliJ, which

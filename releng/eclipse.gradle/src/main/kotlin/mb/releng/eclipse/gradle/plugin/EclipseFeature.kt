@@ -1,7 +1,6 @@
 package mb.releng.eclipse.gradle.plugin
 
 import mb.releng.eclipse.gradle.util.GradleLog
-import mb.releng.eclipse.mavenize.toGradleDependencyNotation
 import mb.releng.eclipse.mavenize.toMaven
 import mb.releng.eclipse.model.eclipse.BuildProperties
 import mb.releng.eclipse.model.eclipse.Feature
@@ -12,6 +11,7 @@ import org.gradle.api.tasks.Copy
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.project
 import java.nio.file.Files
 
 class EclipseFeature : Plugin<Project> {
@@ -24,7 +24,7 @@ class EclipseFeature : Plugin<Project> {
   private fun configure(project: Project) {
     project.pluginManager.apply(BasePlugin::class)
     project.pluginManager.apply(MavenizePlugin::class)
-    
+
     val log = GradleLog(project.logger)
     val mavenized = project.mavenizedEclipseInstallation()
 
@@ -40,11 +40,19 @@ class EclipseFeature : Plugin<Project> {
         project.version = feature.version.toMaven()
       }
       val converter = mavenized.createConverter(project.group.toString())
-      for(dependency in feature.dependencies) {
-        val dependencyCoordinates = converter.convert(dependency.coordinates)
-        val depNotation = dependencyCoordinates.toGradleDependencyNotation()
-        // NOTE: for some reason, this dependency gets automatically converted into a project dependency when needed.
-        project.dependencies.add(EclipseBasePlugin.pluginConfigurationName, depNotation)
+      val configuration = project.pluginConfiguration
+      configuration.defaultDependencies {
+        for(dependency in feature.dependencies) {
+          val depCoords = converter.convert(dependency.coordinates)
+          val depProjectPath = ":${depCoords.id}"
+          val depProject = project.findProject(depProjectPath)
+          val dep = if(depProject != null) {
+            project.dependencies.project(depProjectPath, configuration.name)
+          } else {
+            project.dependencies.create(depCoords.groupId, depCoords.id, depCoords.version.toString(), configuration.name)
+          }
+          this.add(dep)
+        }
       }
     } else {
       error("Cannot configure Eclipse feature; project $project has no 'feature.xml' file")

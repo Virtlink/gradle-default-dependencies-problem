@@ -5,6 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.property
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -79,3 +80,5 @@ class MavenizeDslPlugin : Plugin<Project> {
     extension.mavenizeDir.set(Paths.get(System.getProperty("user.home"), ".mavenize"))
   }
 }
+
+fun Project.mavenizeExtension() = project.extensions.getByType<MavenizeExtension>()

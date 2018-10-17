@@ -6,7 +6,6 @@ import mb.releng.eclipse.mavenize.mavenizeEclipseInstallation
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.extra
-import org.gradle.kotlin.dsl.getByType
 
 class MavenizePlugin : Plugin<Project> {
   companion object {
@@ -18,7 +17,7 @@ class MavenizePlugin : Plugin<Project> {
     // resolution, which may or may not happen in the configuration phase. This costs at least one HTTP request per
     // configuration phase, to check if we need to download and Mavenize a new Eclipse archive.
     val log = GradleLog(project.logger)
-    val extension = project.extensions.getByType<MavenizeExtension>()
+    val extension = project.mavenizeExtension()
     val mavenized = mavenizeEclipseInstallation(
       extension.mavenizeDir.get(),
       extension.url,

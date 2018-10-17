@@ -22,3 +22,7 @@ class EclipseBasePlugin : Plugin<Project> {
     }
   }
 }
+
+val Project.pluginConfiguration get() = this.configurations.getByName(EclipseBasePlugin.pluginConfigurationName)
+val Project.featureConfiguration get() = this.configurations.getByName(EclipseBasePlugin.featureConfigurationName)
+val Project.repositoryConfiguration get() = this.configurations.getByName(EclipseBasePlugin.repositoryConfigurationName)
