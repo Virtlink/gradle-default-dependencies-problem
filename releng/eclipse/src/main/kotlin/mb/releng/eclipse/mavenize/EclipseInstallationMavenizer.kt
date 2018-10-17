@@ -67,7 +67,7 @@ fun mavenizeEclipseInstallation(
 
   // Collect names of Eclipse installation bundles by directory listing of all installed artifacts.
   val installedBundleDirs = Files.list(repoGroupIdDir)
-  val installationBundleNames = installedBundleDirs.map { it.fileName.toString() }.collect(Collectors.toList())
+  val installationBundleNames = installedBundleDirs.map { it.fileName.toString() }.collect(Collectors.toSet())
   installedBundleDirs.close()
   return MavenizedEclipseInstallation(groupId, repoDir, installationDir, installationPluginsDir, installationBundleNames)
 }
@@ -77,8 +77,10 @@ data class MavenizedEclipseInstallation(
   val repoDir: Path,
   val installationDir: Path,
   val installationPluginsDir: Path,
-  val installationBundleNames: Collection<String>
+  val installationBundleNames: Set<String>
 ) {
+  fun isMavenizedBundle(groupId: String, id: String) = groupId == this.groupId && installationBundleNames.contains(id)
+
   fun createConverter(fallbackGroupId: String): EclipseConverter {
     val converter = EclipseConverter(fallbackGroupId)
     for(bundleName in installationBundleNames) {

@@ -80,9 +80,6 @@ fun MavenDependency.toEclipse(): BundleDependency {
   return BundleDependency(coordinates.id, version, resolution, visibility)
 }
 
-fun DependencyCoordinates.toGradleDependencyNotation() =
-  "$groupId:$id:$version${if(classifier != null) ":$classifier" else ""}${if(extension != null) "@$extension" else ""}"
-
 
 fun Feature.Dependency.Coordinates.toMaven(
   groupId: String,

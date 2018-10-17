@@ -1,6 +1,7 @@
 package mb.releng.eclipse.gradle.plugin
 
 import mb.releng.eclipse.gradle.util.GradleLog
+import mb.releng.eclipse.gradle.util.toGradleDependency
 import mb.releng.eclipse.mavenize.toMaven
 import mb.releng.eclipse.model.eclipse.BuildProperties
 import mb.releng.eclipse.model.eclipse.Feature
@@ -11,7 +12,6 @@ import org.gradle.api.tasks.Copy
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.project
 import java.nio.file.Files
 
 class EclipseFeature : Plugin<Project> {
@@ -43,15 +43,8 @@ class EclipseFeature : Plugin<Project> {
       val configuration = project.pluginConfiguration
       configuration.defaultDependencies {
         for(dependency in feature.dependencies) {
-          val depCoords = converter.convert(dependency.coordinates)
-          val depProjectPath = ":${depCoords.id}"
-          val depProject = project.findProject(depProjectPath)
-          val dep = if(depProject != null) {
-            project.dependencies.project(depProjectPath, configuration.name)
-          } else {
-            project.dependencies.create(depCoords.groupId, depCoords.id, depCoords.version.toString(), configuration.name)
-          }
-          this.add(dep)
+          val coords = converter.convert(dependency.coordinates)
+          this.add(coords.toGradleDependency(project, configuration.name))
         }
       }
     } else {

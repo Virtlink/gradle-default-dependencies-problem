@@ -1,5 +1,6 @@
 package mb.releng.eclipse.gradle.plugin
 
+import mb.releng.eclipse.gradle.util.toGradleDependency
 import mb.releng.eclipse.model.eclipse.Site
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -8,7 +9,10 @@ import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
-import org.gradle.kotlin.dsl.*
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.property
 import java.nio.file.Files
 
 open class EclipseRepositoryExtension(objects: ObjectFactory) {
@@ -48,15 +52,8 @@ class EclipseRepository : Plugin<Project> {
       val configuration = project.featureConfiguration
       configuration.defaultDependencies {
         for(dependency in site.dependencies) {
-          val depCoords = converter.convert(dependency)
-          val depProjectPath = ":${depCoords.id}"
-          val depProject = project.findProject(depProjectPath)
-          val dep = if(depProject != null) {
-            project.dependencies.project(depProjectPath, EclipseBasePlugin.featureConfigurationName)
-          } else {
-            project.dependencies.create(depCoords.groupId, depCoords.id, depCoords.version.toString(), configuration.name)
-          }
-          this.add(dep)
+          val coords = converter.convert(dependency)
+          this.add(coords.toGradleDependency(project, configuration.name))
         }
       }
     } else {

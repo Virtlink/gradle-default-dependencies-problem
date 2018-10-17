@@ -1,15 +1,11 @@
 package mb.releng.eclipse.gradle.plugin
 
 import mb.releng.eclipse.gradle.util.GradleLog
-import mb.releng.eclipse.gradle.util.closureOf
-import mb.releng.eclipse.mavenize.toGradleDependencyNotation
+import mb.releng.eclipse.gradle.util.toGradleDependency
 import mb.releng.eclipse.model.eclipse.BuildProperties
 import mb.releng.eclipse.model.eclipse.Bundle
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.dsl.RepositoryHandler
-import org.gradle.api.internal.artifacts.BaseRepositoryFactory
-import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
@@ -28,27 +24,10 @@ class EclipsePlugin : Plugin<Project> {
   }
 
   private fun configure(project: Project) {
-    project.pluginManager.apply(JavaPlugin::class)
     project.pluginManager.apply(MavenizePlugin::class)
-
-    val log = GradleLog(project.logger)
     val mavenized = project.mavenizedEclipseInstallation()
 
-    // Add Mavenized repository to project repositories.
-    // HACK: get instance of BaseRepositoryFactory so that we can manually add a custom Maven repository.
-    // From: https://discuss.gradle.org/t/how-can-i-get-hold-of-the-gradle-instance-of-the-repository-factory/6943/6
-    project.run {
-      val repositoryFactory = (this as ProjectInternal).services.get(BaseRepositoryFactory::class.java)
-      this.repositories(closureOf<RepositoryHandler> {
-        val mavenRepo = repositoryFactory.createMavenRepository()
-        mavenRepo.name = "mavenized"
-        mavenRepo.setUrl(mavenized.repoDir)
-        // Add to top of repositories to speed up dependency resolution.
-        addFirst(mavenRepo)
-      })
-    }
-
-    val jarTask = project.tasks.getByName<Jar>(JavaPlugin.JAR_TASK_NAME)
+    val log = GradleLog(project.logger)
 
     // Process META-INF/MANIFEST.MF file, if any.
     val manifestFile = project.file("META-INF/MANIFEST.MF").toPath()
@@ -62,18 +41,41 @@ class EclipsePlugin : Plugin<Project> {
         // Set project version only if it it has not been set yet.
         project.version = mavenArtifact.coordinates.version
       }
-      for(dependency in mavenArtifact.dependencies) {
-        val configuration = if(dependency.optional) {
-          JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
-        } else {
-          JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME
+      // Add default dependencies to plugin configuration.
+      val pluginConfiguration = project.pluginConfiguration
+      pluginConfiguration.defaultDependencies {
+        for(dependency in mavenArtifact.dependencies) {
+          if(dependency.optional) continue
+          // Use null (default) configuration when the dependency is a mavenized bundle.
+          val coords = dependency.coordinates
+          val configuration = if(mavenized.isMavenizedBundle(coords.groupId, coords.id)) null else pluginConfiguration.name
+          this.add(coords.toGradleDependency(project, configuration))
         }
-        project.dependencies.add(configuration, dependency.coordinates.toGradleDependencyNotation())
       }
-      jarTask.manifest.from(manifestFile)
+      // Add default dependencies to optional plugin configuration.
+      val pluginOptionalConfiguration = project.pluginOptionalConfiguration
+      pluginOptionalConfiguration.defaultDependencies {
+        for(dependency in mavenArtifact.dependencies) {
+          if(!dependency.optional) continue
+          val coords = dependency.coordinates
+          val configuration = if(mavenized.isMavenizedBundle(coords.groupId, coords.id)) null else pluginOptionalConfiguration.name
+          this.add(coords.toGradleDependency(project, configuration))
+        }
+      }
     } else {
       error("Cannot configure Eclipse plugin; project $project has no 'META-INF/MANIFEST.MF' file")
     }
+
+    // Apply Java plugin, after setting dependencies, because it apparently eagerly resolves configurations, freezing them.
+    project.pluginManager.apply(JavaPlugin::class)
+    val jarTask = project.tasks.getByName<Jar>(JavaPlugin.JAR_TASK_NAME)
+    if(Files.isRegularFile(manifestFile)) {
+      jarTask.manifest.from(manifestFile)
+    }
+    // Make the Java plugin's configurations extend our plugin configuration, so that all dependencies from our
+    // configurations are included in the Java plugin configurations.
+    project.configurations.getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME).extendsFrom(project.pluginConfiguration)
+    project.configurations.getByName(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).extendsFrom(project.pluginOptionalConfiguration)
 
     // Process build properties.
     val properties = run {

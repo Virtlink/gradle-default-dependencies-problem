@@ -1,4 +1,4 @@
-package spoofax.eclipse.plugin;
+package mb.spoofax.eclipse.plugin;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
