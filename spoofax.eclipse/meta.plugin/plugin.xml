@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+  <extension point="org.eclipse.ui.commands">
+    <category
+      id="spoofax.eclipse.meta.plugin.commands.category"
+      name="Spoofax Meta Category"
+    >
+    </category>
+    <command
+      categoryId="spoofax.eclipse.meta.plugin.commands.category"
+      name="Spoofax Meta Command"
+      id="spoofax.eclipse.meta.plugin.commands.sampleCommand"
+    >
+    </command>
+  </extension>
+  <extension point="org.eclipse.ui.handlers">
+    <handler
+      class="mb.spoofax.eclipse.meta.plugin.handlers.SampleHandler"
+      commandId="spoofax.eclipse.meta.plugin.commands.sampleCommand"
+    >
+    </handler>
+  </extension>
+  <extension point="org.eclipse.ui.bindings">
+    <key
+      commandId="spoofax.eclipse.meta.plugin.commands.sampleCommand"
+      schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+      contextId="org.eclipse.ui.contexts.window"
+      sequence="M1+6"
+    >
+    </key>
+  </extension>
+  <extension point="org.eclipse.ui.menus">
+    <menuContribution locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+      <menu
+        id="spoofax.eclipse.meta.plugin.menus.sampleMenu"
+        label="Spoofax Meta Menu"
+        mnemonic="S"
+      >
+        <command
+          commandId="spoofax.eclipse.meta.plugin.commands.sampleCommand"
+          id="spoofax.eclipse.meta.plugin.menus.sampleCommand"
+          mnemonic="S"
+        >
+        </command>
+      </menu>
+    </menuContribution>
+    <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+      <toolbar id="spoofax.eclipse.meta.plugin.toolbars.sampleToolbar">
+        <command
+          id="spoofax.eclipse.meta.plugin.toolbars.sampleCommand"
+          commandId="spoofax.eclipse.meta.plugin.commands.sampleCommand"
+          tooltip="Say hello world"
+        >
+        </command>
+      </toolbar>
+    </menuContribution>
+  </extension>
+</plugin>

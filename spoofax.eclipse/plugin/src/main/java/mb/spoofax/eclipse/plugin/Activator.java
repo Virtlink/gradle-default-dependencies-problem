@@ -11,6 +11,8 @@ public class Activator extends AbstractUIPlugin {
 	// The plug-in ID
 	public static final String PLUGIN_ID = "spoofax.eclipse.plugin"; //$NON-NLS-1$
 
+	public static final String SECRET_MESSAGE = "omfgwtfbbq";
+
 	// The shared instance
 	private static Activator plugin;
 

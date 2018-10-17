@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Spoofax Eclipse Meta Plugin
+Bundle-SymbolicName: spoofax.eclipse.meta.plugin;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: mb.spoofax.eclipse.meta.plugin.Activator
+Bundle-Vendor: MetaBorg
+Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,spoofax.eclipse.plugin
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: spoofax.eclipse.meta.plugin
+Bundle-ActivationPolicy: lazy

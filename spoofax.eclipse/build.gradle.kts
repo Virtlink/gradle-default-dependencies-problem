@@ -7,13 +7,9 @@ subprojects {
 }
 tasks {
   register("buildAll") {
-    dependsOn(project(":spoofax.eclipse.plugin").tasks["build"])
-    dependsOn(project(":spoofax.eclipse.feature").tasks["build"])
-    dependsOn(project(":spoofax.eclipse.repository").tasks["build"])
+    dependsOn(subprojects.map { it.tasks["build"] })
   }
   register("cleanAll") {
-    dependsOn(project(":spoofax.eclipse.plugin").tasks["clean"])
-    dependsOn(project(":spoofax.eclipse.feature").tasks["clean"])
-    dependsOn(project(":spoofax.eclipse.repository").tasks["clean"])
+    dependsOn(subprojects.map { it.tasks["clean"] })
   }
 }

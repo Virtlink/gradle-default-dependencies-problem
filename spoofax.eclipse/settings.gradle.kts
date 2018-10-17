@@ -11,9 +11,13 @@ pluginManagement {
 rootProject.name = "spoofax.eclipse"
 
 include("spoofax.eclipse.plugin")
+include("spoofax.eclipse.meta.plugin")
 include("spoofax.eclipse.feature")
+include("spoofax.eclipse.meta.feature")
 include("spoofax.eclipse.repository")
 
 project(":spoofax.eclipse.plugin").projectDir = file("plugin")
+project(":spoofax.eclipse.meta.plugin").projectDir = file("meta.plugin")
 project(":spoofax.eclipse.feature").projectDir = file("feature")
+project(":spoofax.eclipse.meta.feature").projectDir = file("meta.feature")
 project(":spoofax.eclipse.repository").projectDir = file("repository")
