@@ -6,6 +6,13 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.project
 
+fun DependencyCoordinates.toGradleDependency(project: Project, configuration: String?) =
+  project.createDependency(groupId, id, version.toString(), configuration, classifier, extension)
+
+fun DependencyCoordinates.toGradleDependencyNotation() =
+  "$groupId:$id:$version${if(classifier != null) ":$classifier" else ""}${if(extension != null) "@$extension" else ""}"
+
+
 private fun Project.createDependency(groupId: String, id: String, version: String, configuration: String?, classifier: String?, extension: String?): Dependency {
   val projectPath = ":$id"
   return if(project.findProject(projectPath) != null) {
@@ -14,10 +21,3 @@ private fun Project.createDependency(groupId: String, id: String, version: Strin
     project.dependencies.create(groupId, id, version, configuration, classifier, extension)
   }
 }
-
-fun DependencyCoordinates.toGradleDependency(project: Project, configuration: String?): Dependency {
-  return project.createDependency(groupId, id, version.toString(), configuration, classifier, extension)
-}
-
-fun DependencyCoordinates.toGradleDependencyNotation() =
-  "$groupId:$id:$version${if(classifier != null) ":$classifier" else ""}${if(extension != null) "@$extension" else ""}"

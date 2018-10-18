@@ -1,7 +1,12 @@
 package mb.releng.eclipse.gradle.plugin
 
+import mb.releng.eclipse.gradle.plugin.internal.*
+import mb.releng.eclipse.gradle.util.GradleLog
 import mb.releng.eclipse.gradle.util.toGradleDependency
 import mb.releng.eclipse.model.eclipse.Site
+import mb.releng.eclipse.util.TempDir
+import mb.releng.eclipse.util.packJar
+import mb.releng.eclipse.util.unpack
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
@@ -13,7 +18,11 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.property
+import java.io.PrintStream
 import java.nio.file.Files
+import java.nio.file.Path
+import java.text.SimpleDateFormat
+import java.util.*
 
 open class EclipseRepositoryExtension(objects: ObjectFactory) {
   var repositoryDescriptionFile: String
@@ -22,7 +31,14 @@ open class EclipseRepositoryExtension(objects: ObjectFactory) {
       _repositoryDescriptionFile.set(value)
     }
 
+  var qualifierReplacement: String
+    get() = _qualifierReplacement.get()
+    set(value) {
+      _qualifierReplacement.set(value)
+    }
+
   private val _repositoryDescriptionFile: Property<String> = objects.property()
+  private val _qualifierReplacement: Property<String> = objects.property()
 }
 
 class EclipseRepository : Plugin<Project> {
@@ -32,17 +48,20 @@ class EclipseRepository : Plugin<Project> {
 
     val extension = project.extensions.create<EclipseRepositoryExtension>("eclipseRepository", project.objects)
     extension.repositoryDescriptionFile = "site.xml"
+    extension.qualifierReplacement = SimpleDateFormat("yyyyMMddHHmm").format(Calendar.getInstance().time)
 
     project.afterEvaluate { configure(this) }
   }
 
   private fun configure(project: Project) {
-    project.pluginManager.apply(BasePlugin::class)
-    project.pluginManager.apply(MavenizePlugin::class)
-
-    val mavenized = project.mavenizedEclipseInstallation()
+    val log = GradleLog(project.logger)
 
     val extension = project.extensions.getByType<EclipseRepositoryExtension>()
+
+    project.pluginManager.apply(BasePlugin::class)
+
+    project.pluginManager.apply(MavenizePlugin::class)
+    val mavenized = project.mavenizedEclipseInstallation()
 
     // Process repository description (site.xml) file.
     val repositoryDescriptionFile = project.file(extension.repositoryDescriptionFile).toPath()
@@ -60,7 +79,7 @@ class EclipseRepository : Plugin<Project> {
       error("Cannot configure Eclipse repository; project $project has no '$repositoryDescriptionFile' file")
     }
 
-    // Build the repository.
+    // Unpack dependency features.
     val unpackFeaturesDir = project.buildDir.resolve("unpackFeatures")
     val unpackFeaturesTask = project.tasks.create<Copy>("unpackFeatures") {
       destinationDir = unpackFeaturesDir
@@ -68,12 +87,60 @@ class EclipseRepository : Plugin<Project> {
         from(project.zipTree(it))
       }
     }
+
+    // Replace '.qualifier' with concrete qualifiers in all features and plugins. Have to do the unpacking/packing of
+    // JAR files manually, as we cannot create Gradle tasks during execution.
+    val concreteQualifier = extension.qualifierReplacement
+    val replaceQualifierDir = project.buildDir.resolve("replaceQualifier")
+    val replaceQualifierTask = project.tasks.create("replaceQualifier") {
+      dependsOn(unpackFeaturesTask)
+      inputs.dir(unpackFeaturesDir)
+      outputs.dir(replaceQualifierDir)
+      doLast {
+        TempDir("replaceQualifier").use { tempDir ->
+          val replaceQualifierFeaturesDir = replaceQualifierDir.resolve("features").toPath()
+          Files.list(unpackFeaturesDir.resolve("features").toPath()).use { featureJarFiles ->
+            for(featureJarFile in featureJarFiles) {
+              val fileName = featureJarFile.fileName
+              val unpackTempDir = tempDir.createTempDir(fileName.toString())
+              unpack(featureJarFile, unpackTempDir, log)
+              val featureFile = unpackTempDir.resolve("feature.xml")
+              if(Files.isRegularFile(featureFile)) {
+                featureFile.replaceInFile(".qualifier", ".$concreteQualifier")
+              } else {
+                log.warning("Unable to replace qualifiers in versions for $fileName, as it has no feature.xml file")
+              }
+              val targetJarFile = replaceQualifierFeaturesDir.resolve(fileName)
+              packJar(unpackTempDir, targetJarFile)
+            }
+          }
+          val replaceQualifierPluginsDir = replaceQualifierDir.resolve("plugins").toPath()
+          Files.list(unpackFeaturesDir.resolve("plugins").toPath()).use { pluginJarFiles ->
+            for(pluginJarFile in pluginJarFiles) {
+              val fileName = pluginJarFile.fileName
+              val unpackTempDir = tempDir.createTempDir(fileName.toString())
+              unpack(pluginJarFile, unpackTempDir, log)
+              val manifestFile = unpackTempDir.resolve("META-INF/MANIFEST.MF")
+              if(Files.isRegularFile(manifestFile)) {
+                manifestFile.replaceInFile(".qualifier", ".$concreteQualifier")
+              } else {
+                log.warning("Unable to replace qualifiers in versions for $fileName, as it has no META-INF/MANIFEST.MF file")
+              }
+              val targetJarFile = replaceQualifierPluginsDir.resolve(fileName)
+              packJar(unpackTempDir, targetJarFile)
+            }
+          }
+        }
+      }
+    }
+
+    // Build the repository.
     val repositoryDir = project.buildDir.resolve("repository")
     val eclipseLauncherPath = mavenized.launcherPath()?.toString() ?: error("Could not find Eclipse launcher")
     val createRepositoryTask = project.tasks.create("createRepository") {
-      dependsOn(unpackFeaturesTask)
+      dependsOn(replaceQualifierTask)
+      inputs.dir(replaceQualifierDir)
       inputs.file(eclipseLauncherPath)
-      inputs.dir(unpackFeaturesDir)
       inputs.file(repositoryDescriptionFile)
       outputs.dir(repositoryDir)
       doLast {
@@ -84,7 +151,7 @@ class EclipseRepository : Plugin<Project> {
             "-application", "org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher",
             "-metadataRepository", "file:/$repositoryDir",
             "-artifactRepository", "file:/$repositoryDir",
-            "-source", "$unpackFeaturesDir",
+            "-source", "$replaceQualifierDir",
             "-configs", "ANY",
             "-compress",
             "-publishArtifacts"
@@ -97,13 +164,14 @@ class EclipseRepository : Plugin<Project> {
             "-application", "org.eclipse.equinox.p2.publisher.CategoryPublisher",
             "-metadataRepository", "file:/$repositoryDir",
             "-categoryDefinition", "file:/$repositoryDescriptionFile",
-            "-source", "$unpackFeaturesDir",
             "-categoryQualifier",
             "-compress"
           )
         }
       }
     }
+
+    // Zip the repository.
     val zipRepositoryTask = project.tasks.create<Zip>("zipRepository") {
       dependsOn(createRepositoryTask)
       from(repositoryDir)
@@ -112,5 +180,13 @@ class EclipseRepository : Plugin<Project> {
     project.artifacts {
       add(EclipseBasePlugin.repositoryConfigurationName, zipRepositoryTask)
     }
+  }
+}
+
+private fun Path.replaceInFile(pattern: String, replacement: String) {
+  // TODO: more efficient way to replace strings in a file?
+  val text = String(Files.readAllBytes(this)).replace(pattern, replacement)
+  Files.newOutputStream(this).buffered().use { outputStream ->
+    PrintStream(outputStream).print(text)
   }
 }

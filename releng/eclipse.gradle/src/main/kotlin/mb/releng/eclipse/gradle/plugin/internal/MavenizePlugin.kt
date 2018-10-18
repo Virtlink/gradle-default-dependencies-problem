@@ -1,4 +1,4 @@
-package mb.releng.eclipse.gradle.plugin
+package mb.releng.eclipse.gradle.plugin.internal
 
 import mb.releng.eclipse.gradle.util.GradleLog
 import mb.releng.eclipse.gradle.util.closureOf
