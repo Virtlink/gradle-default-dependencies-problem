@@ -106,6 +106,7 @@ class EclipseRepository : Plugin<Project> {
               unpack(featureJarFile, unpackTempDir, log)
               val featureFile = unpackTempDir.resolve("feature.xml")
               if(Files.isRegularFile(featureFile)) {
+                // TODO: this could have false positives, do a model 2 model transformation instead?
                 featureFile.replaceInFile(".qualifier", ".$concreteQualifier")
               } else {
                 log.warning("Unable to replace qualifiers in versions for $fileName, as it has no feature.xml file")
@@ -122,6 +123,7 @@ class EclipseRepository : Plugin<Project> {
               unpack(pluginJarFile, unpackTempDir, log)
               val manifestFile = unpackTempDir.resolve("META-INF/MANIFEST.MF")
               if(Files.isRegularFile(manifestFile)) {
+                // TODO: this could have false positives, do a model 2 model transformation instead?
                 manifestFile.replaceInFile(".qualifier", ".$concreteQualifier")
               } else {
                 log.warning("Unable to replace qualifiers in versions for $fileName, as it has no META-INF/MANIFEST.MF file")
