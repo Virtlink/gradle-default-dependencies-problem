@@ -5,3 +5,10 @@
 # IntelliJ
 **/.idea
 **/out
+
+# Eclipse
+**/.project
+**/.settings
+**/.classpath
+**/.factorypath
+**/bin
