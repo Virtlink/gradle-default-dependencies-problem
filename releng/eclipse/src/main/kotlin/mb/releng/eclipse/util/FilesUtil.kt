@@ -1,7 +1,10 @@
 package mb.releng.eclipse.util
 
+import java.io.File
+import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
+
 
 fun deleteNonEmptyDirectoryIfExists(directory: Path) {
   if(!Files.exists(directory)) return
@@ -16,4 +19,18 @@ fun createParentDirectories(path: Path) {
   if(parent != null) {
     Files.createDirectories(parent)
   }
+}
+
+fun Path.toPortableString(): String {
+  if(FileSystems.getDefault().separator == """\""") {
+    return this.toString().replace('\\', '/')
+  }
+  return this.toString()
+}
+
+fun File.toPortableString(): String {
+  if(File.separatorChar == '\\') {
+    return this.toString().replace('\\', '/')
+  }
+  return this.toString()
 }

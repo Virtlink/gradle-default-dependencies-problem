@@ -1,6 +1,8 @@
 package mb.releng.eclipse.gradle.plugin
 
 import mb.releng.eclipse.gradle.plugin.internal.*
+import mb.releng.eclipse.gradle.task.EclipseRun
+import mb.releng.eclipse.gradle.task.PrepareEclipseRunConfig
 import mb.releng.eclipse.gradle.util.GradleLog
 import mb.releng.eclipse.gradle.util.toGradleDependency
 import mb.releng.eclipse.model.eclipse.Site
@@ -90,6 +92,8 @@ class EclipseRepository : Plugin<Project> {
 
     // Replace '.qualifier' with concrete qualifiers in all features and plugins. Have to do the unpacking/packing of
     // JAR files manually, as we cannot create Gradle tasks during execution.
+    val featuresInUnpackFeaturesDir = unpackFeaturesDir.resolve("features").toPath()
+    val pluginsInUnpackFeaturesDir = unpackFeaturesDir.resolve("plugins").toPath()
     val concreteQualifier = extension.qualifierReplacement
     val replaceQualifierDir = project.buildDir.resolve("replaceQualifier")
     val replaceQualifierTask = project.tasks.create("replaceQualifier") {
@@ -99,7 +103,7 @@ class EclipseRepository : Plugin<Project> {
       doLast {
         TempDir("replaceQualifier").use { tempDir ->
           val replaceQualifierFeaturesDir = replaceQualifierDir.resolve("features").toPath()
-          Files.list(unpackFeaturesDir.resolve("features").toPath()).use { featureJarFiles ->
+          Files.list(featuresInUnpackFeaturesDir).use { featureJarFiles ->
             for(featureJarFile in featureJarFiles) {
               val fileName = featureJarFile.fileName
               val unpackTempDir = tempDir.createTempDir(fileName.toString())
@@ -116,7 +120,7 @@ class EclipseRepository : Plugin<Project> {
             }
           }
           val replaceQualifierPluginsDir = replaceQualifierDir.resolve("plugins").toPath()
-          Files.list(unpackFeaturesDir.resolve("plugins").toPath()).use { pluginJarFiles ->
+          Files.list(pluginsInUnpackFeaturesDir).use { pluginJarFiles ->
             for(pluginJarFile in pluginJarFiles) {
               val fileName = pluginJarFile.fileName
               val unpackTempDir = tempDir.createTempDir(fileName.toString())
@@ -138,7 +142,7 @@ class EclipseRepository : Plugin<Project> {
 
     // Build the repository.
     val repositoryDir = project.buildDir.resolve("repository")
-    val eclipseLauncherPath = mavenized.launcherPath()?.toString() ?: error("Could not find Eclipse launcher")
+    val eclipseLauncherPath = mavenized.equinoxLauncherPath()?.toString() ?: error("Could not find Eclipse launcher")
     val createRepositoryTask = project.tasks.create("createRepository") {
       dependsOn(replaceQualifierTask)
       inputs.dir(replaceQualifierDir)
@@ -182,6 +186,22 @@ class EclipseRepository : Plugin<Project> {
     project.artifacts {
       add(EclipseBasePlugin.repositoryConfigurationName, zipRepositoryTask)
     }
+
+    // Run Eclipse with unpacked plugins.
+    val prepareEclipseRunConfigurationTask = project.tasks.create<PrepareEclipseRunConfig>("prepareRunConfiguration") {
+      dependsOn(unpackFeaturesTask)
+      setFromMavenizedEclipseInstallation(mavenized)
+      doFirst {
+        Files.list(pluginsInUnpackFeaturesDir).use { pluginFiles ->
+          for(file in pluginFiles) {
+            addBundle(file)
+          }
+        }
+      }
+    }
+    project.tasks.create<EclipseRun>("run") {
+      configure(prepareEclipseRunConfigurationTask, mavenized)
+    }
   }
 }
 
@@ -189,6 +209,10 @@ private fun Path.replaceInFile(pattern: String, replacement: String) {
   // TODO: more efficient way to replace strings in a file?
   val text = String(Files.readAllBytes(this)).replace(pattern, replacement)
   Files.newOutputStream(this).buffered().use { outputStream ->
-    PrintStream(outputStream).print(text)
+    PrintStream(outputStream).use {
+      it.print(text)
+      it.flush()
+    }
+    outputStream.flush()
   }
 }

@@ -1,6 +1,8 @@
 package mb.releng.eclipse.gradle.plugin
 
 import mb.releng.eclipse.gradle.plugin.internal.*
+import mb.releng.eclipse.gradle.task.EclipseRun
+import mb.releng.eclipse.gradle.task.PrepareEclipseRunConfig
 import mb.releng.eclipse.gradle.util.GradleLog
 import mb.releng.eclipse.gradle.util.toGradleDependency
 import mb.releng.eclipse.model.eclipse.BuildProperties
@@ -13,6 +15,7 @@ import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByName
 import org.gradle.language.jvm.tasks.ProcessResources
 import java.nio.file.Files
@@ -46,21 +49,25 @@ class EclipsePlugin : Plugin<Project> {
       val pluginConfiguration = project.pluginConfiguration
       pluginConfiguration.defaultDependencies {
         for(dependency in mavenArtifact.dependencies) {
-          if(dependency.optional) continue
-          // Use null (default) configuration when the dependency is a mavenized bundle.
           val coords = dependency.coordinates
+          val isMavenizedBundle = mavenized.isMavenizedBundle(coords.groupId, coords.id)
+          // Don't add mavenized and optional dependencies, they go into `project.pluginCompileOnlyConfiguration`.
+          if(isMavenizedBundle || dependency.optional) continue
+          // Use null (default) configuration when the dependency is a mavenized bundle.
           val configuration = if(mavenized.isMavenizedBundle(coords.groupId, coords.id)) null else pluginConfiguration.name
           this.add(coords.toGradleDependency(project, configuration))
         }
       }
-      // Add default dependencies to optional plugin configuration.
-      val pluginOptionalConfiguration = project.pluginOptionalConfiguration
-      pluginOptionalConfiguration.defaultDependencies {
+      // Add default dependencies to compile-only plugin configuration.
+      project.pluginCompileOnlyConfiguration.defaultDependencies {
         for(dependency in mavenArtifact.dependencies) {
-          if(!dependency.optional) continue
           val coords = dependency.coordinates
-          val configuration = if(mavenized.isMavenizedBundle(coords.groupId, coords.id)) null else pluginOptionalConfiguration.name
-          this.add(coords.toGradleDependency(project, configuration))
+          val isMavenizedBundle = mavenized.isMavenizedBundle(coords.groupId, coords.id)
+          if(isMavenizedBundle || dependency.optional) {
+            // Add mavenized and optional bundles to `project.pluginCompileOnlyConfiguration`.
+            val configuration = if(mavenized.isMavenizedBundle(coords.groupId, coords.id)) null else pluginConfiguration.name
+            this.add(coords.toGradleDependency(project, configuration))
+          }
         }
       }
     } else {
@@ -76,7 +83,7 @@ class EclipsePlugin : Plugin<Project> {
     // Make the Java plugin's configurations extend our plugin configuration, so that all dependencies from our
     // configurations are included in the Java plugin configurations.
     project.configurations.getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME).extendsFrom(project.pluginConfiguration)
-    project.configurations.getByName(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).extendsFrom(project.pluginOptionalConfiguration)
+    project.configurations.getByName(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).extendsFrom(project.pluginCompileOnlyConfiguration)
 
     // Process build properties.
     val properties = run {
@@ -107,6 +114,21 @@ class EclipsePlugin : Plugin<Project> {
     }
     project.artifacts {
       add(EclipseBasePlugin.pluginConfigurationName, jarTask)
+    }
+
+    // Run Eclipse with this plugin and its dependencies.
+    val prepareEclipseRunConfigurationTask = project.tasks.create<PrepareEclipseRunConfig>("prepareRunConfiguration") {
+      setFromMavenizedEclipseInstallation(mavenized)
+      dependsOn(jarTask)
+      doFirst {
+        addBundle(jarTask)
+        for(file in project.pluginConfiguration) {
+          addBundle(file)
+        }
+      }
+    }
+    project.tasks.create<EclipseRun>("run") {
+      configure(prepareEclipseRunConfigurationTask, mavenized)
     }
   }
 }

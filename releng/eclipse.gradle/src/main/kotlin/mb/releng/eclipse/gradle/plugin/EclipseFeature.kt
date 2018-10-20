@@ -1,6 +1,8 @@
 package mb.releng.eclipse.gradle.plugin
 
 import mb.releng.eclipse.gradle.plugin.internal.*
+import mb.releng.eclipse.gradle.task.EclipseRun
+import mb.releng.eclipse.gradle.task.PrepareEclipseRunConfig
 import mb.releng.eclipse.gradle.util.GradleLog
 import mb.releng.eclipse.gradle.util.toGradleDependency
 import mb.releng.eclipse.mavenize.toMaven
@@ -45,7 +47,10 @@ class EclipseFeature : Plugin<Project> {
       configuration.defaultDependencies {
         for(dependency in feature.dependencies) {
           val coords = converter.convert(dependency.coordinates)
-          this.add(coords.toGradleDependency(project, configuration.name))
+          val isMavenizedBundle = mavenized.isMavenizedBundle(coords.groupId, coords.id)
+          if(!isMavenizedBundle) {
+            this.add(coords.toGradleDependency(project, configuration.name))
+          }
         }
       }
     } else {
@@ -83,6 +88,19 @@ class EclipseFeature : Plugin<Project> {
     project.tasks.getByName(BasePlugin.ASSEMBLE_TASK_NAME).dependsOn(jarTask)
     project.artifacts {
       add(EclipseBasePlugin.featureConfigurationName, jarTask)
+    }
+
+    // Run Eclipse with dependencies.
+    val prepareEclipseRunConfigurationTask = project.tasks.create<PrepareEclipseRunConfig>("prepareRunConfiguration") {
+      setFromMavenizedEclipseInstallation(mavenized)
+      doFirst {
+        for(file in project.pluginConfiguration) {
+          addBundle(file)
+        }
+      }
+    }
+    project.tasks.create<EclipseRun>("run") {
+      configure(prepareEclipseRunConfigurationTask, mavenized)
     }
   }
 }

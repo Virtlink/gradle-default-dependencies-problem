@@ -89,16 +89,27 @@ data class MavenizedEclipseInstallation(
     return converter
   }
 
-  fun launcherPath(): Path? {
-    val matcher = FileSystems.getDefault().getPathMatcher("glob:org.eclipse.equinox.launcher_*.jar")
+
+  fun osgiFrameworkPath() = pluginPath("org.eclipse.osgi")
+
+  fun equinoxLauncherPath() = pluginPath("org.eclipse.equinox.launcher")
+
+  fun equinoxConfiguratorPath() = pluginPath("org.eclipse.equinox.simpleconfigurator")
+
+  fun pluginPath(name: String): Path? {
+    val matcher = FileSystems.getDefault().getPathMatcher("glob:${name}_*.jar")
     val plugins = Files.list(installationPluginsDir)
-    val launcher = plugins.filter {
+    val plugin = plugins.filter {
       matcher.matches(it.fileName)
     }.findFirst()
-    return if(!launcher.isPresent) {
+    return if(!plugin.isPresent) {
       null
     } else {
-      launcher.get()
+      plugin.get()
     }
   }
+
+
+  // TODO: this path is probably different on osx, should be passed as input!
+  fun equinoxConfiguratorBundlesInfoPath(): Path = installationDir.resolve("eclipse/configuration/org.eclipse.equinox.simpleconfigurator/bundles.info")
 }
