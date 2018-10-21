@@ -85,7 +85,7 @@ class EclipseRepository : Plugin<Project> {
     val unpackFeaturesDir = project.buildDir.resolve("unpackFeatures")
     val unpackFeaturesTask = project.tasks.create<Copy>("unpackFeatures") {
       destinationDir = unpackFeaturesDir
-      project.configurations.getByName(EclipseBasePlugin.featureConfigurationName).forEach {
+      project.featureConfiguration.forEach {
         from(project.zipTree(it))
       }
     }

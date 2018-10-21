@@ -26,9 +26,4 @@ apply {
   // HACK: apply our plugin, instead of using a declarative plugin block.
   plugin("org.metaborg.eclipse-repository")
 }
-//plugins {
-//  id("org.metaborg.eclipse-repository") version "develop-SNAPSHOT"
-//}
-//dependencies {
-//  "eclipse-feature"(project(":spoofax.eclipse.feature", "eclipse-feature"))
-//}
+version = "1.0.0-SNAPSHOT"

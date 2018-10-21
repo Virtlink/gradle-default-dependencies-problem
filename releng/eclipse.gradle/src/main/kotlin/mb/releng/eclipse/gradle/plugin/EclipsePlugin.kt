@@ -54,7 +54,7 @@ class EclipsePlugin : Plugin<Project> {
           // Don't add mavenized and optional dependencies, they go into `project.pluginCompileOnlyConfiguration`.
           if(isMavenizedBundle || dependency.optional) continue
           // Use null (default) configuration when the dependency is a mavenized bundle.
-          val configuration = if(mavenized.isMavenizedBundle(coords.groupId, coords.id)) null else pluginConfiguration.name
+          val configuration = if(isMavenizedBundle) null else pluginConfiguration.name
           this.add(coords.toGradleDependency(project, configuration))
         }
       }
@@ -65,7 +65,7 @@ class EclipsePlugin : Plugin<Project> {
           val isMavenizedBundle = mavenized.isMavenizedBundle(coords.groupId, coords.id)
           if(isMavenizedBundle || dependency.optional) {
             // Add mavenized and optional bundles to `project.pluginCompileOnlyConfiguration`.
-            val configuration = if(mavenized.isMavenizedBundle(coords.groupId, coords.id)) null else pluginConfiguration.name
+            val configuration = if(isMavenizedBundle) null else pluginConfiguration.name
             this.add(coords.toGradleDependency(project, configuration))
           }
         }

@@ -8,4 +8,10 @@ tasks {
   register("runSpoofaxCli") {
     dependsOn(gradle.includedBuild("spoofax").task(":spoofax.cli:run"))
   }
+  register("runSpoofaxEclipse") {
+    dependsOn(gradle.includedBuild("spoofax.eclipse").task(":spoofax.eclipse.repository:run"))
+  }
+  register("spoofaxEclipseRepositoryDependencies") {
+    dependsOn(gradle.includedBuild("spoofax.eclipse").task(":spoofax.eclipse.repository:dependencies"))
+  }
 }

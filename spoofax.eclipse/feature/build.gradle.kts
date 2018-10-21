@@ -24,6 +24,3 @@ apply {
   // HACK: apply our plugin, instead of using a declarative plugin block.
   plugin("org.metaborg.eclipse-feature")
 }
-//plugins {
-//  id("org.metaborg.eclipse-feature") version "develop-SNAPSHOT"
-//}
