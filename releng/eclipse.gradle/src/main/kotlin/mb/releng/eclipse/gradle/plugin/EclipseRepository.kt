@@ -6,9 +6,7 @@ import mb.releng.eclipse.gradle.task.PrepareEclipseRunConfig
 import mb.releng.eclipse.gradle.util.GradleLog
 import mb.releng.eclipse.gradle.util.toGradleDependency
 import mb.releng.eclipse.model.eclipse.Site
-import mb.releng.eclipse.util.TempDir
-import mb.releng.eclipse.util.packJar
-import mb.releng.eclipse.util.unpack
+import mb.releng.eclipse.util.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
@@ -16,10 +14,7 @@ import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.property
+import org.gradle.kotlin.dsl.*
 import java.io.PrintStream
 import java.nio.file.Files
 import java.nio.file.Path
@@ -200,7 +195,7 @@ class EclipseRepository : Plugin<Project> {
       }
     }
     project.tasks.create<EclipseRun>("run") {
-      configure(prepareEclipseRunConfigurationTask, mavenized)
+      configure(prepareEclipseRunConfigurationTask, mavenized, project.mavenizeExtension())
     }
   }
 }

@@ -16,10 +16,11 @@ class MavenizeTest {
     val mavenizeDir = Paths.get(System.getProperty("user.home"), ".mavenize")
     val installationArchiveUrl = "http://ftp.fau.de/eclipse/technology/epp/downloads/release/photon/R/eclipse-committers-photon-R-win32-x86_64.zip"
     val installationPluginsDirRelative = Paths.get("eclipse", "plugins")
+    val installationConfigurationDirRelative = Paths.get("eclipse", "configuration")
     val groupId = "eclipse-photon"
 
-    val mavenizedEclipseInstallation1 = mavenizeEclipseInstallation(mavenizeDir, installationArchiveUrl, installationPluginsDirRelative, groupId, log, true, true)
-    val mavenizedEclipseInstallation2 = mavenizeEclipseInstallation(mavenizeDir, installationArchiveUrl, installationPluginsDirRelative, groupId, log)
+    val mavenizedEclipseInstallation1 = mavenizeEclipseInstallation(mavenizeDir, installationArchiveUrl, installationPluginsDirRelative, installationConfigurationDirRelative, groupId, log, true, true)
+    val mavenizedEclipseInstallation2 = mavenizeEclipseInstallation(mavenizeDir, installationArchiveUrl, installationPluginsDirRelative, installationConfigurationDirRelative, groupId, log)
     Assertions.assertEquals(mavenizedEclipseInstallation1, mavenizedEclipseInstallation2)
   }
 }

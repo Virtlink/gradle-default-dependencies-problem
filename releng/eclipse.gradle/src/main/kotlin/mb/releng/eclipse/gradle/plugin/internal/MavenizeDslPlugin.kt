@@ -4,18 +4,39 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.property
+import org.gradle.kotlin.dsl.*
 import java.nio.file.Path
 import java.nio.file.Paths
 
-enum class EclipseOs(val archiveSuffix: String, val archiveExtension: String, val pluginsDir: Path) {
-  Windows("win32", "zip", Paths.get("eclipse", "plugins")),
-  Linux("linux", "tar.gz", Paths.get("eclipse", "plugins")),
+enum class EclipseOs(
+  val archiveSuffix: String,
+  val archiveExtension: String,
+  val pluginsDir: Path,
+  val configurationDir: Path,
+  val extraJvmArgs: List<String>
+) {
+  Windows(
+    "win32",
+    "zip",
+    Paths.get("eclipse", "plugins"),
+    Paths.get("eclipse", "configuration"),
+    listOf()
+  ),
+  Linux(
+    "linux-gtk",
+    "tar.gz",
+    Paths.get("eclipse", "plugins"),
+    Paths.get("eclipse", "configuration"),
+    listOf()
+  ),
   // TODO: OSX archive is in DMG format, temporarily treat it as Linux until we can unpack DMG archives.
-  OSX("linux", "tar.gz", Paths.get("eclipse", "plugins"));
-  //OSX("macosx", "dmg", Paths.get("TODO"));
+  OSX(
+    "macosx-cocoa",
+    "dmg",
+    Paths.get("Eclipse.app", "Contents", "Eclipse", "plugins"),
+    Paths.get("Eclipse.app", "Contents", "Eclipse", "configuration"),
+    listOf("-XstartOnFirstThread")
+  );
 
   companion object {
     fun current(): EclipseOs {
@@ -31,14 +52,15 @@ enum class EclipseOs(val archiveSuffix: String, val archiveExtension: String, va
 }
 
 enum class EclipseArch(val archiveSuffix: String) {
-  X86_32(""), X86_64("-x86_64");
+  X86_32(""),
+  X86_64("-x86_64");
 
   companion object {
     fun current(): EclipseArch {
       val arch = System.getProperty("os.arch")
       return when(arch) {
         "x86", "i386" -> X86_32
-        "amd64" -> X86_64
+        "amd64", "x86_64" -> X86_64
         else -> error("Unsupported Eclipse architecture '$arch'")
       }
     }

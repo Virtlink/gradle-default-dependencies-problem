@@ -26,6 +26,7 @@ class MavenizePlugin : Plugin<Project> {
       extension.mavenizeDir.get(),
       extension.url,
       extension.os.get().pluginsDir,
+      extension.os.get().configurationDir,
       extension.groupId.get(),
       log
     )

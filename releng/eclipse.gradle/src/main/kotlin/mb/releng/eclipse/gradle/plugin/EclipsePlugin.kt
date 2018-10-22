@@ -128,7 +128,7 @@ class EclipsePlugin : Plugin<Project> {
       }
     }
     project.tasks.create<EclipseRun>("run") {
-      configure(prepareEclipseRunConfigurationTask, mavenized)
+      configure(prepareEclipseRunConfigurationTask, mavenized, project.mavenizeExtension())
     }
   }
 }

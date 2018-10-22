@@ -1,18 +1,15 @@
 package mb.releng.eclipse.mavenize
 
 import mb.releng.eclipse.model.eclipse.*
-import mb.releng.eclipse.util.Log
-import mb.releng.eclipse.util.TempDir
-import mb.releng.eclipse.util.deleteNonEmptyDirectoryIfExists
-import java.nio.file.FileSystems
-import java.nio.file.Files
-import java.nio.file.Path
+import mb.releng.eclipse.util.*
+import java.nio.file.*
 import java.util.stream.Collectors
 
 fun mavenizeEclipseInstallation(
   mavenizeDir: Path,
   installationArchiveUrl: String,
   installationPluginsDirRelative: Path,
+  installationConfigurationDirRelative: Path,
   groupId: String,
   log: Log,
   forceDownload: Boolean = false,
@@ -69,7 +66,9 @@ fun mavenizeEclipseInstallation(
   val installedBundleDirs = Files.list(repoGroupIdDir)
   val installationBundleNames = installedBundleDirs.map { it.fileName.toString() }.collect(Collectors.toSet())
   installedBundleDirs.close()
-  return MavenizedEclipseInstallation(groupId, repoDir, installationDir, installationPluginsDir, installationBundleNames)
+
+  val installationConfigurationDir = installationDir.resolve(installationConfigurationDirRelative)
+  return MavenizedEclipseInstallation(groupId, repoDir, installationDir, installationPluginsDir, installationConfigurationDir, installationBundleNames)
 }
 
 data class MavenizedEclipseInstallation(
@@ -77,6 +76,7 @@ data class MavenizedEclipseInstallation(
   val repoDir: Path,
   val installationDir: Path,
   val installationPluginsDir: Path,
+  val installationConfigurationDir: Path,
   val installationBundleNames: Set<String>
 ) {
   fun isMavenizedBundle(groupId: String, id: String) = groupId == this.groupId && installationBundleNames.contains(id)
@@ -110,6 +110,5 @@ data class MavenizedEclipseInstallation(
   }
 
 
-  // TODO: this path is probably different on osx, should be passed as input!
-  fun equinoxConfiguratorBundlesInfoPath(): Path = installationDir.resolve("eclipse/configuration/org.eclipse.equinox.simpleconfigurator/bundles.info")
+  fun equinoxConfiguratorBundlesInfoPath(): Path = installationConfigurationDir.resolve("org.eclipse.equinox.simpleconfigurator/bundles.info")
 }
