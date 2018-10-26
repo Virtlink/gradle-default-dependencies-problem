@@ -26,20 +26,16 @@ val exports = listOf(
   "org.slf4j.*;provider=mb;mandatory:=provider",
   "kotlin.*;-split-package:=first;provider=mb;mandatory:=provider"
 )
-val imports = listOf(
-  "!org.slf4j.impl",
-  "*"
-)
 val jar: Jar by tasks
 jar.apply {
   manifest {
     attributes(Pair("Export-Package", exports.joinToString(", ")))
-    attributes(Pair("Import-Package", imports.joinToString(", ")))
+    attributes(Pair("Import-Package", "")) // No imports needed
     attributes(Pair("Bundle-Version", version.replace("-SNAPSHOT", ".qualifier")))
   }
 }
 
-// Export the produced OSGi bundle JAR as an 'eclipse-plugin' artifact.
+// Export the produced OSGi bundle JAR as an 'eclipse-plugin' artifact, for use in our Eclipse plugin.
 configurations.create("eclipse-plugin")
 artifacts {
   add("eclipse-plugin", jar)
