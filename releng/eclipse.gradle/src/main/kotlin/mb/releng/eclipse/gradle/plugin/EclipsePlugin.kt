@@ -9,6 +9,7 @@ import mb.releng.eclipse.model.eclipse.BuildProperties
 import mb.releng.eclipse.model.eclipse.Bundle
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
@@ -34,7 +35,7 @@ class EclipsePlugin : Plugin<Project> {
     project.pluginManager.apply(MavenizePlugin::class)
     val mavenized = project.mavenizedEclipseInstallation()
 
-    project.pluginManager.apply(JavaPlugin::class)
+    project.pluginManager.apply(JavaLibraryPlugin::class)
     val jarTask = project.tasks.getByName<Jar>(JavaPlugin.JAR_TASK_NAME)
 
     // Process META-INF/MANIFEST.MF file, if any.
@@ -82,7 +83,7 @@ class EclipsePlugin : Plugin<Project> {
     // Make the Java plugin's configurations extend our plugin configuration, so that all dependencies from our
     // configurations are included in the Java plugin configurations. Doing this after scanning dependencies, because
     // this may resolve our configurations.
-    project.configurations.getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME).extendsFrom(project.pluginConfiguration)
+    project.configurations.getByName(JavaPlugin.API_CONFIGURATION_NAME).extendsFrom(project.pluginConfiguration)
     project.configurations.getByName(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).extendsFrom(project.pluginCompileOnlyConfiguration)
 
     // Process build properties.

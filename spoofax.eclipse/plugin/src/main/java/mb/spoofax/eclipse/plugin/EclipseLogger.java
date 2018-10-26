@@ -19,7 +19,7 @@ public class EclipseLogger extends ALogger {
 
     @Override
     public void trace(String msg, Throwable cause) {
-        log.log(new Status(IStatus.INFO, SpoofaxPlugin.PLUGIN_ID, msg, cause));
+        log.log(new Status(IStatus.INFO, pluginId, msg, cause));
     }
 
     @Override
@@ -30,7 +30,7 @@ public class EclipseLogger extends ALogger {
 
     @Override
     public void debug(String msg, Throwable cause) {
-        log.log(new Status(IStatus.INFO, SpoofaxPlugin.PLUGIN_ID, msg, cause));
+        log.log(new Status(IStatus.INFO, pluginId, msg, cause));
     }
 
     @Override
@@ -41,7 +41,7 @@ public class EclipseLogger extends ALogger {
 
     @Override
     public void info(String msg, Throwable cause) {
-        log.log(new Status(IStatus.INFO, SpoofaxPlugin.PLUGIN_ID, msg, cause));
+        log.log(new Status(IStatus.INFO, pluginId, msg, cause));
     }
 
     @Override
@@ -52,7 +52,7 @@ public class EclipseLogger extends ALogger {
 
     @Override
     public void warn(String msg, Throwable cause) {
-        log.log(new Status(IStatus.WARNING, SpoofaxPlugin.PLUGIN_ID, msg, cause));
+        log.log(new Status(IStatus.WARNING, pluginId, msg, cause));
     }
 
     @Override
@@ -63,7 +63,7 @@ public class EclipseLogger extends ALogger {
 
     @Override
     public void error(String msg, Throwable cause) {
-        log.log(new Status(IStatus.ERROR, SpoofaxPlugin.PLUGIN_ID, msg, cause));
+        log.log(new Status(IStatus.ERROR, pluginId, msg, cause));
     }
 
     @Override
