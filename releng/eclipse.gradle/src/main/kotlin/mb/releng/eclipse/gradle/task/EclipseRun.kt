@@ -17,6 +17,7 @@ open class EclipseRun : JavaExec() {
       "-Dosgi.sharedConfiguration.area.readOnly=true",
       "-Dosgi.configuration.area=configuration",
       "-jar", installation.equinoxLauncherPath(),
+      "-clean", // Clean the OSGi cache so that rewiring occurs, which is needed when bundles change.
       "-data", "workspace",
       "-consoleLog"
     )
