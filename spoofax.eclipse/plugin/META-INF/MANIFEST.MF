@@ -3,10 +3,10 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Spoofax Eclipse Plugin
 Bundle-SymbolicName: spoofax.eclipse.plugin;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: mb.spoofax.eclipse.plugin.Activator
+Bundle-Activator: mb.spoofax.eclipse.plugin.SpoofaxPlugin
 Bundle-Vendor: MetaBorg
 Export-Package: mb.spoofax.eclipse.plugin
-Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime
+Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,spoofax.eclipse.externaldeps
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: spoofax.eclipse.plugin
 Bundle-ActivationPolicy: lazy

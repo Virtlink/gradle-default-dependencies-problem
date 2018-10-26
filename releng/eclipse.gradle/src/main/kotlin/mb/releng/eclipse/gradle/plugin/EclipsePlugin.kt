@@ -28,14 +28,20 @@ class EclipsePlugin : Plugin<Project> {
   }
 
   private fun configure(project: Project) {
+    val log = GradleLog(project.logger)
+    val pluginConfiguration = project.pluginConfiguration
+
     project.pluginManager.apply(MavenizePlugin::class)
     val mavenized = project.mavenizedEclipseInstallation()
 
-    val log = GradleLog(project.logger)
+    project.pluginManager.apply(JavaPlugin::class)
+    val jarTask = project.tasks.getByName<Jar>(JavaPlugin.JAR_TASK_NAME)
 
     // Process META-INF/MANIFEST.MF file, if any.
     val manifestFile = project.file("META-INF/MANIFEST.MF").toPath()
     if(Files.isRegularFile(manifestFile)) {
+      jarTask.manifest.from(manifestFile)
+
       val bundle = Bundle.readFromManifestFile(manifestFile, log)
       val groupId = project.group.toString()
       val converter = mavenized.createConverter(groupId)
@@ -46,7 +52,6 @@ class EclipsePlugin : Plugin<Project> {
         project.version = mavenArtifact.coordinates.version
       }
       // Add default dependencies to plugin configuration.
-      val pluginConfiguration = project.pluginConfiguration
       pluginConfiguration.defaultDependencies {
         for(dependency in mavenArtifact.dependencies) {
           val coords = dependency.coordinates
@@ -74,14 +79,9 @@ class EclipsePlugin : Plugin<Project> {
       error("Cannot configure Eclipse plugin; project $project has no 'META-INF/MANIFEST.MF' file")
     }
 
-    // Apply Java plugin, after setting dependencies, because it apparently eagerly resolves configurations, freezing them.
-    project.pluginManager.apply(JavaPlugin::class)
-    val jarTask = project.tasks.getByName<Jar>(JavaPlugin.JAR_TASK_NAME)
-    if(Files.isRegularFile(manifestFile)) {
-      jarTask.manifest.from(manifestFile)
-    }
     // Make the Java plugin's configurations extend our plugin configuration, so that all dependencies from our
-    // configurations are included in the Java plugin configurations.
+    // configurations are included in the Java plugin configurations. Doing this after scanning dependencies, because
+    // this may resolve our configurations.
     project.configurations.getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME).extendsFrom(project.pluginConfiguration)
     project.configurations.getByName(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).extendsFrom(project.pluginCompileOnlyConfiguration)
 
@@ -118,11 +118,12 @@ class EclipsePlugin : Plugin<Project> {
 
     // Run Eclipse with this plugin and its dependencies.
     val prepareEclipseRunConfigurationTask = project.tasks.create<PrepareEclipseRunConfig>("prepareRunConfiguration") {
-      setFromMavenizedEclipseInstallation(mavenized)
       dependsOn(jarTask)
+      dependsOn(pluginConfiguration)
+      setFromMavenizedEclipseInstallation(mavenized)
       doFirst {
         addBundle(jarTask)
-        for(file in project.pluginConfiguration) {
+        for(file in pluginConfiguration) {
           addBundle(file)
         }
       }

@@ -25,10 +25,12 @@ class EclipseFeature : Plugin<Project> {
   }
 
   private fun configure(project: Project) {
-    project.pluginManager.apply(BasePlugin::class)
-    project.pluginManager.apply(MavenizePlugin::class)
-
     val log = GradleLog(project.logger)
+    val pluginConfiguration = project.pluginConfiguration
+
+    project.pluginManager.apply(BasePlugin::class)
+
+    project.pluginManager.apply(MavenizePlugin::class)
     val mavenized = project.mavenizedEclipseInstallation()
 
     // Process feature.xml file.
@@ -43,13 +45,12 @@ class EclipseFeature : Plugin<Project> {
         project.version = feature.version.toMaven()
       }
       val converter = mavenized.createConverter(project.group.toString())
-      val configuration = project.pluginConfiguration
-      configuration.defaultDependencies {
+      pluginConfiguration.defaultDependencies {
         for(dependency in feature.dependencies) {
           val coords = converter.convert(dependency.coordinates)
           val isMavenizedBundle = mavenized.isMavenizedBundle(coords.groupId, coords.id)
           if(!isMavenizedBundle) {
-            this.add(coords.toGradleDependency(project, configuration.name))
+            this.add(coords.toGradleDependency(project, pluginConfiguration.name))
           }
         }
       }
@@ -79,7 +80,8 @@ class EclipseFeature : Plugin<Project> {
     }
     val copyPluginsTask = project.tasks.create<Copy>("copyPlugins") {
       destinationDir = targetDir.resolve("plugins")
-      from(project.configurations.getByName(EclipseBasePlugin.pluginConfigurationName))
+      dependsOn(pluginConfiguration)
+      from(pluginConfiguration)
     }
     val jarTask = project.tasks.create<Jar>("jar") {
       dependsOn(featureJarTask, copyPluginsTask)
@@ -92,9 +94,10 @@ class EclipseFeature : Plugin<Project> {
 
     // Run Eclipse with dependencies.
     val prepareEclipseRunConfigurationTask = project.tasks.create<PrepareEclipseRunConfig>("prepareRunConfiguration") {
+      dependsOn(pluginConfiguration)
       setFromMavenizedEclipseInstallation(mavenized)
       doFirst {
-        for(file in project.pluginConfiguration) {
+        for(file in pluginConfiguration) {
           addBundle(file)
         }
       }

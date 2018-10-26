@@ -1,21 +1,19 @@
 package mb.spoofax.eclipse.meta.plugin.handlers;
 
-import mb.spoofax.eclipse.plugin.Activator;
+import mb.pie.api.PieApi;
+import mb.pie.runtime.PieRuntime;
+import mb.spoofax.eclipse.meta.plugin.SpoofaxMetaPlugin;
+import mb.spoofax.eclipse.plugin.SpoofaxPlugin;
+import mb.spoofax.pie.SpoofaxPie;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 public class SampleHandler extends AbstractHandler {
     @Override
-    public Object execute(ExecutionEvent event) throws ExecutionException {
-        IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-        MessageDialog.openInformation(window.getShell(),
-                "Spoofax Meta Eclipse Plugin",
-                "Hello, Eclipse world, from Spoofax Meta, depending on Spoofax with message '" + Activator.SECRET_MESSAGE + "', through Gradle!"
-        );
+    public Object execute(ExecutionEvent event) {
+        final PieApi pieApi = new PieRuntime();
+        final SpoofaxPie spoofaxPie = new SpoofaxPie(SpoofaxPlugin.getApi(), pieApi);
+        spoofaxPie.doSpoofaxPieStuff(SpoofaxMetaPlugin.getLogger());
         return null;
     }
 }

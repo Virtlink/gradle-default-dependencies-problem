@@ -52,7 +52,7 @@ class EclipseRepository : Plugin<Project> {
 
   private fun configure(project: Project) {
     val log = GradleLog(project.logger)
-
+    val featureConfiguration = project.featureConfiguration
     val extension = project.extensions.getByType<EclipseRepositoryExtension>()
 
     project.pluginManager.apply(BasePlugin::class)
@@ -65,11 +65,10 @@ class EclipseRepository : Plugin<Project> {
     if(Files.isRegularFile(repositoryDescriptionFile)) {
       val site = Site.read(repositoryDescriptionFile)
       val converter = mavenized.createConverter(project.group.toString())
-      val configuration = project.featureConfiguration
-      configuration.defaultDependencies {
+      featureConfiguration.defaultDependencies {
         for(dependency in site.dependencies) {
           val coords = converter.convert(dependency)
-          this.add(coords.toGradleDependency(project, configuration.name))
+          this.add(coords.toGradleDependency(project, featureConfiguration.name))
         }
       }
     } else {
@@ -80,7 +79,9 @@ class EclipseRepository : Plugin<Project> {
     val unpackFeaturesDir = project.buildDir.resolve("unpackFeatures")
     val unpackFeaturesTask = project.tasks.create<Copy>("unpackFeatures") {
       destinationDir = unpackFeaturesDir
-      project.featureConfiguration.forEach {
+      dependsOn(featureConfiguration)
+      featureConfiguration.forEach {
+        inputs.file(it)
         from(project.zipTree(it))
       }
     }
@@ -91,13 +92,17 @@ class EclipseRepository : Plugin<Project> {
     val pluginsInUnpackFeaturesDir = unpackFeaturesDir.resolve("plugins").toPath()
     val concreteQualifier = extension.qualifierReplacement
     val replaceQualifierDir = project.buildDir.resolve("replaceQualifier")
+    val featuresInReplaceQualifierDir = replaceQualifierDir.resolve("features").toPath()
+    val pluginsInReplaceQualifierDir = replaceQualifierDir.resolve("plugins").toPath()
     val replaceQualifierTask = project.tasks.create("replaceQualifier") {
       dependsOn(unpackFeaturesTask)
       inputs.dir(unpackFeaturesDir)
       outputs.dir(replaceQualifierDir)
+      doFirst {
+        replaceQualifierDir.deleteRecursively()
+      }
       doLast {
         TempDir("replaceQualifier").use { tempDir ->
-          val replaceQualifierFeaturesDir = replaceQualifierDir.resolve("features").toPath()
           Files.list(featuresInUnpackFeaturesDir).use { featureJarFiles ->
             for(featureJarFile in featureJarFiles) {
               val fileName = featureJarFile.fileName
@@ -110,11 +115,10 @@ class EclipseRepository : Plugin<Project> {
               } else {
                 log.warning("Unable to replace qualifiers in versions for $fileName, as it has no feature.xml file")
               }
-              val targetJarFile = replaceQualifierFeaturesDir.resolve(fileName)
+              val targetJarFile = featuresInReplaceQualifierDir.resolve(fileName)
               packJar(unpackTempDir, targetJarFile)
             }
           }
-          val replaceQualifierPluginsDir = replaceQualifierDir.resolve("plugins").toPath()
           Files.list(pluginsInUnpackFeaturesDir).use { pluginJarFiles ->
             for(pluginJarFile in pluginJarFiles) {
               val fileName = pluginJarFile.fileName
@@ -127,7 +131,7 @@ class EclipseRepository : Plugin<Project> {
               } else {
                 log.warning("Unable to replace qualifiers in versions for $fileName, as it has no META-INF/MANIFEST.MF file")
               }
-              val targetJarFile = replaceQualifierPluginsDir.resolve(fileName)
+              val targetJarFile = pluginsInReplaceQualifierDir.resolve(fileName)
               packJar(unpackTempDir, targetJarFile)
             }
           }
@@ -145,6 +149,7 @@ class EclipseRepository : Plugin<Project> {
       inputs.file(repositoryDescriptionFile)
       outputs.dir(repositoryDir)
       doLast {
+        repositoryDir.deleteRecursively()
         project.javaexec {
           main = "-jar"
           args = mutableListOf(

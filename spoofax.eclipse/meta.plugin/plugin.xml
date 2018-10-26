@@ -26,7 +26,7 @@
       commandId="spoofax.eclipse.meta.plugin.commands.sampleCommand"
       schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
       contextId="org.eclipse.ui.contexts.window"
-      sequence="M1+6"
+      sequence="M1+7"
     >
     </key>
   </extension>

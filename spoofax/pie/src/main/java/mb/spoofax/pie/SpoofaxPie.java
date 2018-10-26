@@ -16,7 +16,7 @@ public class SpoofaxPie {
 
 
     public void doSpoofaxPieStuff(Logger logger) {
-        logger.info("Spoofax-PIE is combining Spoofax and PIE!");
+        logger.warn("Spoofax-PIE is combining Spoofax and PIE!");
         spoofaxApi.doSpoofaxStuff(logger);
         pieApi.doPieStuff(logger);
     }

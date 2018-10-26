@@ -5,4 +5,5 @@
   label="Spoofax Eclipse Feature"
 >
   <plugin id="spoofax.eclipse.plugin" version="1.0.0.qualifier" unpack="false"/>
+  <plugin id="spoofax.eclipse.externaldeps" version="1.0.0.qualifier" unpack="false"/>
 </feature>

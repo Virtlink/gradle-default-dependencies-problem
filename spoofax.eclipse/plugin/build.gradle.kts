@@ -24,3 +24,9 @@ apply {
   // HACK: apply our plugin, instead of using a declarative plugin block.
   plugin("org.metaborg.eclipse-plugin")
 }
+plugins {
+  `java-library`
+}
+dependencies {
+  api(project(":spoofax.eclipse.externaldeps"))
+}
