@@ -24,6 +24,8 @@ apply {
   // HACK: apply our plugin, instead of using a declarative plugin block.
   plugin("org.metaborg.eclipse-plugin")
 }
+
+// HACK: add externaldeps as a Java API dependency, because IntelliJ does not recognize this from our plugin.
 plugins {
   `java-library`
 }
