@@ -42,19 +42,21 @@ data class Feature(
         ?: error("Cannot parse feature XML; could not parse version '$versionStr'")
       val label = featureNode.attributes.getNamedItem("label")?.nodeValue
 
-      val pluginNodes = featureNode.childNodes
+      val subNodes = featureNode.childNodes
       val dependencies = mutableListOf<Dependency>()
-      for(i in 0 until pluginNodes.length) {
-        val pluginNode = pluginNodes.item(i)
-        if(pluginNode.nodeType != Node.ELEMENT_NODE) continue
-        val depId = pluginNode.attributes.getNamedItem("id")?.nodeValue
+      for(i in 0 until subNodes.length) {
+        val subNode = subNodes.item(i)
+        if(subNode.nodeType != Node.ELEMENT_NODE) continue
+        // TODO: full support for feature.xml. See: https://help.eclipse.org/photon/index.jsp?topic=%2Forg.eclipse.platform.doc.isv%2Freference%2Fmisc%2Ffeature_manifest.html.
+        if(subNode.nodeName != "plugin") continue
+        val depId = subNode.attributes.getNamedItem("id")?.nodeValue
           ?: error("Cannot parse feature XML; plugin node has no 'id' attribute")
-        val depVersionStr = pluginNode.attributes.getNamedItem("version")?.nodeValue
+        val depVersionStr = subNode.attributes.getNamedItem("version")?.nodeValue
           ?: error("Cannot parse feature XML; plugin node has no 'version' attribute")
         val depVersion = BundleVersion.parse(depVersionStr)
           ?: error("Cannot parse feature XML; could not parse version '$depVersionStr'")
         val coordinates = Dependency.Coordinates(depId, depVersion)
-        val unpack = pluginNode.attributes.getNamedItem("unpack")?.nodeValue?.toBoolean() ?: false
+        val unpack = subNode.attributes.getNamedItem("unpack")?.nodeValue?.toBoolean() ?: false
         dependencies.add(Dependency(coordinates, unpack))
       }
 

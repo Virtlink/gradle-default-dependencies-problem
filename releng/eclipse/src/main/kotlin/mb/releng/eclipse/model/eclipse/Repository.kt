@@ -6,7 +6,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import javax.xml.parsers.DocumentBuilderFactory
 
-data class Site(
+data class Repository(
   val dependencies: Collection<Dependency>
 ) {
   data class Dependency(
@@ -15,13 +15,13 @@ data class Site(
   )
 
   companion object {
-    fun read(file: Path): Site {
+    fun read(file: Path): Repository {
       return Files.newInputStream(file).buffered().use {
         read(it)
       }
     }
 
-    fun read(inputStream: InputStream): Site {
+    fun read(inputStream: InputStream): Repository {
       val factory = DocumentBuilderFactory.newInstance()
       val builder = factory.newDocumentBuilder()
       val doc = builder.parse(inputStream)
@@ -32,6 +32,7 @@ data class Site(
       for(i in 0 until subNodes.length) {
         val subNode = subNodes.item(i)
         if(subNode.nodeType != Node.ELEMENT_NODE) continue
+        // TODO: full support for category.xml/site.xml. See https://wiki.eclipse.org/Tycho/category.xml.
         if(subNode.nodeName != "feature") continue
         val depId = subNode.attributes.getNamedItem("id")?.nodeValue
           ?: error("Cannot parse site XML; feature node has no 'id' attribute")
@@ -42,7 +43,7 @@ data class Site(
         dependencies.add(Dependency(depId, depVersion))
       }
 
-      return Site(dependencies)
+      return Repository(dependencies)
     }
   }
 }

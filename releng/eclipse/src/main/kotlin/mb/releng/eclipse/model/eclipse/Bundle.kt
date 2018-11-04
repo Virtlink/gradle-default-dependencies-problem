@@ -1,25 +1,74 @@
 package mb.releng.eclipse.model.eclipse
 
 import mb.releng.eclipse.util.Log
+import mb.releng.eclipse.util.readManifestFromFile
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.jar.Attributes
 import java.util.jar.JarInputStream
 import java.util.jar.Manifest
-import java.util.stream.Collectors
 
-data class BundleCoordinates(val name: String, val version: BundleVersion) {
+data class BundleCoordinates(val name: String, val version: BundleVersion, val isSingleton: Boolean = true) {
+  companion object {
+    private const val symbolicNameAttribute = "Bundle-SymbolicName"
+    private const val versionAttribute = "Bundle-Version"
+
+    private const val singletonParameter = "singleton"
+
+    fun readFromManifest(attributes: Attributes): BundleCoordinates {
+      val (name, isSingleton) = run {
+        val symbolicName = attributes.getValue(symbolicNameAttribute)
+          ?: throw BundleParseException("Cannot read bundle from manifest, it does not have a $symbolicNameAttribute attribute")
+        when {
+          // Symbolic name can contain extra data such as: "org.eclipse.core.runtime; singleton:=true". Take everything
+          // before the ; as the name. Also search for singleton parameter.
+          symbolicName.contains(';') -> {
+            val split = symbolicName.split(';')
+            val isSingleton = split.any { it.contains(singletonParameter) && it.contains("true") }
+            Pair(split[0].trim(), isSingleton)
+          }
+          else -> Pair(symbolicName.trim(), false)
+        }
+      }
+
+      val version = run {
+        val versionStr = attributes.getValue(versionAttribute)?.trim()
+        if(versionStr == null) {
+          throw BundleParseException("Cannot read bundle '$name' from manifest, it does not have a $versionAttribute attribute")
+        } else {
+          BundleVersion.parse(versionStr)
+            ?: throw BundleParseException("Cannot read bundle '$name' from manifest, failed to parse $versionAttribute '$versionStr'")
+        }
+      }
+
+      return BundleCoordinates(name, version, isSingleton)
+    }
+  }
+
+  fun writeToManifestAttributes(attributes: MutableMap<String, String>) {
+    val symbolicName = if(isSingleton) "$name;$singletonParameter:=true" else name
+    attributes[symbolicNameAttribute] = symbolicName
+    attributes[versionAttribute] = version.toString()
+  }
+
   override fun toString() = "$name@$version"
 }
 
 data class Bundle(
+  val manifestVersion: String = manifestVersionDefault,
   val coordinates: BundleCoordinates,
-  val requiredBundles: Collection<BundleDependency>,
-  val fragmentHost: BundleDependency?,
-  val sourceBundleFor: BundleDependency?
+  val requiredBundles: Collection<BundleDependency> = listOf(),
+  val fragmentHost: BundleDependency? = null,
+  val sourceBundleFor: BundleDependency? = null
 ) {
   companion object {
+    private const val manifestVersionAttribute = "Bundle-ManifestVersion"
+    private const val manifestVersionDefault = "2"
+    private const val fragmentHostAttribute = "Fragment-Host"
+    private const val eclipseSourceBundleAttribute = "Eclipse-SourceBundle"
+
     fun read(jarFileOrDir: Path, log: Log): Bundle {
       val manifest: Manifest = when {
         !Files.exists(jarFileOrDir) -> {
@@ -41,71 +90,35 @@ data class Bundle(
     }
 
     fun readFromManifestFile(manifestFile: Path, log: Log): Bundle {
-      val manifest = Files.newInputStream(manifestFile).buffered().use { inputStream ->
-        Manifest(inputStream)
-      }
+      val manifest = readManifestFromFile(manifestFile)
       return readFromManifest(manifest, log)
     }
 
     fun readFromManifest(manifest: Manifest, log: Log): Bundle {
-      val name = run {
-        val symbolicName = manifest.mainAttributes.getValue("Bundle-SymbolicName")
-          ?: throw BundleParseException("Cannot read bundle from manifest, it does not have a Bundle-SymbolicName attribute")
-        when {
-          // Symbolic name can contain extra data such as: "org.eclipse.core.runtime; singleton:=true". Take everything
-          // before the ;.
-          symbolicName.contains(';') -> symbolicName.split(';')[0]
-          else -> symbolicName
-        }.trim()
+      val attributes = manifest.mainAttributes
+      val manifestVersion = run {
+        attributes.getValue(manifestVersionAttribute) ?: manifestVersionDefault
       }
-
-      val version = run {
-        val versionStr = manifest.mainAttributes.getValue("Bundle-Version")?.trim()
-        if(versionStr == null) {
-          throw BundleParseException("Cannot read bundle '$name' from manifest, it does not have a Bundle-Version attribute")
-        } else {
-          BundleVersion.parse(versionStr)
-            ?: throw BundleParseException("Cannot read bundle '$name' from manifest, failed to parse Bundle-Version '$versionStr'")
-        }
-      }
-
-      val coordinates = BundleCoordinates(name, version)
-
-      val requireBundleStr = manifest.mainAttributes.getValue("Require-Bundle")
-      val requiredBundles = if(requireBundleStr != null) {
-        try {
-          BundleDependency.parse(requireBundleStr, log)
-        } catch(e: RequireBundleParseException) {
-          throw BundleParseException("Cannot read bundle '$name' from manifest, failed to parse Require-Bundle '$requireBundleStr'", e)
-        }
-      } else {
-        arrayListOf()
-      }
-
-      val fragmentHostStr = manifest.mainAttributes.getValue("Fragment-Host")
-      val fragmentHost = if(fragmentHostStr != null) {
-        try {
-          BundleDependency.parseInner(fragmentHostStr, log)
-        } catch(e: RequireBundleParseException) {
-          throw BundleParseException("Cannot read bundle '$name' from manifest, failed to parse Fragment-Host '$fragmentHostStr'", e)
-        }
-      } else {
-        null
-      }
-
-      val sourceBundleStr = manifest.mainAttributes.getValue("Eclipse-SourceBundle")
-      val sourceBundleFor = if(sourceBundleStr != null) {
-        try {
-          BundleDependency.parseInner(sourceBundleStr, log)
-        } catch(e: RequireBundleParseException) {
-          throw BundleParseException("Cannot read bundle '$name' from manifest, failed to parse Eclipse-SourceBundle '$sourceBundleStr'", e)
-        }
-      } else {
-        null
-      }
-
-      return Bundle(coordinates, requiredBundles, fragmentHost, sourceBundleFor)
+      val coordinates = BundleCoordinates.readFromManifest(attributes)
+      val requiredBundles = BundleDependency.readRequireBundleFromManifest(attributes, log)
+      val fragmentHost = BundleDependency.readDependencyFromManifest(attributes, fragmentHostAttribute, log)
+      val sourceBundleFor = BundleDependency.readDependencyFromManifest(attributes, eclipseSourceBundleAttribute, log)
+      return Bundle(manifestVersion, coordinates, requiredBundles, fragmentHost, sourceBundleFor)
     }
+  }
+
+  fun writeToManifestAttributes(): Map<String, String> {
+    val attributes = mutableMapOf<String, String>()
+    attributes[manifestVersionAttribute] = manifestVersion
+    coordinates.writeToManifestAttributes(attributes)
+    BundleDependency.writeToRequireBundleManifestAttributes(requiredBundles, attributes)
+    if(fragmentHost != null) {
+      BundleDependency.writeToDependencyManifestAttributes(fragmentHost, fragmentHostAttribute, attributes)
+    }
+    if(sourceBundleFor != null) {
+      BundleDependency.writeToDependencyManifestAttributes(sourceBundleFor, eclipseSourceBundleAttribute, attributes)
+    }
+    return attributes
   }
 
   override fun toString() = coordinates.toString()
@@ -117,12 +130,57 @@ class BundleParseException(message: String, cause: Throwable?) : Exception(messa
 
 data class BundleDependency(
   val name: String,
-  val version: BundleVersionOrRange?,
-  val resolution: DependencyResolution,
-  val visibility: DependencyVisibility
+  val version: BundleVersionOrRange? = null,
+  val resolution: DependencyResolution = DependencyResolution.default,
+  val visibility: DependencyVisibility = DependencyVisibility.default,
+  val isSourceBundleDependency: Boolean = false
 ) {
   companion object {
-    internal fun parse(str: String, log: Log): Collection<BundleDependency> {
+    private const val requireBundleAttribute = "Require-Bundle"
+
+    private const val bundleVersionParameter = "bundle-version"
+    private const val versionParameter = "version"
+    private const val resolutionParameter = "resolution"
+    private const val visibilityParameter = "visibility"
+
+    fun readRequireBundleFromManifest(attributes: Attributes, log: Log): Collection<BundleDependency> {
+      val requireBundleStr = attributes.getValue(requireBundleAttribute)
+      return if(requireBundleStr != null) {
+        try {
+          parse(requireBundleStr, log)
+        } catch(e: RequireBundleParseException) {
+          throw BundleParseException("Cannot read dependency from manifest, failed to parse $requireBundleAttribute '$requireBundleStr'", e)
+        }
+      } else {
+        arrayListOf()
+      }
+    }
+
+    fun readDependencyFromManifest(attributes: Attributes, attributeName: String, log: Log): BundleDependency? {
+      val value = attributes.getValue(attributeName)
+      return if(value != null) {
+        try {
+          parseInner(value, log)
+        } catch(e: RequireBundleParseException) {
+          throw BundleParseException("Cannot read dependency from manifest, failed to parse $attributeName '$value'", e)
+        }
+      } else {
+        null
+      }
+    }
+
+    fun writeToRequireBundleManifestAttributes(requiredBundles: Collection<BundleDependency>, attributes: MutableMap<String, String>) {
+      if(!requiredBundles.isEmpty()) {
+        attributes[requireBundleAttribute] = requiredBundles.joinToString(",") { it.toString() }
+      }
+    }
+
+    fun writeToDependencyManifestAttributes(dependency: BundleDependency, attributeName: String, attributes: MutableMap<String, String>) {
+      attributes[attributeName] = dependency.toString()
+    }
+
+
+    fun parse(str: String, log: Log): Collection<BundleDependency> {
       // Can't split on ',', because it also appears inside quoted version ranges. Manually parse to handle quotes.
       val requiredBundles = mutableListOf<BundleDependency>()
       if(str.isEmpty()) {
@@ -153,7 +211,7 @@ data class BundleDependency(
       return requiredBundles
     }
 
-    internal fun parseInner(str: String, log: Log): BundleDependency {
+    fun parseInner(str: String, log: Log): BundleDependency {
       val elements = str.split(';')
       if(elements.isEmpty()) {
         throw RequireBundleParseException("Failed to parse part of Require-Bundle string '$str': it does not have a name element")
@@ -162,29 +220,35 @@ data class BundleDependency(
       var versionOrRange: BundleVersionOrRange? = null
       var resolution = DependencyResolution.Mandatory
       var visibility = DependencyVisibility.Private
+      var isSourceBundleDependency = false
       for(element in elements.subList(1, elements.size)) {
         @Suppress("NAME_SHADOWING") val element = element.trim()
         when {
-          // HACK: support parsing Eclipse-SourceBundle by accepting 'version' elements.
-          element.startsWith("bundle-version") || element.startsWith("version") -> {
-            // Expected format: version="<str>", strip to <str>.
+          element.startsWith(bundleVersionParameter) -> {
+            // Expected format: bundle-version="<str>", strip to <str>.
             versionOrRange = BundleVersionOrRange.parse(stripElement(element), log)
           }
-          element.startsWith("resolution") -> {
+          element.startsWith(resolutionParameter) -> {
             // Expected format: resolution:="<str>", strip to <str>.
             resolution = DependencyResolution.parse(stripElement(element))
           }
-          element.startsWith("visibility") -> {
+          element.startsWith(visibilityParameter) -> {
             // Expected format: visibility:="<str>", strip to <str>.
             visibility = DependencyVisibility.parse(stripElement(element))
           }
+          // HACK: support parsing Eclipse-SourceBundle by accepting 'version' elements.
+          element.startsWith(versionParameter) -> {
+            // Expected format: version="<str>", strip to <str>.
+            versionOrRange = BundleVersionOrRange.parse(stripElement(element), log)
+            isSourceBundleDependency = true
+          }
         }
       }
-      return BundleDependency(name, versionOrRange, resolution, visibility)
+      return BundleDependency(name, versionOrRange, resolution, visibility, isSourceBundleDependency)
     }
 
     private fun stripElement(element: String): String {
-      @Suppress("NAME_SHADOWING") var element = element.substring(element.indexOf('=') + 1)
+      @Suppress("NAME_SHADOWING") var element = element.substring(element.indexOf('=') + 1).trim()
       if(element.startsWith('"')) {
         element = element.substring(1)
       }
@@ -196,14 +260,22 @@ data class BundleDependency(
   }
 
   override fun toString(): String {
-    val versionStr = if(version != null) {
-      "bundle-version=\"$version\","
-    } else {
-      ""
+    val parameters = mutableListOf<String>()
+    if(version != null) {
+      if(isSourceBundleDependency) {
+        // HACK: support parsing Eclipse-SourceBundle by accepting 'version' elements.
+        parameters.add(";$versionParameter=\"$version\"")
+      } else {
+        parameters.add(";$bundleVersionParameter=\"$version\"")
+      }
     }
-    val resolutionStr = "resolution:=${DependencyResolution.toString(resolution)}"
-    val visibilityStr = ",visibility:=${DependencyVisibility.toString(visibility)}"
-    return "$name;$versionStr$resolutionStr$visibilityStr"
+    if(resolution != DependencyResolution.default) {
+      parameters.add(";$resolutionParameter:=${DependencyResolution.toString(resolution)}")
+    }
+    if(visibility != DependencyVisibility.default) {
+      parameters.add(";$visibilityParameter:=${DependencyVisibility.toString(visibility)}")
+    }
+    return "$name${parameters.joinToString("")}"
   }
 }
 

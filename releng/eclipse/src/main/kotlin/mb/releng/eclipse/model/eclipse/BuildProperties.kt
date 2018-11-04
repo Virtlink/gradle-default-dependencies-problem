@@ -31,6 +31,7 @@ data class BuildProperties(
         // Remove '.' include, since it makes no sense to include everything.
         // Remove 'META-INF/' include, since a manifest is already included in JAR files.
         .filter { it != "." && it != "META-INF/" }
+      // TODO: full support for build.properties. See: https://help.eclipse.org/photon/index.jsp?topic=%2Forg.eclipse.pde.doc.user%2Freference%2Fpde_feature_generating_build.htm.
       return BuildProperties(sourceDirs, outputDir, binaryIncludes)
     }
 

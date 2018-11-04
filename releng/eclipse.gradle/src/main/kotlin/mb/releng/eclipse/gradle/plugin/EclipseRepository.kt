@@ -5,7 +5,7 @@ import mb.releng.eclipse.gradle.task.EclipseRun
 import mb.releng.eclipse.gradle.task.PrepareEclipseRunConfig
 import mb.releng.eclipse.gradle.util.GradleLog
 import mb.releng.eclipse.gradle.util.toGradleDependency
-import mb.releng.eclipse.model.eclipse.Site
+import mb.releng.eclipse.model.eclipse.Repository
 import mb.releng.eclipse.util.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -44,7 +44,7 @@ class EclipseRepository : Plugin<Project> {
     project.pluginManager.apply(MavenizeDslPlugin::class)
 
     val extension = project.extensions.create<EclipseRepositoryExtension>("eclipseRepository", project.objects)
-    extension.repositoryDescriptionFile = "site.xml"
+    extension.repositoryDescriptionFile = "category.xml"
     extension.qualifierReplacement = SimpleDateFormat("yyyyMMddHHmm").format(Calendar.getInstance().time)
 
     project.afterEvaluate { configure(this) }
@@ -60,10 +60,10 @@ class EclipseRepository : Plugin<Project> {
     project.pluginManager.apply(MavenizePlugin::class)
     val mavenized = project.mavenizedEclipseInstallation()
 
-    // Process repository description (site.xml) file.
+    // Process repository description file.
     val repositoryDescriptionFile = project.file(extension.repositoryDescriptionFile).toPath()
     if(Files.isRegularFile(repositoryDescriptionFile)) {
-      val site = Site.read(repositoryDescriptionFile)
+      val site = Repository.read(repositoryDescriptionFile)
       val converter = mavenized.createConverter(project.group.toString())
       featureConfiguration.defaultDependencies {
         for(dependency in site.dependencies) {

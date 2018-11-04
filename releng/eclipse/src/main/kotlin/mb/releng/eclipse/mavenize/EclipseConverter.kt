@@ -53,7 +53,7 @@ class EclipseConverter(private val fallbackGroupId: String) {
     return coordinates.toMaven(groupId)
   }
 
-  fun convert(dependency: Site.Dependency): DependencyCoordinates {
+  fun convert(dependency: Repository.Dependency): DependencyCoordinates {
     val groupId = bundleNameToGroupIds[dependency.id] ?: fallbackGroupId
     return dependency.toMaven(groupId)
   }
@@ -66,7 +66,7 @@ class EclipseConverter(private val fallbackGroupId: String) {
       val (name, version) = it.coordinates
       val groupId = bundleNameToGroupIds[name]
         ?: error("No group ID was set for fragment quest bundle '${it.coordinates}', used from bundle '${bundle.coordinates}")
-      val bundleDependency = BundleDependency(name, version, DependencyResolution.Mandatory, DependencyVisibility.Reexport)
+      val bundleDependency = BundleDependency(name, version, DependencyResolution.Mandatory, DependencyVisibility.Reexport, false)
       bundleDependency.toMaven(groupId)
     } ?: listOf()
   }

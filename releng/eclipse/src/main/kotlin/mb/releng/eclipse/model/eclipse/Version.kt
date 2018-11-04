@@ -36,11 +36,11 @@ data class BundleVersion(
 data class BundleVersionRange(
   val minInclusive: Boolean,
   val minVersion: BundleVersion,
-  val maxVersion: BundleVersion?,
+  val maxVersion: BundleVersion,
   val maxInclusive: Boolean
 ) : BundleVersionOrRange() {
   companion object {
-    private val pattern = Pattern.compile("""([\[\(])(.+)\w*,\w*(.*)([\]\)])""")
+    private val pattern = Pattern.compile("""([\[\(])\w*([^,]+)\w*,\w*([^,]+)\w*([\]\)])""")
 
     fun parse(str: String): BundleVersionRange? {
       val matcher = pattern.matcher(str)
@@ -48,20 +48,18 @@ data class BundleVersionRange(
       val minChr = matcher.group(1) ?: return null
       val minVerStr = matcher.group(2) ?: return null
       val minVer = BundleVersion.parse(minVerStr) ?: return null
-      val maxVerStr = matcher.group(3)
-      val maxVer = BundleVersion.parse(maxVerStr)
+      val maxVerStr = matcher.group(3) ?: return null
+      val maxVer = BundleVersion.parse(maxVerStr) ?: return null
       val maxChr = matcher.group(4) ?: return null
       return BundleVersionRange(minChr == "[", minVer, maxVer, maxChr == "]")
     }
-
-    fun anyVersionsRange() = BundleVersionRange(true, BundleVersion.zero(), null, false)
   }
 
   fun withoutQualifiers() =
-    BundleVersionRange(minInclusive, minVersion.withoutQualifier(), maxVersion?.withoutQualifier(), maxInclusive)
+    BundleVersionRange(minInclusive, minVersion.withoutQualifier(), maxVersion.withoutQualifier(), maxInclusive)
 
   override fun toString() =
-    "${if(minInclusive) "[" else "("}$minVersion,${maxVersion ?: ""}${if(maxInclusive) "]" else ")"}"
+    "${if(minInclusive) "[" else "("}$minVersion,$maxVersion${if(maxInclusive) "]" else ")"}"
 }
 
 sealed class BundleVersionOrRange {

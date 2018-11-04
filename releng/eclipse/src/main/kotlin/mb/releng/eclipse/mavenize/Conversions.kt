@@ -9,7 +9,7 @@ fun BundleVersion.toMaven(): MavenVersion {
 }
 
 fun BundleVersionRange.toMaven(): MavenVersionRange {
-  return MavenVersionRange.from(minInclusive, minVersion.toMaven(), maxVersion?.toMaven(), maxInclusive)
+  return MavenVersionRange.from(minInclusive, minVersion.toMaven(), maxVersion.toMaven(), maxInclusive)
 }
 
 fun BundleVersionOrRange.toMaven(): MavenVersionOrRange {
@@ -27,9 +27,17 @@ fun MavenVersion.toEclipse(): BundleVersion {
   return BundleVersion(major, minor, incremental, qualifier?.replace("SNAPSHOT", "qualifier"))
 }
 
-fun MavenVersionRange.toEclipse(): BundleVersionRange {
-  return BundleVersionRange.parse(toString())
-    ?: error("Could not convert Maven version range '$this' to an Eclipse bundle version range")
+fun MavenVersionRange.toEclipse(): BundleVersionOrRange {
+  val lower = if(range.lowerBound != null) {
+    MavenVersion(range.lowerBound).toEclipse()
+  } else {
+    BundleVersion.zero()
+  }
+  if(range.upperBound == null) {
+    return lower
+  }
+  val upper = MavenVersion(range.upperBound).toEclipse()
+  return BundleVersionRange(range.isLowerBoundInclusive, lower, upper, range.isUpperBoundInclusive)
 }
 
 fun MavenVersionOrRange.toEclipse(): BundleVersionOrRange {
@@ -90,7 +98,7 @@ fun Feature.Dependency.Coordinates.toMaven(
   return DependencyCoordinates(groupId, id, version, classifier, extension)
 }
 
-fun Site.Dependency.toMaven(
+fun Repository.Dependency.toMaven(
   groupId: String,
   classifier: String? = null,
   extension: String? = null

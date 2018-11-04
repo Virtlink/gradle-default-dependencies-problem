@@ -1,11 +1,9 @@
 package mb.releng.eclipse.model.maven
 
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
-import org.apache.maven.artifact.versioning.VersionRange
+import org.apache.maven.artifact.versioning.*
 
 data class MavenVersion(
-  val version: DefaultArtifactVersion
+  val version: ArtifactVersion
 ) : MavenVersionOrRange() {
   companion object {
     fun parse(str: String): MavenVersion {
@@ -36,12 +34,18 @@ data class MavenVersion(
 }
 
 data class MavenVersionRange(
-  val version: VersionRange
+  private val version: VersionRange
 ) : MavenVersionOrRange() {
+  val range: Restriction get() = version.restrictions[0]
+
   companion object {
     fun parse(str: String): MavenVersionRange? {
       return try {
-        MavenVersionRange(VersionRange.createFromVersionSpec(str))
+        val range = VersionRange.createFromVersionSpec(str)
+        if(!range.hasRestrictions()) {
+          return null
+        }
+        MavenVersionRange(range)
       } catch(_: InvalidVersionSpecificationException) {
         null
       }

@@ -1,8 +1,12 @@
 package mb.releng.eclipse.mavenize
 
 import mb.releng.eclipse.model.eclipse.*
-import mb.releng.eclipse.util.*
-import java.nio.file.*
+import mb.releng.eclipse.util.Log
+import mb.releng.eclipse.util.TempDir
+import mb.releng.eclipse.util.deleteNonEmptyDirectoryIfExists
+import java.nio.file.FileSystems
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.stream.Collectors
 
 fun mavenizeEclipseInstallation(
@@ -35,7 +39,7 @@ fun mavenizeEclipseInstallation(
 
       // Remove qualifiers to fix version range matching in Maven and Gradle.
       val newCoordinates = bundle.coordinates.run {
-        BundleCoordinates(name, version.withoutQualifier())
+        BundleCoordinates(name, version.withoutQualifier(), isSingleton)
       }
 
       fun BundleVersionOrRange?.fixDepVersion() = when(this) {
@@ -44,12 +48,12 @@ fun mavenizeEclipseInstallation(
         is BundleVersionRange -> withoutQualifiers()
       }
 
-      fun BundleDependency.fixDep() = BundleDependency(name, version.fixDepVersion(), resolution, visibility)
+      fun BundleDependency.fixDep() = BundleDependency(name, version.fixDepVersion(), resolution, visibility, isSourceBundleDependency)
 
       val newDeps = bundle.requiredBundles.map { it.fixDep() }
       val newFragmentHost = bundle.fragmentHost?.fixDep()
       val newSourceBundleFor = bundle.sourceBundleFor?.fixDep()
-      val newBundle = Bundle(newCoordinates, newDeps, newFragmentHost, newSourceBundleFor)
+      val newBundle = Bundle(bundle.manifestVersion, newCoordinates, newDeps, newFragmentHost, newSourceBundleFor)
       MavenInstallableBundle(newBundle, bundleGroupId, location)
     }
 
