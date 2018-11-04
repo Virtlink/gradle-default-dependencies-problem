@@ -89,11 +89,6 @@ data class Bundle(
       return readFromManifest(manifest, log)
     }
 
-    fun readFromManifestFile(manifestFile: Path, log: Log): Bundle {
-      val manifest = readManifestFromFile(manifestFile)
-      return readFromManifest(manifest, log)
-    }
-
     fun readFromManifest(manifest: Manifest, log: Log): Bundle {
       val attributes = manifest.mainAttributes
       val manifestVersion = run {

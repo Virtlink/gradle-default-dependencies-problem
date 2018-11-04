@@ -40,7 +40,7 @@ open class EclipseRepositoryExtension(objects: ObjectFactory) {
 
 class EclipseRepository : Plugin<Project> {
   override fun apply(project: Project) {
-    project.pluginManager.apply(EclipseBasePlugin::class)
+    project.pluginManager.apply(EclipseBase::class)
     project.pluginManager.apply(MavenizeDslPlugin::class)
 
     val extension = project.extensions.create<EclipseRepositoryExtension>("eclipseRepository", project.objects)
@@ -184,7 +184,7 @@ class EclipseRepository : Plugin<Project> {
     }
     project.tasks.getByName(BasePlugin.ASSEMBLE_TASK_NAME).dependsOn(zipRepositoryTask)
     project.artifacts {
-      add(EclipseBasePlugin.repositoryConfigurationName, zipRepositoryTask)
+      add(EclipseBase.repositoryConfigurationName, zipRepositoryTask)
     }
 
     // Run Eclipse with unpacked plugins.

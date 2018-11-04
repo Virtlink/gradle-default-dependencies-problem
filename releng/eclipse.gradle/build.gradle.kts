@@ -7,6 +7,10 @@ dependencies {
 }
 gradlePlugin {
   plugins {
+    create("eclipse-base") {
+      id = "org.metaborg.eclipse-base"
+      implementationClass = "mb.releng.eclipse.gradle.plugin.EclipseBase"
+    }
     create("eclipse-plugin") {
       id = "org.metaborg.eclipse-plugin"
       implementationClass = "mb.releng.eclipse.gradle.plugin.EclipsePlugin"

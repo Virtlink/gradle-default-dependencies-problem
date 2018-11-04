@@ -19,7 +19,7 @@ import java.nio.file.Files
 
 class EclipseFeature : Plugin<Project> {
   override fun apply(project: Project) {
-    project.pluginManager.apply(EclipseBasePlugin::class)
+    project.pluginManager.apply(EclipseBase::class)
     project.pluginManager.apply(MavenizeDslPlugin::class)
     project.afterEvaluate { configure(this) }
   }
@@ -89,7 +89,7 @@ class EclipseFeature : Plugin<Project> {
     }
     project.tasks.getByName(BasePlugin.ASSEMBLE_TASK_NAME).dependsOn(jarTask)
     project.artifacts {
-      add(EclipseBasePlugin.featureConfigurationName, jarTask)
+      add(EclipseBase.featureConfigurationName, jarTask)
     }
 
     // Run Eclipse with dependencies.

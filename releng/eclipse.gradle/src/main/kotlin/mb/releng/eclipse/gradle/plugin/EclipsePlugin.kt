@@ -30,7 +30,7 @@ import java.nio.file.Files
 
 class EclipsePlugin : Plugin<Project> {
   override fun apply(project: Project) {
-    project.pluginManager.apply(EclipseBasePlugin::class)
+    project.pluginManager.apply(EclipseBase::class)
     project.pluginManager.apply(MavenizeDslPlugin::class)
     project.afterEvaluate { configure(this) }
   }
@@ -160,7 +160,7 @@ class EclipsePlugin : Plugin<Project> {
       }
     }
     project.artifacts {
-      add(EclipseBasePlugin.pluginConfigurationName, jarTask)
+      add(EclipseBase.pluginConfigurationName, jarTask)
     }
 
     // Run Eclipse with this plugin and its dependencies.
