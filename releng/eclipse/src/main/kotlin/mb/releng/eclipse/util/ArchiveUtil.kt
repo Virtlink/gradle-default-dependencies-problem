@@ -50,6 +50,7 @@ private fun unarchive(inputStream: InputStream, unpackDirectory: Path, log: Log)
       if(entry.isDirectory) {
         Files.createDirectories(path)
       } else {
+        createParentDirectories(path)
         Files.newOutputStream(path).buffered().use {
           archiveInputStream.copyTo(it)
           it.flush()

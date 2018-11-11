@@ -1,12 +1,17 @@
 package mb.releng.eclipse.gradle.plugin
 
-import mb.releng.eclipse.gradle.plugin.internal.*
+import mb.releng.eclipse.gradle.plugin.internal.MavenizeDslPlugin
+import mb.releng.eclipse.gradle.plugin.internal.MavenizePlugin
+import mb.releng.eclipse.gradle.plugin.internal.mavenizeExtension
+import mb.releng.eclipse.gradle.plugin.internal.mavenizedEclipseInstallation
 import mb.releng.eclipse.gradle.task.EclipseRun
 import mb.releng.eclipse.gradle.task.PrepareEclipseRunConfig
 import mb.releng.eclipse.gradle.util.GradleLog
 import mb.releng.eclipse.gradle.util.toGradleDependency
 import mb.releng.eclipse.model.eclipse.Repository
-import mb.releng.eclipse.util.*
+import mb.releng.eclipse.util.TempDir
+import mb.releng.eclipse.util.packJar
+import mb.releng.eclipse.util.unpack
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
@@ -14,7 +19,10 @@ import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
-import org.gradle.kotlin.dsl.*
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.property
 import java.io.PrintStream
 import java.nio.file.Files
 import java.nio.file.Path
@@ -111,7 +119,7 @@ class EclipseRepository : Plugin<Project> {
               val featureFile = unpackTempDir.resolve("feature.xml")
               if(Files.isRegularFile(featureFile)) {
                 // TODO: this could have false positives, do a model 2 model transformation instead?
-                featureFile.replaceInFile(".qualifier", ".$concreteQualifier")
+                featureFile.replaceInFile("qualifier", concreteQualifier)
               } else {
                 log.warning("Unable to replace qualifiers in versions for $fileName, as it has no feature.xml file")
               }
@@ -127,7 +135,7 @@ class EclipseRepository : Plugin<Project> {
               val manifestFile = unpackTempDir.resolve("META-INF/MANIFEST.MF")
               if(Files.isRegularFile(manifestFile)) {
                 // TODO: this could have false positives, do a model 2 model transformation instead?
-                manifestFile.replaceInFile(".qualifier", ".$concreteQualifier")
+                manifestFile.replaceInFile("qualifier", concreteQualifier)
               } else {
                 log.warning("Unable to replace qualifiers in versions for $fileName, as it has no META-INF/MANIFEST.MF file")
               }

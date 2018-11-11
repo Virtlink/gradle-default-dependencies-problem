@@ -25,11 +25,16 @@ apply {
   plugin("org.metaborg.eclipse-plugin")
 }
 
+val eclipsePlugin by configurations
+val eclipsePluginTransitive by configurations
 // HACK: require java-library plugin for dependency below.
 plugins {
   `java-library`
 }
 dependencies {
   // HACK: add externaldeps as a Java API dependency, because IntelliJ does not recognize that we make the Java's plugin extend our configurations.
-  api(project(":spoofax.eclipse.externaldeps"))
+  //api(project(":spoofax.eclipse.externaldeps"))
+  eclipsePlugin("eclipse-photon:org.eclipse.ui:[0,)")
+  eclipsePlugin("eclipse-photon:org.eclipse.core.runtime:[0,)")
+  eclipsePluginTransitive("org.metaborg:spoofax.eclipse.externaldeps:$version")
 }

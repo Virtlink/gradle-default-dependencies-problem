@@ -6,20 +6,20 @@ import org.gradle.api.Project
 class EclipseBase : Plugin<Project> {
   companion object {
     const val pluginConfigurationName = "eclipsePlugin"
-    const val pluginCompileOnlyConfigurationName = "${pluginConfigurationName}CompileOnly"
+    const val pluginTransitiveConfigurationName = "${pluginConfigurationName}Transitive"
     const val featureConfigurationName = "eclipseFeature"
     const val repositoryConfigurationName = "eclipseRepository"
   }
 
   override fun apply(project: Project) {
     project.configurations.create(pluginConfigurationName) {
-      setTransitive(true)
-    }
-    project.configurations.create(pluginCompileOnlyConfigurationName) {
       setTransitive(false)
     }
-    project.configurations.create(featureConfigurationName) {
+    project.configurations.create(pluginTransitiveConfigurationName) {
       setTransitive(true)
+    }
+    project.configurations.create(featureConfigurationName) {
+      setTransitive(false)
     }
     project.configurations.create(repositoryConfigurationName) {
       setTransitive(false)
@@ -27,7 +27,7 @@ class EclipseBase : Plugin<Project> {
   }
 }
 
+val Project.pluginTransitiveConfiguration get() = this.configurations.getByName(EclipseBase.pluginTransitiveConfigurationName)
 val Project.pluginConfiguration get() = this.configurations.getByName(EclipseBase.pluginConfigurationName)
-val Project.pluginCompileOnlyConfiguration get() = this.configurations.getByName(EclipseBase.pluginCompileOnlyConfigurationName)
 val Project.featureConfiguration get() = this.configurations.getByName(EclipseBase.featureConfigurationName)
 val Project.repositoryConfiguration get() = this.configurations.getByName(EclipseBase.repositoryConfigurationName)

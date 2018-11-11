@@ -41,14 +41,11 @@ class EclipsePlugin : Plugin<Project> {
 
   private fun configure(project: Project) {
     val log = GradleLog(project.logger)
+    val pluginTransitiveConfiguration = project.pluginTransitiveConfiguration
     val pluginConfiguration = project.pluginConfiguration
-    val pluginCompileOnlyConfiguration = project.pluginCompileOnlyConfiguration
 
     project.pluginManager.apply(MavenizePlugin::class)
     val mavenized = project.mavenizedEclipseInstallation()
-
-    project.pluginManager.apply(JavaLibraryPlugin::class)
-    val jarTask = project.tasks.getByName<Jar>(JavaPlugin.JAR_TASK_NAME)
 
     // Process META-INF/MANIFEST.MF file, if any.
     val manifestFile = project.file("META-INF/MANIFEST.MF").toPath()
@@ -89,28 +86,12 @@ class EclipsePlugin : Plugin<Project> {
       }
       // Add default dependencies to plugin configuration.
       pluginConfiguration.defaultDependencies {
-        for(dependency in mavenArtifact.dependencies) {
+        this.addAll(mavenArtifact.dependencies.map { dependency ->
           val coords = dependency.coordinates
           val isMavenizedBundle = mavenized.isMavenizedBundle(coords.groupId, coords.id)
-          // Don't add mavenized and optional dependencies, they go into `project.pluginCompileOnlyConfiguration`.
-          if(isMavenizedBundle || dependency.optional) continue
-          // Use null (default) configuration when the dependency is a mavenized bundle, as Maven artifacts have no configuration.
           val configuration = if(isMavenizedBundle) null else pluginConfiguration.name
-          this.add(coords.toGradleDependency(project, configuration))
-        }
-      }
-      // Add default dependencies to compile-only plugin configuration.
-      pluginCompileOnlyConfiguration.defaultDependencies {
-        for(dependency in mavenArtifact.dependencies) {
-          val coords = dependency.coordinates
-          val isMavenizedBundle = mavenized.isMavenizedBundle(coords.groupId, coords.id)
-          // Add mavenized and optional bundles to `project.pluginCompileOnlyConfiguration`.
-          if(isMavenizedBundle || dependency.optional) {
-            // Use null (default) configuration when the dependency is a mavenized bundle, as Maven artifacts have no configuration.
-            val configuration = if(isMavenizedBundle) null else pluginConfiguration.name
-            this.add(coords.toGradleDependency(project, configuration))
-          }
-        }
+          coords.toGradleDependency(project, configuration)
+        })
       }
       manifest
     } else {
@@ -120,13 +101,15 @@ class EclipsePlugin : Plugin<Project> {
     // Make the Java plugin's configurations extend our plugin configuration, so that all dependencies from our
     // configurations are included in the Java plugin configurations. Doing this after scanning dependencies, because
     // this may resolve our configurations.
-    project.configurations.getByName(JavaPlugin.API_CONFIGURATION_NAME).extendsFrom(pluginConfiguration)
-    project.configurations.getByName(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).extendsFrom(pluginCompileOnlyConfiguration)
+    project.pluginManager.apply(JavaLibraryPlugin::class)
+    val jarTask = project.tasks.getByName<Jar>(JavaPlugin.JAR_TASK_NAME)
+    project.configurations.getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME).extendsFrom(pluginConfiguration)
+    project.configurations.getByName(JavaPlugin.API_CONFIGURATION_NAME).extendsFrom(pluginTransitiveConfiguration)
 
     // Prepare manifest and set it in the JAR task.
     val prepareManifestTask = project.tasks.create("prepareManifestTask") {
+      dependsOn(pluginTransitiveConfiguration)
       dependsOn(pluginConfiguration)
-      dependsOn(pluginCompileOnlyConfiguration)
       doLast {
         if(manifest != null) {
           jarTask.manifest.attributes(manifest.mainAttributes.toStringMap())
@@ -136,7 +119,7 @@ class EclipsePlugin : Plugin<Project> {
         val bundleCoordinates = Coordinates(project.group.toString(), project.name, MavenVersion.parse(project.version.toString())).toEclipse()
         bundleCoordinates.writeToManifestAttributes(attributesMap)
 
-        val requiredBundles = (pluginConfiguration.allDependencies + pluginCompileOnlyConfiguration.allDependencies).map {
+        val requiredBundles = (pluginTransitiveConfiguration.allDependencies + pluginConfiguration.allDependencies).map {
           val versionStr = it.version
           val version = if(versionStr != null) {
             MavenVersionOrRange.parse(versionStr).toEclipse()
@@ -180,17 +163,17 @@ class EclipsePlugin : Plugin<Project> {
       }
     }
     project.artifacts {
-      add(EclipseBase.pluginConfigurationName, jarTask)
+      add(EclipseBase.pluginTransitiveConfigurationName, jarTask)
     }
 
     // Run Eclipse with this plugin and its dependencies.
     val prepareEclipseRunConfigurationTask = project.tasks.create<PrepareEclipseRunConfig>("prepareRunConfiguration") {
       dependsOn(jarTask)
-      dependsOn(pluginConfiguration)
+      dependsOn(pluginTransitiveConfiguration)
       setFromMavenizedEclipseInstallation(mavenized)
       doFirst {
         addBundle(jarTask)
-        for(file in pluginConfiguration) {
+        for(file in pluginTransitiveConfiguration) {
           addBundle(file)
         }
       }
