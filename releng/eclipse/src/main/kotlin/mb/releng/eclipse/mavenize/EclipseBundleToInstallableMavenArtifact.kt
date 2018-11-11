@@ -8,6 +8,7 @@ import mb.releng.eclipse.model.maven.createPomSubArtifact
 import mb.releng.eclipse.util.Log
 import mb.releng.eclipse.util.TempDir
 import mb.releng.eclipse.util.packJar
+import mb.releng.eclipse.util.readManifestFromJarFileOrDirectory
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
@@ -19,7 +20,8 @@ data class MavenInstallableBundle(
 ) {
   companion object {
     fun read(jarFileOrDir: Path, groupId: String, log: Log): MavenInstallableBundle {
-      val bundle = Bundle.read(jarFileOrDir, log)
+      val manifest = readManifestFromJarFileOrDirectory(jarFileOrDir)
+      val bundle = Bundle.readFromManifestAttributes(manifest.mainAttributes, log)
       return MavenInstallableBundle(bundle, groupId, jarFileOrDir)
     }
 

@@ -25,10 +25,11 @@ apply {
   plugin("org.metaborg.eclipse-plugin")
 }
 
-// HACK: add externaldeps as a Java API dependency, because IntelliJ does not recognize this from our plugin.
+// HACK: require java-library plugin for dependency below.
 plugins {
   `java-library`
 }
 dependencies {
+  // HACK: add externaldeps as a Java API dependency, because IntelliJ does not recognize that we make the Java's plugin extend our configurations.
   api(project(":spoofax.eclipse.externaldeps"))
 }

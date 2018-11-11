@@ -1,5 +1,6 @@
 subprojects {
   group = "org.metaborg"
+  version = "develop-SNAPSHOT"
   repositories {
     mavenCentral()
     jcenter()

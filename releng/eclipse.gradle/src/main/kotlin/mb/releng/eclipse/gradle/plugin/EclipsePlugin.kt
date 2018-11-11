@@ -1,6 +1,9 @@
 package mb.releng.eclipse.gradle.plugin
 
-import mb.releng.eclipse.gradle.plugin.internal.*
+import mb.releng.eclipse.gradle.plugin.internal.MavenizeDslPlugin
+import mb.releng.eclipse.gradle.plugin.internal.MavenizePlugin
+import mb.releng.eclipse.gradle.plugin.internal.mavenizeExtension
+import mb.releng.eclipse.gradle.plugin.internal.mavenizedEclipseInstallation
 import mb.releng.eclipse.gradle.task.EclipseRun
 import mb.releng.eclipse.gradle.task.PrepareEclipseRunConfig
 import mb.releng.eclipse.gradle.util.GradleLog
@@ -8,6 +11,7 @@ import mb.releng.eclipse.gradle.util.toGradleDependency
 import mb.releng.eclipse.mavenize.toEclipse
 import mb.releng.eclipse.model.eclipse.BuildProperties
 import mb.releng.eclipse.model.eclipse.Bundle
+import mb.releng.eclipse.model.eclipse.BundleCoordinates
 import mb.releng.eclipse.model.eclipse.BundleDependency
 import mb.releng.eclipse.model.maven.Coordinates
 import mb.releng.eclipse.model.maven.MavenVersion
@@ -50,8 +54,27 @@ class EclipsePlugin : Plugin<Project> {
     val manifestFile = project.file("META-INF/MANIFEST.MF").toPath()
     val manifest = if(Files.isRegularFile(manifestFile)) {
       val manifest = readManifestFromFile(manifestFile)
-      // Read into bundle, convert into Maven artifact metadata, and set project version and default dependencies.
-      val bundle = Bundle.readFromManifest(manifest, log)
+      // Read bundle from manifest.
+      val bundle = run {
+        val bundleCoordinates = run {
+          val bundleCoordinatesBuilder = BundleCoordinates.Builder()
+          bundleCoordinatesBuilder.readFromManifestAttributes(manifest.mainAttributes)
+          if(bundleCoordinatesBuilder.name == null) {
+            bundleCoordinatesBuilder.name = project.name
+          }
+          if(bundleCoordinatesBuilder.version == null) {
+            if(project.version == Project.DEFAULT_VERSION) {
+              error("Cannot configure Eclipse plugin project; no project version was set, nor has a version been set in $manifestFile")
+            }
+            bundleCoordinatesBuilder.version = MavenVersion.parse(project.version.toString()).toEclipse()
+          }
+          bundleCoordinatesBuilder.build()
+        }
+        val bundleBuilder = Bundle.Builder(bundleCoordinates)
+        bundleBuilder.readFromManifestAttributes(manifest.mainAttributes, log)
+        bundleBuilder.build()
+      }
+      // Convert into Maven artifact metadata.
       val groupId = project.group.toString()
       val converter = mavenized.createConverter(groupId)
       converter.recordBundle(bundle, groupId)
@@ -107,9 +130,6 @@ class EclipsePlugin : Plugin<Project> {
       doLast {
         if(manifest != null) {
           jarTask.manifest.attributes(manifest.mainAttributes.toStringMap())
-        }
-        if(project.version == Project.DEFAULT_VERSION) {
-          error("Version has not been set, cannot prepare bundle manifest")
         }
 
         val attributesMap = mutableMapOf<String, String>()

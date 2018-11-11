@@ -1,7 +1,6 @@
 package mb.releng.eclipse.model.eclipse
 
 import mb.releng.eclipse.util.Log
-import mb.releng.eclipse.util.readManifestFromFile
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -14,37 +13,59 @@ data class BundleCoordinates(val name: String, val version: BundleVersion, val i
   companion object {
     private const val symbolicNameAttribute = "Bundle-SymbolicName"
     private const val versionAttribute = "Bundle-Version"
-
     private const val singletonParameter = "singleton"
 
-    fun readFromManifest(attributes: Attributes): BundleCoordinates {
+    fun readFromManifestAttributes(attributes: Attributes) =
+      Builder().readFromManifestAttributes(attributes).build()
+  }
+
+  class Builder {
+    var name: String? = null
+    var version: BundleVersion? = null
+    var isSingleton: Boolean? = null
+
+    fun readFromManifestAttributes(attributes: Attributes): Builder {
       val (name, isSingleton) = run {
-        val symbolicName = attributes.getValue(symbolicNameAttribute)
-          ?: throw BundleParseException("Cannot read bundle from manifest, it does not have a $symbolicNameAttribute attribute")
+        val symbolicName: String? = attributes.getValue(symbolicNameAttribute)
         when {
           // Symbolic name can contain extra data such as: "org.eclipse.core.runtime; singleton:=true". Take everything
           // before the ; as the name. Also search for singleton parameter.
-          symbolicName.contains(';') -> {
+          symbolicName != null && symbolicName.contains(';') -> {
             val split = symbolicName.split(';')
             val isSingleton = split.any { it.contains(singletonParameter) && it.contains("true") }
             Pair(split[0].trim(), isSingleton)
           }
-          else -> Pair(symbolicName.trim(), false)
+          symbolicName != null -> Pair(symbolicName.trim(), false)
+          else -> Pair(null, null)
         }
+      }
+      if(name != null) {
+        this.name = name
+      }
+      if(isSingleton != null) {
+        this.isSingleton = isSingleton
       }
 
       val version = run {
         val versionStr = attributes.getValue(versionAttribute)?.trim()
         if(versionStr == null) {
-          throw BundleParseException("Cannot read bundle '$name' from manifest, it does not have a $versionAttribute attribute")
+          null
         } else {
           BundleVersion.parse(versionStr)
             ?: throw BundleParseException("Cannot read bundle '$name' from manifest, failed to parse $versionAttribute '$versionStr'")
         }
       }
-
-      return BundleCoordinates(name, version, isSingleton)
+      if(version != null) {
+        this.version = version
+      }
+      return this
     }
+
+    fun build() = BundleCoordinates(
+      name ?: error("Cannot create bundle coordinates, name was not set"),
+      version ?: error("Cannot create bundle coordinates, version was not set"),
+      isSingleton ?: false
+    )
   }
 
   fun writeToManifestAttributes(attributes: MutableMap<String, String>) {
@@ -69,37 +90,40 @@ data class Bundle(
     private const val fragmentHostAttribute = "Fragment-Host"
     private const val eclipseSourceBundleAttribute = "Eclipse-SourceBundle"
 
-    fun read(jarFileOrDir: Path, log: Log): Bundle {
-      val manifest: Manifest = when {
-        !Files.exists(jarFileOrDir) -> {
-          throw IOException("Bundle file or directory $jarFileOrDir does not exist")
-        }
-        Files.isDirectory(jarFileOrDir) -> {
-          val manifestFile = jarFileOrDir.resolve(Paths.get("META-INF", "MANIFEST.MF"))
-          Files.newInputStream(manifestFile).buffered().use { inputStream ->
-            Manifest(inputStream)
-          }
-        }
-        else -> {
-          Files.newInputStream(jarFileOrDir).buffered().use { inputStream ->
-            JarInputStream(inputStream).manifest
-          } ?: throw IOException("Could not get bundle manifest in JAR file $jarFileOrDir")
-        }
+    fun readFromManifestAttributes(attributes: Attributes, log: Log): Bundle {
+      val coordinates = BundleCoordinates.readFromManifestAttributes(attributes)
+      return Builder(coordinates).readFromManifestAttributes(attributes, log).build()
+    }
+  }
+
+  class Builder(val coordinates: BundleCoordinates) {
+    var manifestVersion: String? = null
+    var requiredBundles: Collection<BundleDependency> = listOf()
+    var fragmentHost: BundleDependency? = null
+    var sourceBundleFor: BundleDependency? = null
+
+    fun readFromManifestAttributes(attributes: Attributes, log: Log): Builder {
+      val manifestVersion: String? = attributes.getValue(manifestVersionAttribute)
+      if(manifestVersion != null) {
+        this.manifestVersion = manifestVersion
       }
-      return readFromManifest(manifest, log)
+      val requiredBundles = BundleDependency.readRequireBundleFromManifest(attributes, log)
+      if(!requiredBundles.isEmpty()) {
+        this.requiredBundles = requiredBundles
+      }
+      val fragmentHost = BundleDependency.readDependencyFromManifest(attributes, fragmentHostAttribute, log)
+      if(fragmentHost != null) {
+        this.fragmentHost = fragmentHost
+      }
+      val sourceBundleFor = BundleDependency.readDependencyFromManifest(attributes, eclipseSourceBundleAttribute, log)
+      if(sourceBundleFor != null) {
+        this.sourceBundleFor = sourceBundleFor
+      }
+      return this
     }
 
-    fun readFromManifest(manifest: Manifest, log: Log): Bundle {
-      val attributes = manifest.mainAttributes
-      val manifestVersion = run {
-        attributes.getValue(manifestVersionAttribute) ?: manifestVersionDefault
-      }
-      val coordinates = BundleCoordinates.readFromManifest(attributes)
-      val requiredBundles = BundleDependency.readRequireBundleFromManifest(attributes, log)
-      val fragmentHost = BundleDependency.readDependencyFromManifest(attributes, fragmentHostAttribute, log)
-      val sourceBundleFor = BundleDependency.readDependencyFromManifest(attributes, eclipseSourceBundleAttribute, log)
-      return Bundle(manifestVersion, coordinates, requiredBundles, fragmentHost, sourceBundleFor)
-    }
+    fun build() =
+      Bundle(manifestVersion ?: manifestVersionDefault, coordinates, requiredBundles, fragmentHost, sourceBundleFor)
   }
 
   fun writeToManifestAttributes(): Map<String, String> {
