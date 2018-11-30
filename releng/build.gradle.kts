@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  // Stick with version 1.2.61 because the kotlin-dsl plugin uses that.
-  kotlin("jvm") version "1.2.61" apply false
+  // Stick with version 1.3.10 because the kotlin-dsl plugin uses that.
+  kotlin("jvm") version "1.3.10" apply false
 }
 subprojects {
   group = "org.metaborg"
