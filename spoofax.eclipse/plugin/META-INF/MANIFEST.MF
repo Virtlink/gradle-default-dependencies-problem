@@ -1,4 +1,0 @@
-Bundle-Activator: mb.spoofax.eclipse.plugin.SpoofaxPlugin
-Export-Package: mb.spoofax.eclipse.plugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Bundle-ActivationPolicy: lazy

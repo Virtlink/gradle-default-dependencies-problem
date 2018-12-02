@@ -20,7 +20,6 @@ class EclipseFeature : Plugin<Project> {
     project.pluginManager.apply(BasePlugin::class)
 
       pluginConfiguration.defaultDependencies {
-//          val element1 = project.dependencies.project(":spoofax.eclipse.externaldeps", "eclipsePlugin")
           val element1 = project.dependencies.create("com.google.code.findbugs", "jsr305", "3.0.2", "default")
           this.addAll(listOf(element1))
       }
