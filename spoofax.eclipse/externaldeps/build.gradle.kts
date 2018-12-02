@@ -3,7 +3,7 @@ buildscript {
     // HACK: add our plugin's JAR and its dependencies as a repository, to make it available in IntelliJ, which
     // currently does not handle plugins in composite builds.
     flatDir { dirs("../../releng/eclipse.gradle/build/libs") }
-    flatDir { dirs("../../releng/eclipse/build/libs") }
+//    flatDir { dirs("../../releng/eclipse/build/libs") }
     // Following repositories needed to resolve dependencies of our plugin, and the bnd plugin.
     mavenCentral()
     jcenter()
@@ -11,7 +11,7 @@ buildscript {
   dependencies {
     // HACK: add our plugin and its dependencies via classpath, instead of using a declarative plugin block.
     classpath("org.metaborg", "releng.eclipse.gradle", "develop-SNAPSHOT")
-    classpath("org.metaborg", "releng.eclipse", "develop-SNAPSHOT")
+//    classpath("org.metaborg", "releng.eclipse", "develop-SNAPSHOT")
     classpath("org.apache.maven.resolver:maven-resolver-api:1.1.1")
     classpath("org.apache.maven.resolver:maven-resolver-impl:1.1.1")
     classpath("org.apache.maven.resolver:maven-resolver-connector-basic:1.1.1")
@@ -35,10 +35,10 @@ plugins {
 version = "1.0.0-SNAPSHOT"
 
 dependencies {
-  api("org.metaborg:log.slf4j:develop-SNAPSHOT")
-  api("org.metaborg:pie.runtime:develop-SNAPSHOT")
-  api("org.metaborg:spoofax.runtime:develop-SNAPSHOT")
-  api("org.metaborg:spoofax.pie:develop-SNAPSHOT")
+//  api("org.metaborg:log.slf4j:develop-SNAPSHOT")
+//  api("org.metaborg:pie.runtime:develop-SNAPSHOT")
+//  api("org.metaborg:spoofax.runtime:develop-SNAPSHOT")
+//  api("org.metaborg:spoofax.pie:develop-SNAPSHOT")
 }
 
 // Use bnd to create a single OSGi bundle that includes all dependencies.

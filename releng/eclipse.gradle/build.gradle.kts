@@ -3,7 +3,6 @@ plugins {
   `kotlin-dsl`
 }
 dependencies {
-  compile(project(":releng.eclipse"))
 }
 gradlePlugin {
   plugins {
