@@ -10,12 +10,8 @@ pluginManagement {
 
 rootProject.name = "spoofax.eclipse"
 
-include("spoofax.eclipse.plugin")
 include("spoofax.eclipse.feature")
 include("spoofax.eclipse.repository")
-include("spoofax.eclipse.externaldeps")
 
-project(":spoofax.eclipse.plugin").projectDir = file("plugin")
 project(":spoofax.eclipse.feature").projectDir = file("feature")
 project(":spoofax.eclipse.repository").projectDir = file("repository")
-project(":spoofax.eclipse.externaldeps").projectDir = file("externaldeps")
