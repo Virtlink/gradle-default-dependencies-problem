@@ -2,7 +2,7 @@ pluginManagement {
   resolutionStrategy {
     eachPlugin {
       if(requested.id.id.startsWith("org.metaborg")) {
-        useModule("org.metaborg:releng.eclipse.gradle:${requested.version}")
+        useModule("org.metaborg:eclipse.gradle:${requested.version}")
       }
     }
   }
