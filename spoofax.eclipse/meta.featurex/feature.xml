@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<feature
-  id="spoofax.eclipse.meta.feature"
-  version="1.0.0.qualifier"
-  label="Spoofax Eclipse Meta Feature"
->
-  <plugin id="spoofax.eclipse.meta.plugin" version="1.0.0.qualifier" unpack="false"/>
-</feature>
