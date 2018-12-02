@@ -4,7 +4,7 @@ subprojects {
   }
 }
 tasks {
-  register("buildAll") {
+  register("build") {
     dependsOn(subprojects.map { it.tasks["build"] })
   }
 }

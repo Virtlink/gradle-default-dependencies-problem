@@ -10,10 +10,6 @@ group = "org.plugin"
 version = "develop-SNAPSHOT"
 repositories {
     mavenCentral()
-    jcenter()
-}
-apply {
-    plugin("kotlin")
 }
 tasks.withType<KotlinCompile>().all {
     kotlinOptions.jvmTarget = "1.8"
@@ -21,11 +17,6 @@ tasks.withType<KotlinCompile>().all {
 val compile by configurations
 dependencies {
     compile(kotlin("stdlib"))
-}
-tasks {
-    register("buildAll") {
-        dependsOn(build)
-    }
 }
 
 gradlePlugin {
@@ -43,7 +34,4 @@ gradlePlugin {
       implementationClass = "my.plugin.MyPluginRepository"
     }
   }
-}
-kotlinDslPluginOptions {
-  experimentalWarning.set(false)
 }

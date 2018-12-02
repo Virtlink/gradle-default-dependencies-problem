@@ -1,5 +1,5 @@
 tasks {
-  register("buildAll") {
-    dependsOn(gradle.includedBuilds.map { it.task(":buildAll") })
+  register("build") {
+    dependsOn(gradle.includedBuilds.map { it.task(":build") })
   }
 }
