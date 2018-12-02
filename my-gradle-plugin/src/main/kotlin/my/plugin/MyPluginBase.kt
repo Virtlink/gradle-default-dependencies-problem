@@ -1,4 +1,4 @@
-package mb.releng.eclipse.gradle.plugin
+package my.plugin
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project

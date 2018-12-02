@@ -1,14 +1,12 @@
-package mb.releng.eclipse.gradle.plugin
+package my.plugin
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.BasePlugin
-import org.gradle.api.tasks.bundling.Zip
 import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.project
 
-class EclipseRepository : Plugin<Project> {
+class MyPluginRepository : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply(EclipseBase::class)
         project.afterEvaluate { configure(this) }

@@ -1,11 +1,11 @@
 buildscript {
   repositories {
-    flatDir { dirs("../../eclipse.gradle/build/libs") }
+    flatDir { dirs("../../my-gradle-plugin/build/libs") }
   }
   dependencies {
-    classpath("org.metaborg", "eclipse.gradle", "develop-SNAPSHOT")
+    classpath("org.plugin", "my-gradle-plugin", "develop-SNAPSHOT")
   }
 }
 apply {
-  plugin("org.metaborg.eclipse-feature")
+  plugin("my.plugin.my-plugin-feature")
 }

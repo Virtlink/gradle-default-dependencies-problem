@@ -6,7 +6,7 @@ plugins {
     `java-gradle-plugin`
     `kotlin-dsl`
 }
-group = "org.metaborg"
+group = "org.plugin"
 version = "develop-SNAPSHOT"
 repositories {
     mavenCentral()
@@ -28,26 +28,19 @@ tasks {
     }
 }
 
-
-dependencies {
-}
 gradlePlugin {
   plugins {
-    create("eclipse-base") {
-      id = "org.metaborg.eclipse-base"
-      implementationClass = "mb.releng.eclipse.gradle.plugin.EclipseBase"
+    create("my-plugin-base") {
+      id = "my.plugin.my-plugin-base"
+      implementationClass = "my.plugin.MyPluginBase"
     }
-    create("eclipse-plugin") {
-      id = "org.metaborg.eclipse-plugin"
-      implementationClass = "mb.releng.eclipse.gradle.plugin.EclipsePlugin"
+    create("my-plugin-feature") {
+      id = "my.plugin.my-plugin-feature"
+      implementationClass = "my.plugin.MyPluginFeature"
     }
-    create("eclipse-feature") {
-      id = "org.metaborg.eclipse-feature"
-      implementationClass = "mb.releng.eclipse.gradle.plugin.EclipseFeature"
-    }
-    create("eclipse-repository") {
-      id = "org.metaborg.eclipse-repository"
-      implementationClass = "mb.releng.eclipse.gradle.plugin.EclipseRepository"
+    create("my-plugin-repository") {
+      id = "my.plugin.my-plugin-repository"
+      implementationClass = "my.plugin.MyPluginRepository"
     }
   }
 }
