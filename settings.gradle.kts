@@ -1,4 +1,4 @@
-rootProject.name = "spoofax-composite-build"
+rootProject.name = "composite-build"
 
 includeBuild("my-gradle-plugin")
-includeBuild("spoofax.eclipse")
+includeBuild("plugin-user")

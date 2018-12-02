@@ -18,7 +18,7 @@ class MyPluginRepository : Plugin<Project> {
         project.pluginManager.apply(BasePlugin::class)
 
         featureConfiguration.defaultDependencies {
-            this.add(project.dependencies.project(":spoofax.eclipse.feature", "eclipsePlugin"))
+            this.add(project.dependencies.project(":plugin-user.feature", "eclipsePlugin"))
         }
 
         project.tasks.getByName(BasePlugin.ASSEMBLE_TASK_NAME).dependsOn(featureConfiguration)
