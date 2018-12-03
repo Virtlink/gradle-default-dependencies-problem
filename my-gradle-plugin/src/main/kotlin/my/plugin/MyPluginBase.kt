@@ -3,10 +3,10 @@ package my.plugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-class EclipseBase : Plugin<Project> {
+class MyPluginBase : Plugin<Project> {
     companion object {
-        const val pluginConfigurationName = "eclipsePlugin"
-        const val featureConfigurationName = "eclipseFeature"
+        const val pluginConfigurationName = "myPlugin"
+        const val featureConfigurationName = "myFeature"
     }
 
     override fun apply(project: Project) {
@@ -19,5 +19,5 @@ class EclipseBase : Plugin<Project> {
     }
 }
 
-val Project.pluginConfiguration get() = this.configurations.getByName(EclipseBase.pluginConfigurationName)
-val Project.featureConfiguration get() = this.configurations.getByName(EclipseBase.featureConfigurationName)
+val Project.pluginConfiguration get() = this.configurations.getByName(MyPluginBase.pluginConfigurationName)
+val Project.featureConfiguration get() = this.configurations.getByName(MyPluginBase.featureConfigurationName)

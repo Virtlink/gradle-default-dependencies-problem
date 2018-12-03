@@ -8,7 +8,7 @@ import org.gradle.kotlin.dsl.project
 
 class MyPluginRepository : Plugin<Project> {
     override fun apply(project: Project) {
-        project.pluginManager.apply(EclipseBase::class)
+        project.pluginManager.apply(MyPluginBase::class)
         project.afterEvaluate { configure(this) }
     }
 
@@ -18,7 +18,7 @@ class MyPluginRepository : Plugin<Project> {
         project.pluginManager.apply(BasePlugin::class)
 
         featureConfiguration.defaultDependencies {
-            this.add(project.dependencies.project(":plugin-user.feature", "eclipsePlugin"))
+            this.add(project.dependencies.project(":plugin-user.feature", "myPlugin"))
         }
 
         project.tasks.getByName(BasePlugin.ASSEMBLE_TASK_NAME).dependsOn(featureConfiguration)

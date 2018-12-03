@@ -8,7 +8,7 @@ import org.gradle.kotlin.dsl.create
 
 class MyPluginFeature : Plugin<Project> {
     override fun apply(project: Project) {
-        project.pluginManager.apply(EclipseBase::class)
+        project.pluginManager.apply(MyPluginBase::class)
         project.afterEvaluate { configure(this) }
     }
 
