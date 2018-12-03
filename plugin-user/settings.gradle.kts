@@ -1,13 +1,3 @@
-pluginManagement {
-  resolutionStrategy {
-    eachPlugin {
-      if(requested.id.id.startsWith("org.metaborg")) {
-        useModule("org.plugin:my-gradle-plugin:${requested.version}")
-      }
-    }
-  }
-}
-
 rootProject.name = "plugin-user"
 
 include("plugin-user.feature")
